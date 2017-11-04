@@ -5,4 +5,5 @@
     <string name="menulocation_list">Location list</string>
     <string name="menumap">Map</string>
     <string name="menusettings">Settings</string>
+    <string name="menumy_hardware">My Hardware</string>
 </resources>
