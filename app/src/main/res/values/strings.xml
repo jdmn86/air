@@ -10,4 +10,7 @@
     <string name="activity_mySensors_textViewTemperatureSensorName">Temperature</string>
     <string name="activity_mySensors_textView_pressureSensorName">Pressure</string>
     <string name="activity_mySensors_textView_humiditySensorName">Humidity</string>
+    <string name="toast_no_humidity_sensor_available">No humidity sensor available</string>
+    <string name="toast_no_pressure_sensor_available">No pressure sensor available</string>
+    <string name="toast_no_temperature_sensor_available">No temperature sensor available</string>
 </resources>
