@@ -7,14 +7,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-public class DashboardActivity extends AppCompatActivity {
+public class MySensorsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
+        setContentView(R.layout.activity_my_sensors);
     }
-
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
@@ -25,11 +24,14 @@ public class DashboardActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         Intent intent = null;
-        if (id == R.id.menu_create_message) {
-            intent = new Intent(this, CreateInformativeMessageActivity.class);
+        if (id == R.id.menu_dashboard) {
+            intent = new Intent(this, DashboardActivity.class);
 
-        } else if (id == R.id.menu_my_sensors) {
+        }  else if (id == R.id.menu_my_sensors) {
             intent = new Intent(this, MySensorsActivity.class);
+
+        } else if (id == R.id.menu_create_message) {
+            intent = new Intent(this, CreateInformativeMessageActivity.class);
 
         } else if (id == R.id.menu_map) {
             intent = new Intent(this, MapActivity.class);
