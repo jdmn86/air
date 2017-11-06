@@ -1,4 +1,4 @@
-package pt.ipleiria.dei.iair;
+package pt.ipleiria.dei.iair.view;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -7,20 +7,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-public class SettingsActivity extends AppCompatActivity {
+import pt.ipleiria.dei.iair.R;
+
+public class MySensorsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_my_sensors);
     }
-
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -29,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (id == R.id.menu_dashboard) {
             intent = new Intent(this, DashboardActivity.class);
 
-        } else if (id == R.id.menu_my_sensors) {
+        }  else if (id == R.id.menu_my_sensors) {
             intent = new Intent(this, MySensorsActivity.class);
 
         } else if (id == R.id.menu_create_message) {
@@ -41,8 +41,11 @@ public class SettingsActivity extends AppCompatActivity {
         } else if (id == R.id.menu_locations) {
             intent = new Intent(this, LocationActivity.class);
 
+        } else if (id == R.id.menu_settings) {
+            intent = new Intent(this, SettingsActivity.class);
+
         }
-        if (intent != null) {
+        if(intent != null) {
             startActivity(intent);
 
             return true;
