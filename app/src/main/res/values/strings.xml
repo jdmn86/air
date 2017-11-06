@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Iair</string>
+    <string name="menuDashboard">Dashboard</string>
+    <string name="menucreate_inf_message">Create Inf. Message</string>
+    <string name="menulocation_list">Location list</string>
+    <string name="menumap">Map</string>
+    <string name="menusettings">Settings</string>
+    <string name="menumy_hardware">My Hardware</string>
 </resources>
