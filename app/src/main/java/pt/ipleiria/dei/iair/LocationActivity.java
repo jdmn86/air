@@ -7,7 +7,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-public class LocationActivity extends AppCompatActivity {
+import pt.ipleiria.dei.iair.Utils.GPSActivity;
+
+public class LocationActivity extends GPSActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,9 @@ public class LocationActivity extends AppCompatActivity {
 
         }  else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
+
+        } else if (id == R.id.menu_gps) {
+            enableGPS();
 
         }
         if(intent != null) {

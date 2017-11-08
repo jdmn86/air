@@ -7,18 +7,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-public class MySensorsActivity extends AppCompatActivity {
+import pt.ipleiria.dei.iair.Utils.GPSActivity;
+
+public class MySensorsActivity extends GPSActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_sensors);
     }
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -41,6 +39,9 @@ public class MySensorsActivity extends AppCompatActivity {
 
         } else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
+
+        } else if (id == R.id.menu_gps) {
+            enableGPS();
 
         }
         if(intent != null) {

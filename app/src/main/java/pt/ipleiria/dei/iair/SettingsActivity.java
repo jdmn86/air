@@ -7,18 +7,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-public class SettingsActivity extends AppCompatActivity {
+import pt.ipleiria.dei.iair.Utils.GPSActivity;
+
+public class SettingsActivity extends GPSActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
     }
 
     @Override
@@ -40,6 +36,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         } else if (id == R.id.menu_locations) {
             intent = new Intent(this, LocationActivity.class);
+
+        } else if (id == R.id.menu_gps) {
+            enableGPS();
 
         }
         if (intent != null) {
