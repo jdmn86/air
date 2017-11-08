@@ -4,6 +4,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 
+import pt.ipleiria.dei.iair.controller.IAirManager;
+
 /**
  * Created by ricar on 06/11/2017.
  */
@@ -11,6 +13,10 @@ import android.hardware.SensorEventListener;
 public class IAirSensorListener implements SensorEventListener {
 
     private float[] eventValues;
+
+    public IAirSensorListener() {
+
+    }
 
     @Override
     public void onSensorChanged(SensorEvent event) {

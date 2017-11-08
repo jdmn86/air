@@ -1,8 +1,9 @@
-package pt.ipleiria.dei.iair.model;
+package pt.ipleiria.dei.iair.controller;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 
+import pt.ipleiria.dei.iair.model.IAirSensorListener;
 import pt.ipleiria.dei.iair.view.MySensorsActivity;
 
 /**
@@ -15,11 +16,20 @@ public enum IAirManager {
     SensorManager sensorManager;
 
     MySensorsActivity mySensorsActivity;
+    IAirSensorListener temperatureListener;
 
 
 
     public void setSensorManager(SensorManager sensorManager) {
         this.sensorManager = sensorManager;
+    }
+
+    public IAirSensorListener getTemperatureListener() {
+        return temperatureListener;
+    }
+
+    public void setTemperatureListener(Sensor sensor) {
+        this.temperatureListener = new IAirSensorListener();
     }
 
     public void changeTemperatureValue(float[] eventValues) {
@@ -39,6 +49,10 @@ public enum IAirManager {
     }
 
     public void setSensor(Sensor sensor) {
-        sensorManager.registerListener(new IAirSensorListener(),sensor,SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(temperatureListener,sensor,SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    public SensorManager getSensorManager() {
+        return sensorManager;
     }
 }

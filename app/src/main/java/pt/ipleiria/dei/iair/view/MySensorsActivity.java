@@ -10,54 +10,62 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.model.IAirManager;
+import pt.ipleiria.dei.iair.controller.IAirManager;
 
 public class MySensorsActivity extends AppCompatActivity {
 
     private TextView temperatureSensorValue,humiditySensorValue,pressureSensorValue;
-
+    private SensorManager sensorManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_sensors);
         IAirManager.INSTANCE.setMySensorsActivity(this);
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         bindTextViews();
-        setSensors();
+        setSensorManager();
 
 
     }
 
-    private void setSensors() {
-        SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        IAirManager.INSTANCE.setSensorManager(sensorManager);
-
+    private void setSensorManager() {
         try {
-            Sensor temperatureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+            SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            IAirManager.INSTANCE.setSensorManager(sensorManager);
+            setSensors(sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
+                    sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY));
+        }catch (Exception e){
+            return;
+        }
+
+
+    }
+
+    public SensorManager getSensorManager() {
+        return sensorManager;
+    }
+
+    public void setSensors(Sensor temperatureSensor, Sensor pressureSensor, Sensor humiditySensor) {
+        if(temperatureSensor==null){
+            temperatureSensorValue.setText("N/A");
+        }else{
             IAirManager.INSTANCE.setSensor(temperatureSensor);
             temperatureSensorValue.setText("0.0");
-        }catch (Exception e){
-            temperatureSensorValue.setText("N/A");
-            Toast.makeText(this, R.string.toast_no_temperature_sensor_available,Toast.LENGTH_SHORT).show();
         }
-        try {
-            Sensor pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+        if(pressureSensor==null){
+            pressureSensorValue.setText("N/A");
+        }else{
             IAirManager.INSTANCE.setSensor(pressureSensor);
             pressureSensorValue.setText("0.0");
-        }catch (Exception e){
-            pressureSensorValue.setText("N/A");
-            Toast.makeText(this, R.string.toast_no_pressure_sensor_available,Toast.LENGTH_SHORT).show();
         }
-        try {
-            Sensor humiditySensor = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+        if(humiditySensor==null){
+            humiditySensorValue.setText("N/A");
+        }else{
             IAirManager.INSTANCE.setSensor(humiditySensor);
             humiditySensorValue.setText("0.0");
-        }catch (Exception e){
-            humiditySensorValue.setText("N/A");
-            Toast.makeText(this, R.string.toast_no_humidity_sensor_available,Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -106,6 +114,7 @@ public class MySensorsActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
     public void setTemperatureValue(float eventValue) {
         temperatureSensorValue.setText(String.valueOf(eventValue) + " ºC");
     }
