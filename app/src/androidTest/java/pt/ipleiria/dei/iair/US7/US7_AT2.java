@@ -28,6 +28,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -43,8 +44,6 @@ public class US7_AT2 {
 
     @Test
     public void uS7_AT2(){
-        //apenas passa se o equipamento não possuir sensor de pressão, algo que não conseguimos simular no emulador
-        //somente com um equipamento físico que não tenha este sensor...
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction appCompatTextView = onView(
@@ -57,7 +56,20 @@ public class US7_AT2 {
                         isDisplayed()));
         appCompatTextView.perform(click());
 
-        onView(withId(R.id.textViewPressureSensorValue)).check(matches(withText("N/A")));
+        final MySensorsActivity activity = mActivityTestRule.getActivity();
+
+        try {
+            mActivityTestRule.runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    activity.setSensors(null,null,null);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+        assertEquals(activity.getPressureValue(),"N/A");
 
     }
 

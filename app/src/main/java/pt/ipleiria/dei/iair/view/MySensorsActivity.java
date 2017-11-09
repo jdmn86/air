@@ -44,10 +44,6 @@ public class MySensorsActivity extends AppCompatActivity {
 
     }
 
-    public SensorManager getSensorManager() {
-        return sensorManager;
-    }
-
     public void setSensors(Sensor temperatureSensor, Sensor pressureSensor, Sensor humiditySensor) {
         if(temperatureSensor==null){
             temperatureSensorValue.setText("N/A");
@@ -127,4 +123,15 @@ public class MySensorsActivity extends AppCompatActivity {
         pressureSensorValue.setText(String.valueOf(eventValue) + " hpa");
     }
 
+    public String getTemperatureValue() {
+        return temperatureSensorValue.getText().toString();
+    }
+
+    public String getPressureValue() {
+        return pressureSensorValue.getText().toString();
+    }
+
+    public String getHumidityValue() {
+        return humiditySensorValue.getText().toString();
+    }
 }

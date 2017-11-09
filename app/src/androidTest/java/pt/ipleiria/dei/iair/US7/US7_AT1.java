@@ -32,6 +32,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -46,9 +47,7 @@ public class US7_AT1 {
 
 
     @Test
-    public void uS7_AT1(){
-        //apenas passa se o equipamento não possuir sensor de temperatura, algo que não conseguimos simular no emulador
-        //somente com um equipamento físico que não tenha este sensor...
+    public void uS7_AT1() throws Throwable {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction appCompatTextView = onView(
@@ -61,8 +60,17 @@ public class US7_AT1 {
                         isDisplayed()));
 
         appCompatTextView.perform(click());
-        mActivityTestRule.getActivity().getSensorManager().unregisterListener(IAirManager.INSTANCE.getTemperatureListener());
-        onView(withId(R.id.textViewTemperatureSensorValue)).check(matches(withText("N/A")));
+        final MySensorsActivity activity = mActivityTestRule.getActivity();
+
+        mActivityTestRule.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                activity.setSensors(null,null,null);
+            }
+        });
+        assertEquals(activity.getTemperatureValue(),"N/A");
+        //onView(withId(R.id.textViewTemperatureSensorValue)).check(matches(withText("N/A")));
     }
 
 

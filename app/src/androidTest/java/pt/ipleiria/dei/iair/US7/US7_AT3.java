@@ -28,6 +28,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
@@ -41,9 +42,7 @@ public class US7_AT3 {
 
 
     @Test
-    public void uS7_AT3(){
-        //apenas passa se o equipamento não possuir sensor de humidade, algo que não conseguimos simular no emulador
-        //somente com um equipamento físico que não tenha este sensor...
+    public void uS7_AT3() throws Throwable {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction appCompatTextView = onView(
@@ -55,7 +54,16 @@ public class US7_AT3 {
                                 0),
                         isDisplayed()));
         appCompatTextView.perform(click());
-        onView(withId(R.id.textViewHumiditySensorValue)).check(matches(withText("N/A")));
+
+        final MySensorsActivity activity = mActivityTestRule.getActivity();
+        mActivityTestRule.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                activity.setSensors(null,null,null);
+            }
+        });
+        assertEquals(activity.getHumidityValue(),"N/A");
     }
 
 
