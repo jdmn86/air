@@ -16,20 +16,11 @@ public enum IAirManager {
     SensorManager sensorManager;
 
     MySensorsActivity mySensorsActivity;
-    IAirSensorListener temperatureListener;
 
 
 
     public void setSensorManager(SensorManager sensorManager) {
         this.sensorManager = sensorManager;
-    }
-
-    public IAirSensorListener getTemperatureListener() {
-        return temperatureListener;
-    }
-
-    public void setTemperatureListener(Sensor sensor) {
-        this.temperatureListener = new IAirSensorListener();
     }
 
     public void changeTemperatureValue(float[] eventValues) {
@@ -49,7 +40,8 @@ public enum IAirManager {
     }
 
     public void setSensor(Sensor sensor) {
-        sensorManager.registerListener(temperatureListener,sensor,SensorManager.SENSOR_DELAY_NORMAL);
+
+        sensorManager.registerListener(new IAirSensorListener(),sensor,SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public SensorManager getSensorManager() {
