@@ -27,6 +27,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -48,10 +49,11 @@ public class HttpUtils {
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+
                 try {
                      callBack.onResult(new JSONObject(response));
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    callBack.onResult(response);
                 }
             }
         }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
@@ -80,6 +82,27 @@ public class HttpUtils {
 
 MyRequestQueue.add(MyStringRequest);
 
+    }
+    public static void Get(final HttpCallBack callBack, String url, Context context) {
+        final RequestQueue MyRequestQueue = Volley.newRequestQueue(context);
+        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // display response
+                        Log.d("Response", response.toString());
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Error.Response", error.getMessage());
+                    }
+                }
+        );
+
+// add it to the RequestQueue
+        MyRequestQueue.add(getRequest);
     }
 
 

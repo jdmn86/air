@@ -9,4 +9,6 @@ import org.json.JSONObject;
 
 public interface HttpCallBack {
     void onResult(JSONObject response) throws JSONException;
+
+    void onResult(String response);
 }

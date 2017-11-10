@@ -13,6 +13,8 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.util.Random;
+
 /**
  * Created by kxtreme on 10-11-2017.
  */
@@ -21,20 +23,23 @@ public class MQTTHelper {
 
     public MqttAndroidClient mqttAndroidClient;
 
-    final String serverUri = "tcp://m12.cloudmqtt.com:11111";
+    final String serverUri = "mqtt.thingspeak.com:1883";
 
-    final String clientId = "ExampleAndroidClient";
-    final String subscriptionTopic = "sensor/+";
+        private String clientId;
+    String subscriptionTopic;
 
-    final String username = "xxxxxxx";
-    final String password = "yyyyyyyyyy";
+    final String username = "pl12taes217";
+    final String password  = "0DT1756US8QLAZUK";
 
-    public MQTTHelper(Context context) {
+    public MQTTHelper(Context context, String subscriptionTopic) {
+        clientId = getSaltString();
+        this.subscriptionTopic = subscriptionTopic;
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientId);
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean b, String s) {
-                Log.w("mqtt", s);
+
+                System.out.println(s);
             }
 
             @Override
@@ -44,7 +49,7 @@ public class MQTTHelper {
 
             @Override
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
-                Log.w("Mqtt", mqttMessage.toString());
+                System.out.println(mqttMessage.toString());
             }
 
             @Override
@@ -99,6 +104,7 @@ public class MQTTHelper {
             mqttAndroidClient.subscribe(subscriptionTopic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
+
                     Log.w("Mqtt", "Subscribed!");
                 }
 
@@ -112,5 +118,17 @@ public class MQTTHelper {
             System.err.println("Exceptionst subscribing");
             ex.printStackTrace();
         }
+    }
+    protected String getSaltString() {
+        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder salt = new StringBuilder();
+        Random rnd = new Random();
+        while (salt.length() < 18) { // length of the random string.
+            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+            salt.append(SALTCHARS.charAt(index));
+        }
+        String saltStr = salt.toString();
+        return saltStr;
+
     }
 }
