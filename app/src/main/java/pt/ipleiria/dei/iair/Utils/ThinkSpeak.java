@@ -39,7 +39,7 @@ public class ThinkSpeak implements HttpCallBack {
                 public void onResult(JSONObject response) throws JSONException {
                     ArrayList<Pair<String, String>> data = new ArrayList<>();
                     data.add(new Pair<>("API_KEY_CHANNEL", API_KEY_CREATE_ASSOCIATION));
-                    data.add(new Pair<>("api_key", response.getJSONObject("api_keys").getString("api_key")));
+                    data.add(new Pair<>("api_key", new JSONObject(response.getJSONArray("api_keys").get(0).toString()).getString("api_key")));
                     data.add(new Pair<>("Region", response.getString("name")));
                     data.add(new Pair<>("Channel_ID", ( String.valueOf(response.getInt("id")))));
                 HttpUtils.Put(new HttpCallBack() {
@@ -50,6 +50,7 @@ public class ThinkSpeak implements HttpCallBack {
                 },"https://api.thingspeak.com/channels/" + response.getInt("id") + ".json", data, context);
                 }
             }, "https://api.thingspeak.com/channels.json", data, context);
+
         } catch (Exception e) {
            System.out.println(e.getMessage());
         }
