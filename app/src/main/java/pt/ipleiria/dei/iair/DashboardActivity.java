@@ -7,6 +7,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
+import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+
 public class DashboardActivity extends AppCompatActivity {
 
     @Override
@@ -40,7 +43,10 @@ public class DashboardActivity extends AppCompatActivity {
         } else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
 
+        } else if (id == R.id.menu_send_data) {
+            ThinkSpeak.createNewChannel(this, "teste", 39.749495, -8.807290,false, "campo", "field");
         }
+
         if(intent != null) {
             startActivity(intent);
 

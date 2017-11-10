@@ -1,22 +1,27 @@
 package pt.ipleiria.dei.iair.Utils;
 
 
+import android.content.Context;
 import android.util.Pair;
 
-import java.util.ArrayList;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import pt.ipleiria.dei.iair.Utils.InputStream.InputStreamResponseConverter;
+import java.util.ArrayList;
 
 /**
  * Created by kxtreme on 08-11-2017.
  */
 
-public class ThinkSpeak {
-    private final static String API_KEY = "6T4V93KT9K3ZVOWV";
-    public static boolean createNewChannel(String channelName, int latitude, int longitude, boolean status, String... fields) {
+public class ThinkSpeak implements HttpCallBack {
+    private final static String API_KEY_CREATE_CHANNEL = "6T4V93KT9K3ZVOWV";
+    private final static String API_KEY_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
+    private final static String CHANNEL_NUMBER_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
+
+    public static boolean createNewChannel(final Context context, String channelName, double latitude, double longitude, boolean status, String... fields) {
         try {
             ArrayList<Pair<String, String>> data = new ArrayList<>();
-            data.add(new Pair<>("api_key", API_KEY));
+            data.add(new Pair<>("api_key", API_KEY_CREATE_CHANNEL));
             data.add(new Pair<>("name", channelName));
             data.add(new Pair<>("latitude", String.valueOf(latitude)));
             data.add(new Pair<>("longitude", String.valueOf(longitude)));
@@ -29,11 +34,31 @@ public class ThinkSpeak {
             }
 
             //HttpUtils.HttpRequest httpRequest = new HttpUtils.HttpRequest("https://api.thingspeak.com/channels", new HttpUtils.HttpPOST(), new InputStreamResponseConverter());
-            HttpUtils.doRequest("https://api.thingspeak.com/channels", new HttpUtils.HttpPOSTUrlEnconded(), data, new InputStreamResponseConverter(), null);
+            HttpUtils.Post(new HttpCallBack() {
+                @Override
+                public void onResult(JSONObject response) throws JSONException {
+                    ArrayList<Pair<String, String>> data = new ArrayList<>();
+                    data.add(new Pair<>("API_KEY_CHANNEL", API_KEY_CREATE_ASSOCIATION));
+                    data.add(new Pair<>("api_key", response.getJSONObject("api_keys").getString("api_key")));
+                    data.add(new Pair<>("Region", response.getString("name")));
+                    data.add(new Pair<>("Channel_ID", ( String.valueOf(response.getInt("id")))));
+                HttpUtils.Put(new HttpCallBack() {
+                    @Override
+                    public void onResult(JSONObject response) throws JSONException {
+                        System.out.println(response.toString());
+                    }
+                },"https://api.thingspeak.com/channels/" + response.getInt("id") + ".json", data, context);
+                }
+            }, "https://api.thingspeak.com/channels.json", data, context);
         } catch (Exception e) {
            System.out.println(e.getMessage());
         }
 
         return true;
+    }
+
+    @Override
+    public void onResult(JSONObject response) {
+        System.out.println(response.toString());
     }
 }
