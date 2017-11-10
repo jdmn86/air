@@ -9,18 +9,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DashboardActivity">
+        <activity android:name=".view.DashboardActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".CreateInformativeMessageActivity" />
-        <activity android:name=".LocationActivity" />
-        <activity android:name=".MapActivity" />
-        <activity android:name=".MySensorsActivity"></activity>
+        <activity android:name=".view.SettingsActivity" />
+        <activity android:name=".view.CreateInformativeMessageActivity" />
+        <activity android:name=".view.LocationActivity" />
+        <activity android:name=".view.MapActivity" />
+        <activity android:name=".view.MySensorsActivity"/>
     </application>
 
 </manifest>

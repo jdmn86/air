@@ -1,4 +1,4 @@
-package pt.ipleiria.dei.iair;
+package pt.ipleiria.dei.iair.US7;
 
 
 import android.support.test.espresso.ViewInteraction;
@@ -16,8 +16,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.view.DashboardActivity;
-import pt.ipleiria.dei.iair.view.LocationActivity;
+import pt.ipleiria.dei.iair.view.MySensorsActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
@@ -27,23 +28,23 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static junit.framework.Assert.fail;
+import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US2_AT6 extends MasterTest{
+public class US7_AT4 {
 
     @Rule
-    public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
+    public ActivityTestRule<MySensorsActivity> mActivityTestRule = new ActivityTestRule<>(MySensorsActivity.class);
 
     @Test
-    public void uS2_AT6() {
+    public void uS7_AT4() {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction appCompatTextView = onView(
-                allOf(withId(R.id.title), withText("Location list"),
+                allOf(withId(R.id.title), withText("My Hardware"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.support.v7.view.menu.ListMenuItemView")),
@@ -51,9 +52,12 @@ public class US2_AT6 extends MasterTest{
                                 0),
                         isDisplayed()));
         appCompatTextView.perform(click());
-        if(getCurrentActivity().getClass().getName() != LocationActivity.class.getName()) {
-            fail("Activity not Opened");
-        }
+
+
+
+        assertEquals(mActivityTestRule.getActivity().getHumidityValue(),"0.0 %");
+        assertEquals(mActivityTestRule.getActivity().getPressureValue(),"0.0 hpa");
+        assertEquals(mActivityTestRule.getActivity().getTemperatureValue(),"0.0 ºC");
 
     }
 
