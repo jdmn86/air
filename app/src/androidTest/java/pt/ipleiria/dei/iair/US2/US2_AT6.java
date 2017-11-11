@@ -1,7 +1,8 @@
-package pt.ipleiria.dei.iair;
+package pt.ipleiria.dei.iair.US2;
 
 
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -16,7 +17,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import pt.ipleiria.dei.iair.MasterTest;
+import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.view.DashboardActivity;
+import pt.ipleiria.dei.iair.view.LocationActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
@@ -32,17 +36,17 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US2_AT8 extends MasterTest{
+public class US2_AT6 extends MasterTest {
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
 
     @Test
-    public void uS2_AT8() {
+    public void uS2_AT6() {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction appCompatTextView = onView(
-                allOf(withId(R.id.title), withText("Create Inf. Message"),
+                allOf(ViewMatchers.withId(R.id.title), withText("Location list"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.support.v7.view.menu.ListMenuItemView")),
@@ -50,21 +54,10 @@ public class US2_AT8 extends MasterTest{
                                 0),
                         isDisplayed()));
         appCompatTextView.perform(click());
-
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-
-        ViewInteraction appCompatTextView2 = onView(
-                allOf(withId(R.id.title), withText("Dashboard"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.support.v7.view.menu.ListMenuItemView")),
-                                        0),
-                                0),
-                        isDisplayed()));
-        appCompatTextView2.perform(click());
-        if(getCurrentActivity().getClass().getName() != DashboardActivity.class.getName()) {
+        if(getCurrentActivity().getClass().getName() != LocationActivity.class.getName()) {
             fail("Activity not Opened");
         }
+
     }
 
     private static Matcher<View> childAtPosition(

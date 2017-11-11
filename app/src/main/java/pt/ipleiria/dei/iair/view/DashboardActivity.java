@@ -8,6 +8,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import pt.ipleiria.dei.iair.R;
+//import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -15,6 +16,8 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+        //ThinkSpeak.createNewChannel("Coimbra",40.200939, -8.407976,true,"Temperatura","Pressão","Humidade");
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
