@@ -4,6 +4,7 @@ package pt.ipleiria.dei.iair.Utils;
 import android.content.Context;
 import android.util.Pair;
 
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,7 +34,12 @@ public class ThinkSpeak {
                 i += 1;
             }
 
-            //HttpUtils.HttpRequest httpRequest = new HttpUtils.HttpRequest("https://api.thingspeak.com/channels", new HttpUtils.HttpPOST(), new InputStreamResponseConverter());
+            MQTTHandler mqtt = new MQTTHandler(context, "channels/361937/subscribe/json/" + API_KEY_CREATE_ASSOCIATION, "pl12taes217", "0DT1756US8QLAZUK".toCharArray());
+            mqtt.connect();
+            mqtt.addActionListener(new MQTTThinkSpeakHandler() {
+
+            });
+
             HttpUtils.Post(new HttpCallBack() {
                 @Override
                 public void onResult(JSONObject response) throws JSONException {
@@ -45,7 +51,6 @@ public class ThinkSpeak {
                     HttpUtils.Post(new HttpCallBack() {
                         @Override
                         public void onResult(JSONObject response) throws JSONException {
-                            MQTTHelper mqtt = new MQTTHelper(context, "channels/361937/subscribe/json/" + API_KEY_CREATE_ASSOCIATION);
 
                         }
 
