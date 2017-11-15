@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHO" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,11 +21,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".CreateInformativeMessageActivity" />
-        <activity android:name=".LocationActivity" />
-        <activity android:name=".MapActivity" />
-        <activity android:name=".MySensorsActivity"></activity>
+        <activity android:name=".view.SettingsActivity" />
+        <activity android:name=".view.CreateInformativeMessageActivity" />
+        <activity android:name=".view.LocationActivity" />
+        <activity android:name=".view.MapActivity" />
+        <activity android:name=".view.MySensorsActivity"/>
         <service android:name="org.eclipse.paho.android.service.MqttService" />
     </application>
 

@@ -1,6 +1,8 @@
 package pt.ipleiria.dei.iair.view;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,6 +13,8 @@ import pt.ipleiria.dei.iair.R;
 //import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 
 public class DashboardActivity extends AppCompatActivity {
+
+    private ServiceConnection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,8 @@ public class DashboardActivity extends AppCompatActivity {
         } else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
 
+        } else if (id == R.id.menu_send_data) {
+            //ThinkSpeak.sendData(this,39.749495, -8.807290,false, "temp", "pressure", "humity");
         }
         if(intent != null) {
             startActivity(intent);
