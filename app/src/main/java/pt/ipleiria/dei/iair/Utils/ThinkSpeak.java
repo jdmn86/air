@@ -30,6 +30,7 @@ public class ThinkSpeak {
                 for (int i = 0; i < feeds.length();i++ ) {
                     JSONObject elem = new JSONObject((String) feeds.get(i));
                     if (elem.get("field2").equals(location)) {
+                        //insert if already exists
                         ArrayList<Pair<String, String>> data = new ArrayList<>();
                         data.add(new Pair<>("api_key", elem.getString("field1")));
                         data.add(new Pair<>("name", location));
@@ -64,10 +65,6 @@ public class ThinkSpeak {
             }
         }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
         return true;
-    }
-
-    public void InsertToChannel(JSONObject elem, String temperature, Context context) throws JSONException {
-
     }
 
     public static boolean createNewChannel(final CallBack callBack, final Context context, String channelName, double latitude, double longitude, boolean status, String... fields) {
