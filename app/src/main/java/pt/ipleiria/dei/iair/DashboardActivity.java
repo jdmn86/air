@@ -48,7 +48,7 @@ public class DashboardActivity extends AppCompatActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         } else if (id == R.id.menu_send_data) {
-            ThinkSpeak.createNewChannel(this, "teste", 39.749495, -8.807290,false, "temp", "pressure", "humity");
+            //ThinkSpeak.sendData(this,39.749495, -8.807290,false, "temp", "pressure", "humity");
         }
 
         if(intent != null) {

@@ -18,9 +18,9 @@ public class ThinkSpeak {
     private final static String API_KEY_CREATE_CHANNEL = "6T4V93KT9K3ZVOWV";
     private final static String API_KEY_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
     private final static String CHANNEL_NUMBER_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
-    public String location;
+    public static String location;
 
-    public boolean sendData(final Context context, final double latitude, final double longitude, final String temperature, final String pressure, final String humity) {
+    public static boolean sendData(final Context context, final double latitude, final double longitude, final String temperature, final String pressure, final String humity) {
           location = GPSUtils.getLocationDetails(context,latitude, longitude).getLocality();
         HttpUtils.Get(new HttpCallBack() {
             @Override
