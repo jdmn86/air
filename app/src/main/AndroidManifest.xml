@@ -21,11 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".CreateInformativeMessageActivity" />
-        <activity android:name=".LocationActivity" />
-        <activity android:name=".MapActivity" />
-        <activity android:name=".MySensorsActivity"></activity>
         <service android:name="org.eclipse.paho.android.service.MqttService" />
         <activity android:name=".view.SettingsActivity" />
         <activity android:name=".view.CreateInformativeMessageActivity" />
