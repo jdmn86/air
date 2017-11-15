@@ -1,4 +1,4 @@
-package pt.ipleiria.dei.iair;
+package pt.ipleiria.dei.iair.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,8 +9,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import pt.ipleiria.dei.iair.Utils.HttpUtils;
-import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.R;
+
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -48,7 +48,7 @@ public class DashboardActivity extends AppCompatActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         } else if (id == R.id.menu_send_data) {
-            ThinkSpeak.createNewChannel(this, "teste", 39.749495, -8.807290,false, "temp", "pressure", "humity");
+           // ThinkSpeak.createNewChannel(this, "teste", 39.749495, -8.807290,false, "temp", "pressure", "humity");
         }
 
         if(intent != null) {

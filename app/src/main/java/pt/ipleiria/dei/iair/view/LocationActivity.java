@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 import pt.ipleiria.dei.iair.R;
 
+
 public class LocationActivity extends AppCompatActivity {
 
     @Override

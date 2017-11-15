@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+
 import pt.ipleiria.dei.iair.R;
 
 public class CreateInformativeMessageActivity extends AppCompatActivity {
