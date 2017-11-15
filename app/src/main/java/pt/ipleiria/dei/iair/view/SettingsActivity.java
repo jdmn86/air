@@ -1,4 +1,4 @@
-package pt.ipleiria.dei.iair;
+package pt.ipleiria.dei.iair.view;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -7,15 +7,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import pt.ipleiria.dei.iair.Utils.HttpUtils;
-import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.R;
 
-public class DashboardActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
+        setContentView(R.layout.activity_settings);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -23,16 +22,20 @@ public class DashboardActivity extends AppCompatActivity {
         inflater.inflate(R.menu.main, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         Intent intent = null;
-        if (id == R.id.menu_create_message) {
-            intent = new Intent(this, CreateInformativeMessageActivity.class);
+        if (id == R.id.menu_dashboard) {
+            intent = new Intent(this, DashboardActivity.class);
 
         } else if (id == R.id.menu_my_sensors) {
             intent = new Intent(this, MySensorsActivity.class);
+
+        } else if (id == R.id.menu_create_message) {
+            intent = new Intent(this, CreateInformativeMessageActivity.class);
 
         } else if (id == R.id.menu_map) {
             intent = new Intent(this, MapActivity.class);
@@ -40,14 +43,8 @@ public class DashboardActivity extends AppCompatActivity {
         } else if (id == R.id.menu_locations) {
             intent = new Intent(this, LocationActivity.class);
 
-        } else if (id == R.id.menu_settings) {
-            intent = new Intent(this, SettingsActivity.class);
-
-        } else if (id == R.id.menu_send_data) {
-            ThinkSpeak.createNewChannel(this, "teste", 39.749495, -8.807290,false, "campo", "field");
         }
-
-        if(intent != null) {
+        if (intent != null) {
             startActivity(intent);
 
             return true;

@@ -1,4 +1,4 @@
-package pt.ipleiria.dei.iair;
+package pt.ipleiria.dei.iair.view;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -7,12 +7,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-public class MySensorsActivity extends AppCompatActivity {
+import pt.ipleiria.dei.iair.R;
+
+public class MapActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_sensors);
+        setContentView(R.layout.activity_map);
     }
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -32,9 +34,6 @@ public class MySensorsActivity extends AppCompatActivity {
 
         } else if (id == R.id.menu_create_message) {
             intent = new Intent(this, CreateInformativeMessageActivity.class);
-
-        } else if (id == R.id.menu_map) {
-            intent = new Intent(this, MapActivity.class);
 
         } else if (id == R.id.menu_locations) {
             intent = new Intent(this, LocationActivity.class);

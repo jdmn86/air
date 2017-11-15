@@ -1,16 +1,10 @@
-package pt.ipleiria.dei.iair;
+package pt.ipleiria.dei.iair.US2;
 
 
-import android.app.Activity;
-import android.content.ComponentName;
-import android.os.Looper;
-import android.os.SystemClock;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitor;
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
-import android.support.test.runner.lifecycle.Stage;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +17,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Collection;
+import pt.ipleiria.dei.iair.MasterTest;
+import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.view.DashboardActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
@@ -39,17 +35,17 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US2_AT5 extends MasterTest{
+public class US2_AT8 extends MasterTest {
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
 
     @Test
-    public void uS2_AT5() {
+    public void uS2_AT8() {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction appCompatTextView = onView(
-                allOf(withId(R.id.title), withText("Create Inf. Message"),
+                allOf(ViewMatchers.withId(R.id.title), withText("Create Inf. Message"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.support.v7.view.menu.ListMenuItemView")),
@@ -57,10 +53,21 @@ public class US2_AT5 extends MasterTest{
                                 0),
                         isDisplayed()));
         appCompatTextView.perform(click());
-        if(getCurrentActivity().getClass().getName() != CreateInformativeMessageActivity.class.getName()) {
+
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+
+        ViewInteraction appCompatTextView2 = onView(
+                allOf(withId(R.id.title), withText("Dashboard"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.v7.view.menu.ListMenuItemView")),
+                                        0),
+                                0),
+                        isDisplayed()));
+        appCompatTextView2.perform(click());
+        if(getCurrentActivity().getClass().getName() != DashboardActivity.class.getName()) {
             fail("Activity not Opened");
         }
-
     }
 
     private static Matcher<View> childAtPosition(
@@ -81,5 +88,4 @@ public class US2_AT5 extends MasterTest{
             }
         };
     }
-
 }

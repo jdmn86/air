@@ -1,7 +1,8 @@
-package pt.ipleiria.dei.iair;
+package pt.ipleiria.dei.iair.US2;
 
 
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -15,6 +16,11 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import pt.ipleiria.dei.iair.MasterTest;
+import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.view.DashboardActivity;
+import pt.ipleiria.dei.iair.view.SettingsActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
@@ -30,17 +36,17 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US2_AT7 extends MasterTest{
+public class US2_AT4 extends MasterTest {
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
 
     @Test
-    public void uS2_AT7() {
+    public void uS2_AT4() {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction appCompatTextView = onView(
-                allOf(withId(R.id.title), withText("Map"),
+                allOf(ViewMatchers.withId(R.id.title), withText("Settings"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.support.v7.view.menu.ListMenuItemView")),
@@ -48,9 +54,10 @@ public class US2_AT7 extends MasterTest{
                                 0),
                         isDisplayed()));
         appCompatTextView.perform(click());
-        if(getCurrentActivity().getClass().getName() != MapActivity.class.getName()) {
+        if(getCurrentActivity().getClass().getName() != SettingsActivity.class.getName()) {
             fail("Activity not Opened");
         }
+
     }
 
     private static Matcher<View> childAtPosition(
