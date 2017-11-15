@@ -1,23 +1,25 @@
-package pt.ipleiria.dei.iair.view;
+package pt.ipleiria.dei.iair;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import pt.ipleiria.dei.iair.R;
-//import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
+import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 
 public class DashboardActivity extends AppCompatActivity {
+
+    private ServiceConnection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-        //ThinkSpeak.createNewChannel("Coimbra",40.200939, -8.407976,true,"Temperatura","Pressão","Humidade");
-
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -45,7 +47,10 @@ public class DashboardActivity extends AppCompatActivity {
         } else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
 
+        } else if (id == R.id.menu_send_data) {
+            ThinkSpeak.createNewChannel(this, "teste", 39.749495, -8.807290,false, "temp", "pressure", "humity");
         }
+
         if(intent != null) {
             startActivity(intent);
 
@@ -54,4 +59,5 @@ public class DashboardActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
