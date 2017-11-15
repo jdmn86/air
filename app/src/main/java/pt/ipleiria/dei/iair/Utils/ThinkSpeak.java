@@ -19,44 +19,60 @@ public class ThinkSpeak {
     private final static String API_KEY_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
     private final static String CHANNEL_NUMBER_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
     public static String location;
+    public static String temperature;
+    public static String pressure;
+    public static String humity;
+    public static double latitude;
+    public static double longitude;
+    public static Context context;
 
-    public static boolean sendData(final Context context, final double latitude, final double longitude, final String temperature, final String pressure, final String humity) {
+    public static boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
+        ThinkSpeak.humity = humity;
+        ThinkSpeak.pressure = pressure;
+        ThinkSpeak.temperature = temperature;
+        ThinkSpeak.latitude = latitude;
+        ThinkSpeak.longitude = longitude;
+        ThinkSpeak.context = context;
           location = GPSUtils.getLocationDetails(context,latitude, longitude).getLocality();
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
+                System.out.println(response.toString());
                 JSONArray feeds = response.getJSONArray("feeds");
+                if(feeds.length() != 0) {
 
-                for (int i = 0; i < feeds.length();i++ ) {
-                    JSONObject elem = new JSONObject((String) feeds.get(i));
-                    if (elem.get("field2").equals(location)) {
-                        //insert if already exists
-                        ArrayList<Pair<String, String>> data = new ArrayList<>();
-                        data.add(new Pair<>("api_key", elem.getString("field1")));
-                        data.add(new Pair<>("name", location));
-                        data.add(new Pair<>("field1", temperature));
-                        data.add(new Pair<>("field2", pressure));
-                        data.add(new Pair<>("field3", humity));
+                    for (int i = 0; i < feeds.length(); i++) {
+                        JSONObject elem = new JSONObject((String) feeds.get(i));
+                        if (elem.get("field2").equals(location)) {
+                            //insert if already exists
+                            ArrayList<Pair<String, String>> data = new ArrayList<>();
+                            data.add(new Pair<>("api_key", elem.getString("field1")));
+                            data.add(new Pair<>("name", location));
+                            data.add(new Pair<>("field1", ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature));
+                            data.add(new Pair<>("field2", ThinkSpeak.pressure == null? "N/A": ThinkSpeak.pressure));
+                            data.add(new Pair<>("field3", ThinkSpeak.humity == null? "N/A": ThinkSpeak.humity));
 
-                        HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("API_KEY_CHANNEL") + "&field1=" + temperature, data, context);
-                      return;
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("API_KEY_CHANNEL") + "&field1=" + ThinkSpeak.temperature, data, ThinkSpeak.context);
+                        }
+                        return;
                     }
+                }
                     createNewChannel(new CallBack() {
                         @Override
                         public void onFinish(String... messages) {
                             ArrayList<Pair<String, String>> data = new ArrayList<>();
                             data.add(new Pair<>("api_key", messages[0]));
                             data.add(new Pair<>("name", messages[1]));
-                            data.add(new Pair<>("field1", temperature));
-                            data.add(new Pair<>("field2", pressure));
-                            data.add(new Pair<>("field3", humity));
+                            data.add(new Pair<>("field1", ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature));
+                            data.add(new Pair<>("field2", ThinkSpeak.pressure == null? "N/A": ThinkSpeak.pressure));
+                            data.add(new Pair<>("field3", ThinkSpeak.humity == null? "N/A": ThinkSpeak.humity));
 
-                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + messages[0] + "&field1=" + messages[1], data, context);
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + messages[0] + "&field1=" + messages[1], data, ThinkSpeak.context);
                         }
 
-                    }, context,location, latitude,longitude,true, "temperature", "pressure", "humity");
+                    }, ThinkSpeak.context,location, ThinkSpeak.latitude, ThinkSpeak.longitude,true, "temperature", "pressure", "humity");
 
-                }
+
             }
 
             @Override

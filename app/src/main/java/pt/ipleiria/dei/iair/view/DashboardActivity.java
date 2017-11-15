@@ -3,6 +3,7 @@ package pt.ipleiria.dei.iair.view;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,6 +11,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.Utils.GPSUtils;
+import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.IAirSensorListener;
 //import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -50,7 +55,9 @@ public class DashboardActivity extends AppCompatActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         } else if (id == R.id.menu_send_data) {
-            //ThinkSpeak.sendData(this,39.749495, -8.807290,false, "temp", "pressure", "humity");
+            //Location location = GPSUtils.getLocation();
+            ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
         }
         if(intent != null) {
             startActivity(intent);

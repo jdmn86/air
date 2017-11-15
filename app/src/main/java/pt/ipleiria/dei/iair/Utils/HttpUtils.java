@@ -75,6 +75,11 @@ MyRequestQueue.add(MyStringRequest);
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        try {
+                            callBack.onResult(response);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         // display response
                         Log.d("Response", response.toString());
                     }
