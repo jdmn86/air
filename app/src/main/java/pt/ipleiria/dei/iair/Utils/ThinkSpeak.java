@@ -25,6 +25,7 @@ public class ThinkSpeak {
     public static double latitude;
     public static double longitude;
     public static Context context;
+    private static HttpCallBack callback;
 
     public static boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
         ThinkSpeak.humity = humity;
@@ -42,8 +43,8 @@ public class ThinkSpeak {
                 if(feeds.length() != 0) {
 
                     for (int i = 0; i < feeds.length(); i++) {
-                        JSONObject elem = new JSONObject((String) feeds.get(i));
-                        if (elem.get("field2").equals(location)) {
+                        JSONObject elem = new JSONObject(feeds.get(i).toString());
+                        if (elem.getString("field2").equals(location)) {
                             //insert if already exists
                             ArrayList<Pair<String, String>> data = new ArrayList<>();
                             data.add(new Pair<>("api_key", elem.getString("field1")));
@@ -52,9 +53,10 @@ public class ThinkSpeak {
                             data.add(new Pair<>("field2", ThinkSpeak.pressure == null? "N/A": ThinkSpeak.pressure));
                             data.add(new Pair<>("field3", ThinkSpeak.humity == null? "N/A": ThinkSpeak.humity));
 
-                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("API_KEY_CHANNEL") + "&field1=" + ThinkSpeak.temperature, data, ThinkSpeak.context);
-                        }
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("field1") + "&field1=" + ThinkSpeak.temperature, data, ThinkSpeak.context);
                         return;
+                        }
+
                     }
                 }
                     createNewChannel(new CallBack() {
@@ -67,7 +69,7 @@ public class ThinkSpeak {
                             data.add(new Pair<>("field2", ThinkSpeak.pressure == null? "N/A": ThinkSpeak.pressure));
                             data.add(new Pair<>("field3", ThinkSpeak.humity == null? "N/A": ThinkSpeak.humity));
 
-                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + messages[0] + "&field1=" + messages[1], data, ThinkSpeak.context);
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + messages[0] + "&field1=" + ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature, data, ThinkSpeak.context);
                         }
 
                     }, ThinkSpeak.context,location, ThinkSpeak.latitude, ThinkSpeak.longitude,true, "temperature", "pressure", "humity");
@@ -141,5 +143,35 @@ public class ThinkSpeak {
         }
 
         return true;
+    }
+    public static void getData( HttpCallBack callback,Context context, double latitude, double longitude) {
+        getData(callback, context, GPSUtils.getLocationDetails(context, latitude,longitude).getLocality());
+    }
+
+    private static void getData(HttpCallBack callback, Context context, String location) {
+        ThinkSpeak.location = location;
+        ThinkSpeak.context = context;
+        ThinkSpeak.callback = callback;
+        HttpUtils.Get(new HttpCallBack() {
+            @Override
+            public void onResult(JSONObject response) throws JSONException {
+                JSONArray feeds = response.getJSONArray("feeds");
+                if (feeds.length() != 0) {
+
+                    for (int i = 0; i < feeds.length(); i++) {
+                        JSONObject elem = new JSONObject( feeds.get(i).toString());
+                        if (elem.get("field2").equals(ThinkSpeak.location)) {
+                            HttpUtils.Get(ThinkSpeak.callback,"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.context);
+
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onResult(String response) {
+
+            }
+        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
     }
 }
