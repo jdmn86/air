@@ -63,28 +63,43 @@ public class DashboardActivity extends AppCompatActivity {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Alert");
-        alertDialogBuilder.setMessage("Do you want choose current location " + getActualLocation() + " with favourite location?");
+        if(getActualLocation() == "") {
+            alertDialogBuilder.setMessage("You don't have access to current location.");
+            alertDialogBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    if (getUsername() == "") {
+                        openDialogName();
+                    }
+                    favouriteLocationTXT.setText(getLocationFavourite());
+                    Toast.makeText(DashboardActivity.this,"Location Favourite don't Updated",Toast.LENGTH_LONG).show();
+                }
+            });
+        } else {
+            alertDialogBuilder.setMessage("Do you want choose current location " + getActualLocation() + " with favourite location?");
+            alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    saveFavouriteLocation();
+                    if (getUsername() == "") {
+                        openDialogName();
+                    }
+                    favouriteLocationTXT.setText(getLocationFavourite());
+                    Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();
+                }
+            });
 
-        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface arg0, int arg1) {
-                saveFavouriteLocation();
-                if (getUsername() == "") {
-                    openDialogName();
+            alertDialogBuilder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (getUsername() == "") {
+                        openDialogName();
+                    }
+                    Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
                 }
-                favouriteLocationTXT.setText(getLocationFavourite());
-                Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();
-            }
-        });
-        alertDialogBuilder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (getUsername() == "") {
-                    openDialogName();
-                }
-                Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
-            }
-        });
+            });
+        }
+
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
