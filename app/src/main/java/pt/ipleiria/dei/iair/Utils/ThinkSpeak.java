@@ -3,12 +3,15 @@ package pt.ipleiria.dei.iair.Utils;
 
 import android.content.Context;
 import android.util.Pair;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import pt.ipleiria.dei.iair.R;
 
 /**
  * Created by kxtreme on 08-11-2017.
@@ -28,6 +31,9 @@ public class ThinkSpeak {
     private static HttpCallBack callback;
 
     public static boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
+        if(!InternetUtils.isNetworkConnected(context)) {
+            Toast.makeText(context, R.string.No_internet_message, Toast.LENGTH_SHORT).show();
+        }
         ThinkSpeak.humity = humity;
         ThinkSpeak.pressure = pressure;
         ThinkSpeak.temperature = temperature;

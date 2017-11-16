@@ -13,4 +13,5 @@
     <string name="toast_no_humidity_sensor_available">No humidity sensor available</string>
     <string name="toast_no_pressure_sensor_available">No pressure sensor available</string>
     <string name="toast_no_temperature_sensor_available">No temperature sensor available</string>
+    <string name="No_internet_message">No internet Available</string>
 </resources>
