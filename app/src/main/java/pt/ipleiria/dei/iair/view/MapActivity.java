@@ -6,17 +6,21 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,6 +44,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private final static int ALL_PERMISSIONS_RESULT = 101;
     GPSUtils locationTrack;
+
+    private Integer THRESHOLD = 2;
+    private GoogleMap googleMap;
 
 
     @Override
@@ -84,6 +91,37 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_REGIONS).setCountry("PT")
+                .build();
+        autocompleteFragment.setFilter(typeFilter);
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // TODO: obter informações sobre o local selecionado.
+                //Log.i(TAG, "Place: " + place.getName());
+                LatLng chosenLocation = place.getLatLng();
+                googleMap.clear();
+                System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Address:" + place);
+                System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Locale:" + place.getLocale());
+                System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Name:" + place.getName());
+                System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Id:" + place.getId());
+                System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Attributions:" + place.getAttributions());
+                googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
+                googleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Solucionar o erro.
+                //Log.i(TAG, "Ocorreu um erro: " + status);
+            }
+        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -124,8 +162,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        googleMap = googleMap;
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        this.googleMap = googleMap;
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -135,11 +177,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        googleMap.setMyLocationEnabled(true);
-        // Add a marker in Sydney and move the camera
-    //    LatLng sydney = new LatLng(locationTrack.getLatitude(), locationTrack.getLongitude());
-    //    googleMap.addMarker(new MarkerOptions().position(sydney).title("I'm here..."));
-    //    googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //centro de portugal hardcoded deve ser a favorite location
+        LatLng chosenLocation = new LatLng(39.399872, -8.224454);
+        this.googleMap.setMyLocationEnabled(true);
+        this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
+        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(6));
+
     }
 
     private ArrayList findUnAskedPermissions(ArrayList wanted) {
