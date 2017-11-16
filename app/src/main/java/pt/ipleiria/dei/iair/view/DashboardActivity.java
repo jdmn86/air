@@ -15,6 +15,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.appindexing.internal.Thing;
+
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 //import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
@@ -57,6 +59,9 @@ public class DashboardActivity extends AppCompatActivity {
         humidityFavLocationValue = findViewById(R.id.textViewValueHumidity);
         userNameTXT = findViewById(R.id.textViewUserName);
     }
+
+
+
 
 
     public void openDialog(){
