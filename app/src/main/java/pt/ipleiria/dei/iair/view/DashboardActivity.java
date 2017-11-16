@@ -54,7 +54,7 @@ public class DashboardActivity extends AppCompatActivity {
         bindTextViews();
         favLocation = getLocationFavourite();
         if (favLocation == "") {
-            openDialog();
+            //openDialog();
         }
         favouriteLocationTXT.setText(favLocation);
         userNameTXT.setText(txtUsername + getUsername());

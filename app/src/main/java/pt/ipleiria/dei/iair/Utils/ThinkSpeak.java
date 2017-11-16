@@ -33,6 +33,7 @@ public class ThinkSpeak {
     public static boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
         if(!InternetUtils.isNetworkConnected(context)) {
             Toast.makeText(context, R.string.No_internet_message, Toast.LENGTH_SHORT).show();
+            return false;
         }
         ThinkSpeak.humity = humity;
         ThinkSpeak.pressure = pressure;
