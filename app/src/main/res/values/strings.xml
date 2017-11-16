@@ -16,4 +16,5 @@
     <string name="txt_view_favorite_location">Favorite Location</string>
     <string name="txt_dashboard_data">Data</string>
     <string name="txtViewMsgInformative">Informative Message</string>
+    <string name="activity_dashboard_username">Username:</string>
 </resources>
