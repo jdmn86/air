@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -60,9 +61,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private List<Marker> markers;
     private String vinicity="";
-
-    public Runnable myRunnable;
-    public Thread myThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,41 +122,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
                 markers.add(marker);
 
-                googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-                    @Override
-                    public void onMapLongClick(LatLng latLng) {
-                        for(Marker marker : markers) {
-                            if(Math.abs(marker.getPosition().latitude - latLng.latitude) < 0.05 && Math.abs(marker.getPosition().longitude - latLng.longitude) < 0.05) {
-                                IAirManager.INSTANCE.setSelectedPlace(place);
-                                AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
-                                // Add the buttons
-                                builder.setPositiveButton(R.string.set_as_favorite_location, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        IAirManager.INSTANCE.saveFavoriteLocation(place);
-                                        Toast.makeText(MapActivity.this,  place.getName() + " is now your favorite location!", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-
-                                builder.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        // User cancelled the dialog
-                                    }
-                                });
-                                // Set other dialog properties
-                                builder.setTitle(place.getAddress());
-                                builder.setMessage(place.getLatLng().toString());
-
-                                // Create the AlertDialog
-                                AlertDialog dialog = builder.create();
-                                dialog.show();
-
-                                break;
-                            }
-                        }
-                    }
-                });
-                Marker marker = googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
-                markers.add(marker);
 
                 googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                     @Override
@@ -262,17 +225,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        //centro de portugal hardcoded deve ser a favorite location
-        LatLng chosenLocation;
-        LatLng favoriteLocation = IAirManager.INSTANCE.getFavoriteLocationLatLng();
-        if(favoriteLocation==null){
-            chosenLocation = new LatLng(39.399872, -8.224454);
-        }
-        else {
-            chosenLocation = favoriteLocation;
-        }
-        Marker marker = googleMap.addMarker(new MarkerOptions().position(chosenLocation).title("Favorite Location Name"));
-        markers.add(marker);
+
 
 
         LatLng chosenLocation;

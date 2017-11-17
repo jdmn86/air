@@ -28,10 +28,6 @@ public enum IAirManager {
 
     MySensorsActivity mySensorsActivity;
 
-    Place favoriteLocation;
-    Place selectedPlace;
-    SharedPreferences sharedPreferences;
-    LatLng favoriteLocationLatLng;
 
     Place favoriteLocation;
     Place selectedPlace;
@@ -77,35 +73,9 @@ public enum IAirManager {
         return favoriteLocation;
     }
 
-    public void saveFavoriteLocation(Place favoriteLocation) {
-        this.favoriteLocation = favoriteLocation;
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("favoriteLocation",favoriteLocation.getLatLng().latitude + ";" + favoriteLocation.getLatLng().longitude);
-        //guardar também dados que sejam necessarios no dashboard como o nome, da localização favorita por ex
-        editor.commit();
-    }
 
-    public void setSharedPreferences(SharedPreferences sharedPreferences) {
-        this.sharedPreferences = sharedPreferences;
-    }
 
-    public LatLng getFavoriteLocationLatLng() {
-        return favoriteLocationLatLng;
-    }
 
-    public void setFavoriteLocation(String string) {
-        if(string.equals("null")) return;
-        String[] strs = string.split(";");
-        favoriteLocationLatLng=new LatLng(Double.parseDouble(strs[0]),Double.parseDouble(strs[1]));
-    }
-
-    public void setSelectedPlace(Place place) {
-        this.selectedPlace = place;
-    }
-
-    public Place getFavoriteLocation() {
-        return favoriteLocation;
-    }
 
     public void saveFavoriteLocation(Place favoriteLocation) {
         this.favoriteLocation = favoriteLocation;
