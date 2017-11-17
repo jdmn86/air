@@ -1,4 +1,4 @@
-package pt.ipleiria.dei.iair.US2;
+package pt.ipleiria.dei.iair.US8;
 
 
 import android.support.test.espresso.ViewInteraction;
@@ -12,37 +12,45 @@ import android.view.ViewParent;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import pt.ipleiria.dei.iair.MasterTest;
+import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.view.DashboardActivity;
 
-import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US2_AT1 {
+public class US8_AT3 extends MasterTest{
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
 
     @Test
-    public void uS_AT1() {
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-
-        ViewInteraction frameLayout = onView(
-                allOf(childAtPosition(
-                        IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
-                        0),
+    public void uS8_AT3() {
+        ViewInteraction actionMenuItemView = onView(
+                allOf(withId(R.id.menu_send_data), withContentDescription("Send Data"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.action_bar),
+                                        1),
+                                0),
                         isDisplayed()));
-        frameLayout.check(matches(isDisplayed()));
+        actionMenuItemView.perform(click());
+        onView(withText(R.string.No_gps_message)).inRoot(withDecorView(not(is(getCurrentActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
 
     }
 

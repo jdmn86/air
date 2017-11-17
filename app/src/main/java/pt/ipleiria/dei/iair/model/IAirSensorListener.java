@@ -14,9 +14,6 @@ public class IAirSensorListener implements SensorEventListener {
 
     private float[] eventValues;
 
-    public IAirSensorListener() {
-
-    }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
