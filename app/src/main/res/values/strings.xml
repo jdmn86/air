@@ -14,6 +14,8 @@
     <string name="toast_no_pressure_sensor_available">No pressure sensor available</string>
     <string name="toast_no_temperature_sensor_available">No temperature sensor available</string>
     <string name="No_internet_message">No internet Available</string>
+    <string name="No_gps_message">No GPS Available</string>
+    <string name="No_data_message">No Data Available</string>
     <string name="txt_view_favorite_location">Favorite Location</string>
     <string name="txt_dashboard_data">Data</string>
     <string name="txtViewMsgInformative">Informative Message</string>

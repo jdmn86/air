@@ -2,6 +2,7 @@ package pt.ipleiria.dei.iair.Utils;
 
 
 import android.content.Context;
+import android.location.LocationManager;
 import android.util.Pair;
 import android.widget.Toast;
 
@@ -30,16 +31,27 @@ public class ThinkSpeak {
     public static Context context;
     private static HttpCallBack callback;
 
+
     public static boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
-        if(!InternetUtils.isNetworkConnected(context)) {
-            Toast.makeText(context, R.string.No_internet_message, Toast.LENGTH_SHORT).show();
-        }
+
         ThinkSpeak.humity = humity;
         ThinkSpeak.pressure = pressure;
         ThinkSpeak.temperature = temperature;
         ThinkSpeak.latitude = latitude;
         ThinkSpeak.longitude = longitude;
         ThinkSpeak.context = context;
+        LocationManager manager = (LocationManager) context.getSystemService( Context.LOCATION_SERVICE );
+        if(temperature == null && pressure == null && humity == null) {
+            Toast.makeText(context, R.string.No_data_message, Toast.LENGTH_SHORT).show();
+            return false;
+        }else if(!InternetUtils.isNetworkConnected(context)) {
+            Toast.makeText(context, R.string.No_internet_message, Toast.LENGTH_SHORT).show();
+            return false;
+        } else if( manager.isProviderEnabled( LocationManager.GPS_PROVIDER )) {
+            Toast.makeText(context, R.string.No_gps_message, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
           location = GPSUtils.getLocationDetails(context,latitude, longitude).getLocality();
         HttpUtils.Get(new HttpCallBack() {
             @Override
@@ -59,7 +71,7 @@ public class ThinkSpeak {
                             data.add(new Pair<>("field2", ThinkSpeak.pressure == null? "N/A": ThinkSpeak.pressure));
                             data.add(new Pair<>("field3", ThinkSpeak.humity == null? "N/A": ThinkSpeak.humity));
 
-                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("field1") + "&field1=" + ThinkSpeak.temperature, data, ThinkSpeak.context);
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("field1") + "&field1=" + (ThinkSpeak.temperature == null ? "N/A" : ThinkSpeak.temperature), data, ThinkSpeak.context);
                         return;
                         }
 
@@ -75,7 +87,7 @@ public class ThinkSpeak {
                             data.add(new Pair<>("field2", ThinkSpeak.pressure == null? "N/A": ThinkSpeak.pressure));
                             data.add(new Pair<>("field3", ThinkSpeak.humity == null? "N/A": ThinkSpeak.humity));
 
-                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + messages[0] + "&field1=" + ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature, data, ThinkSpeak.context);
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + messages[0] + "&field1=" + (ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature), data, ThinkSpeak.context);
                         }
 
                     }, ThinkSpeak.context,location, ThinkSpeak.latitude, ThinkSpeak.longitude,true, "temperature", "pressure", "humity");

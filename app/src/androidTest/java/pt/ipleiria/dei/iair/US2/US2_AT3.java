@@ -1,9 +1,10 @@
-package pt.ipleiria.dei.iair.US8;
+package pt.ipleiria.dei.iair.US2;
 
 
 import android.content.Context;
-import android.net.wifi.WifiManager;
+import android.location.LocationManager;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -18,7 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.TimeUnit;
 
 import pt.ipleiria.dei.iair.MasterTest;
 import pt.ipleiria.dei.iair.R;
@@ -26,64 +27,45 @@ import pt.ipleiria.dei.iair.view.DashboardActivity;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static junit.framework.Assert.fail;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US8_AT2 extends MasterTest{
+public class US2_AT3 extends MasterTest {
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
 
     @Test
-    public void uS8_AT2() {
-        try {
-            setMobileData(false);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+    public void uS2_AT3() {
+        Context activity = getCurrentActivity().getApplicationContext();
         ViewInteraction actionMenuItemView = onView(
-                allOf(withId(R.id.menu_send_data), withContentDescription("Send Data"),
+                allOf(ViewMatchers.withId(R.id.menu_gps), withContentDescription("GPS"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.action_bar),
                                         1),
-                                0),
+                                1),
                         isDisplayed()));
-        actionMenuItemView.perform(click());
-
         try {
-            mActivityTestRule.runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    WifiManager wifi = (WifiManager) getCurrentActivity().getSystemService(Context.WIFI_SERVICE);
-                    wifi.setWifiEnabled(false);
-
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            actionMenuItemView.perform(click());
+            onView(isRoot()).perform(waitId(R.id.menu_dashboard, TimeUnit.SECONDS.toMillis(15)));
+        } catch (Exception e) {
+            System.out.println("location may be enabled ");
         }
-        onView(withText(R.string.No_internet_message)).inRoot(withDecorView(not(is(getCurrentActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
 
-    }
+        final LocationManager manager = (LocationManager) activity.getSystemService( Context.LOCATION_SERVICE );
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            fail("Location Not On");
+        }
+        }
+
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
