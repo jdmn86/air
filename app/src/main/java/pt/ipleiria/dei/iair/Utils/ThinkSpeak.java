@@ -49,7 +49,7 @@ public class ThinkSpeak {
             return false;
         } else if( manager.isProviderEnabled( LocationManager.GPS_PROVIDER )) {
             Toast.makeText(context, R.string.No_gps_message, Toast.LENGTH_SHORT).show();
-            return false;
+            //return false;
         }
 
           location = GPSUtils.getLocationDetails(context,latitude, longitude).getLocality();
@@ -174,6 +174,7 @@ public class ThinkSpeak {
             @Override
             public void onResult(JSONObject response) throws JSONException {
                 JSONArray feeds = response.getJSONArray("feeds");
+                System.out.println(feeds.length());
                 if (feeds.length() != 0) {
 
                     for (int i = 0; i < feeds.length(); i++) {

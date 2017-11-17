@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,11 +16,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.concurrent.TimeUnit;
+
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
+import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
+
+import static junit.framework.Assert.fail;
+import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.context;
 //import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 
 public class DashboardActivity extends GPSActivity {
@@ -43,6 +54,11 @@ public class DashboardActivity extends GPSActivity {
         preferencesWrite = preferencesRead.edit();
 
         super.onCreate(savedInstanceState);
+        try {
+            runUnitTests();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         setContentView(R.layout.activity_dashboard);
         //ThinkSpeak.createNewChannel("Coimbra",40.200939, -8.407976,true,"Temperatura","Pressão","Humidade");
         bindTextViews();
@@ -225,5 +241,33 @@ public class DashboardActivity extends GPSActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    private void runUnitTests() throws InterruptedException {
+
+        Log.d("Unit Test_US8_AT5" , (ThinkSpeak.sendData(this, 39.039463, 125.763378, null, null, null) ? "Sending null for GPS and worked something Wrong" : "Sending null for GPS and not worked OK"));
+        ThinkSpeak.sendData(this, 39.039463, 125.763378, "80", null, null);
+        Thread.sleep(10000);
+        ThinkSpeak.getData(new HttpCallBack() {
+
+            @Override
+            public void onResult(JSONObject response) throws JSONException {
+                JSONArray feeds = response.getJSONArray("feeds");
+                if(feeds.length() == 0)
+                    fail();
+                JSONObject elem = (JSONObject) feeds.get(feeds.length()-1);
+                if(!(elem.getString("field1").equals("80") && elem.getString("field2").equals("N/A") && elem.getString("field3").equals("N/A"))) {
+                   Log.d("Unit Test_US8_AT6", "Parcial data send failed");
+                } else {
+                    Log.d("Unit Test_US8_AT6", "Parcial data send success");
+
+                }
+            }
+
+            @Override
+            public void onResult(String response) {
+
+            }
+        },  this,  39.039463, 125.763378);
+
     }
 }
