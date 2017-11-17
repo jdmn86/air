@@ -340,9 +340,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
          if(vinicity.isEmpty()){
              getVicinity(latLng,3000);
+         }else if(vinicity.isEmpty()){
+             getVicinity(latLng,4000);
+         }else if(!vinicity.isEmpty()){
+             Toast.makeText(this, vinicity.toString(), Toast.LENGTH_LONG).show();
+
          }
 
-        Toast.makeText(this, vinicity.toString(), Toast.LENGTH_LONG).show();
     }
 
 
