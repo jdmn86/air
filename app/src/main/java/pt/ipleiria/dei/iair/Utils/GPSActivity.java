@@ -37,7 +37,9 @@ public class GPSActivity extends AppCompatActivity {
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(getApplicationContext()) .addApi(LocationServices.API) .build(); googleApiClient.connect();
 
-            LocationRequest locationRequest = LocationRequest.create(); locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); locationRequest.setInterval(30 * 1000); locationRequest.setFastestInterval(5 * 1000); LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder() .addLocationRequest(locationRequest);
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); locationRequest.setInterval(30 * 1000); locationRequest.setFastestInterval(5 * 1000);
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder() .addLocationRequest(locationRequest);
 
             builder.setAlwaysShow(true);
 

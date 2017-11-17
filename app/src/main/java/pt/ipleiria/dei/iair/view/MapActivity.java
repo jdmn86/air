@@ -34,11 +34,12 @@ import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 
-public class MapActivity extends GPSActivity {
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+
+public class MapActivity extends GPSActivity implements OnMapReadyCallback {
 
     private ArrayList permissionsToRequest;
     private ArrayList permissionsRejected = new ArrayList();
@@ -84,7 +85,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
         } else {
 
-            locationTrack.showSettingsAlert();
+           // locationTrack.showSettingsAlert();
         }
 
 
@@ -108,11 +109,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 //Log.i(TAG, "Place: " + place.getName());
                 LatLng chosenLocation = place.getLatLng();
                 googleMap.clear();
-                System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Address:" + place);
-                System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Locale:" + place.getLocale());
-                System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Name:" + place.getName());
-                System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Id:" + place.getId());
-                System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Attributions:" + place.getAttributions());
                 googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
@@ -170,9 +166,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -273,3 +269,4 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
 }
+

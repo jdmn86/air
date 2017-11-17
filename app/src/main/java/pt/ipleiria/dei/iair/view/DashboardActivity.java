@@ -49,25 +49,28 @@ public class DashboardActivity extends GPSActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_dashboard);
+
         preferencesRead =getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         preferencesWrite = preferencesRead.edit();
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
         //ThinkSpeak.createNewChannel("Coimbra",40.200939, -8.407976,true,"Temperatura","Pressão","Humidade");
         bindTextViews();
         favLocation = getLocationFavourite();
         if (favLocation == "") {
-
-            openDialog();
-
+            textDialog();
         }
-        //textDialog();
+        if (getUsername() == "") {
+            openDialogName();
+        }
+
+        getDataLocation();
 
         favouriteLocationTXT.setText(favLocation);
         userNameTXT.setText(txtUsername + getUsername());
 
-        getDataLocation();
+
     }
 
     private void getDataLocation() {
@@ -81,17 +84,17 @@ public class DashboardActivity extends GPSActivity {
                 if(feeds.length() == 0) {
 
                     Toast.makeText(DashboardActivity.this,"Don't have data in your location",Toast.LENGTH_LONG).show();
-                } else {
+                }else {
                     //throw Exception;
                     //temperatureFavLocationValue.setText(String.valueOf(feeds.length()));
 
-                    for (int i = feeds.length()-1; i >= 0; i--) {
+                    for (int i = feeds.length() - 1; i >= 0; i--) {
                         JSONObject elem = (JSONObject) feeds.get(i);
                         if (temperatureFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field1").contains("N/A"))
                             temperatureFavLocationValue.setText(String.valueOf(elem.getString("field1")));
-                        if (pressureFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field2").contains( "N/A"))
+                        if (pressureFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field2").contains("N/A"))
                             pressureFavLocationValue.setText(String.valueOf(elem.getString("field2")));
-                        if (humidityFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field3").contains( "N/A"))
+                        if (humidityFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field3").contains("N/A"))
                             humidityFavLocationValue.setText(elem.getString("field3"));
                         //if(!(elem.getString("field1").equals("23") && elem.getString("field2").equals("900") && elem.getString("field3").equals("0"))) {
                         //fail("not working because" + elem.toString());
@@ -105,7 +108,7 @@ public class DashboardActivity extends GPSActivity {
             public void onResult(String response) {
 
             }
-        }, this, favLocation);
+        }, this, "Leiria");
     }
 
     private void bindTextViews() {
@@ -159,17 +162,23 @@ public class DashboardActivity extends GPSActivity {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Alert");
-        alertDialogBuilder.setMessage("Do you want choose current location " + getActualLocation() + " with favourite location?");
+        alertDialogBuilder.setMessage("Do you want choose favourite location?");
 
-        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("Go to map", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
+                Intent intent = null;
+                intent = new Intent(getApplicationContext(), MapActivity.class);
+                if (intent != null) {
+                    startActivity(intent);
+                }
+                /*
                 saveFavouriteLocation();
                 if (getUsername() == "") {
                     openDialogName();
                 }
                 favouriteLocationTXT.setText(getLocationFavourite());
-                Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();
+                Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();*/
             }
         });
 
@@ -220,9 +229,10 @@ public class DashboardActivity extends GPSActivity {
 
 
     private String getActualLocation() {
-        GPSUtils gpsUtils = new GPSUtils(this);
+
+        GPSUtils gpsUtils = new GPSUtils(DashboardActivity.this);
         Location currentLocation = gpsUtils.getLocation();
-        String actualLocation = "null";
+        String actualLocation = "";
         try {
             actualLocation = preferencesRead.getString("locationText", GPSUtils.getLocationDetails(this, currentLocation.getLatitude(), currentLocation.getLongitude()).getLocality());
         } catch (Exception e) {
