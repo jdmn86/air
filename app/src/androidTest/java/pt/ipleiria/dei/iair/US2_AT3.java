@@ -1,6 +1,8 @@
-package pt.ipleiria.dei.iair.US2;
+package pt.ipleiria.dei.iair;
 
 
+import android.content.Context;
+import android.location.LocationManager;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -12,39 +14,53 @@ import android.view.ViewParent;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import pt.ipleiria.dei.iair.view.DashboardActivity;
+import java.util.concurrent.TimeUnit;
 
-import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static junit.framework.Assert.fail;
 import static org.hamcrest.Matchers.allOf;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US2_AT1 {
+public class US2_AT3 extends MasterTest{
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
 
     @Test
-    public void uS_AT1() {
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-
-        ViewInteraction frameLayout = onView(
-                allOf(childAtPosition(
-                        IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
-                        0),
+    public void uS2_AT3() {
+        Context activity = getCurrentActivity().getApplicationContext();
+        ViewInteraction actionMenuItemView = onView(
+                allOf(withId(R.id.menu_gps), withContentDescription("GPS"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.action_bar),
+                                        1),
+                                1),
                         isDisplayed()));
-        frameLayout.check(matches(isDisplayed()));
+        try {
+            actionMenuItemView.perform(click());
+            onView(isRoot()).perform(waitId(R.id.menu_dashboard, TimeUnit.SECONDS.toMillis(15)));
+        } catch (Exception e) {
+            System.out.println("location may be enabled ");
+        }
 
-    }
+        final LocationManager manager = (LocationManager) activity.getSystemService( Context.LOCATION_SERVICE );
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            fail("Location Not On");
+        }
+        }
+
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
