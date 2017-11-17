@@ -35,6 +35,7 @@ public enum IAirManager {
         return temperature;
     }
 
+
     public void setSensorManager(SensorManager sensorManager) {
         this.sensorManager = sensorManager;
     }

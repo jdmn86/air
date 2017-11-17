@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import pt.ipleiria.dei.iair.R;
+
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
@@ -300,4 +301,5 @@ public class DashboardActivity extends GPSActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
