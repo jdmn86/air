@@ -30,13 +30,14 @@ public class HttpUtils {
 
     public  static void Post(final HttpCallBack callBack, String url, final List<Pair<String, String>> params, Context context) {
 
-
+            System.out.println(url);
         final RequestQueue MyRequestQueue = Volley.newRequestQueue(context);
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
                 try {
+                    if(callBack!= null)
                      callBack.onResult(new JSONObject(response));
                 } catch (JSONException e) {
                     callBack.onResult(response);
@@ -45,13 +46,7 @@ public class HttpUtils {
         }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                final int status = error.networkResponse.statusCode;
-                // Handle 30x
-                if(HttpURLConnection.HTTP_MOVED_PERM == status || status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_SEE_OTHER) {
-                    final String location = error.networkResponse.headers.get("Location");
-                    Log.d(TAG, "Location: " + location);
-                }
+            System.out.println(error.getMessage());
 
                 //This code is executed if there is an error.
             }
