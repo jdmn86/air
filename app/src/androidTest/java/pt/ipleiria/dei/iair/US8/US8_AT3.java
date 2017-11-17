@@ -50,7 +50,7 @@ public class US8_AT3 extends MasterTest{
                                 0),
                         isDisplayed()));
         actionMenuItemView.perform(click());
-        onView(withText(R.string.No_internet_message)).inRoot(withDecorView(not(is(getCurrentActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
+        onView(withText(R.string.No_gps_message)).inRoot(withDecorView(not(is(getCurrentActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
 
     }
 
