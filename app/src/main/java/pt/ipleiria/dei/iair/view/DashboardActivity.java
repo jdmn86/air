@@ -3,13 +3,19 @@ package pt.ipleiria.dei.iair.view;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.controller.IAirManager;
+
+import static android.app.PendingIntent.getActivity;
 
 
 public class DashboardActivity extends AppCompatActivity {
@@ -20,6 +26,15 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+        SharedPreferences sharedPref = this.getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        //Descomentar apenas para limpar as sharedpreferences
+        //SharedPreferences.Editor editor = sharedPref.edit();
+        //editor.clear();
+        //editor.commit();
+        IAirManager.INSTANCE.setSharedPreferences(sharedPref);
+        TextView txtView = this.findViewById(R.id.textViewFavoriteLocation);
+        txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
