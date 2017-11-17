@@ -57,8 +57,12 @@ public class DashboardActivity extends GPSActivity {
         bindTextViews();
         favLocation = getLocationFavourite();
         if (favLocation == "") {
-            //openDialog();
+
+            openDialog();
+
         }
+        //textDialog();
+
         favouriteLocationTXT.setText(favLocation);
         userNameTXT.setText(txtUsername + getUsername());
 
@@ -78,7 +82,7 @@ public class DashboardActivity extends GPSActivity {
                     Toast.makeText(DashboardActivity.this,"Don't have data in your location",Toast.LENGTH_LONG).show();
                 } else {
                     //throw Exception;
-                    temperatureFavLocationValue.setText(String.valueOf(feeds.length()));
+                    //temperatureFavLocationValue.setText(String.valueOf(feeds.length()));
 
                     for (int i = feeds.length()-1; i >= 0; i--) {
                         JSONObject elem = (JSONObject) feeds.get(i);
@@ -100,7 +104,7 @@ public class DashboardActivity extends GPSActivity {
             public void onResult(String response) {
 
             }
-        }, this, "Leiria");
+        }, this, favLocation);
     }
 
     private void bindTextViews() {
@@ -121,42 +125,62 @@ public class DashboardActivity extends GPSActivity {
         alertDialogBuilder.setTitle("Alert");
         if(getActualLocation() == "") {
             alertDialogBuilder.setMessage("You don't have access to current location.");
-            alertDialogBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface arg0, int arg1) {
-                    if (getUsername() == "") {
-                        openDialogName();
-                    }
-                    favouriteLocationTXT.setText(getLocationFavourite());
-                    Toast.makeText(DashboardActivity.this,"Location Favourite don't Updated",Toast.LENGTH_LONG).show();
-                }
-            });
-        } else {
-            alertDialogBuilder.setMessage("Do you want choose current location " + getActualLocation() + " with favourite location?");
-            alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface arg0, int arg1) {
-                    saveFavouriteLocation();
-                    if (getUsername() == "") {
-                        openDialogName();
-                    }
-                    favouriteLocationTXT.setText(getLocationFavourite());
-                    Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();
-                }
-            });
 
-            alertDialogBuilder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
+            alertDialogBuilder.setPositiveButton("Turn on location",new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    enableGPS();
+                    Toast.makeText(DashboardActivity.this,"GPS enabled",Toast.LENGTH_LONG).show();
+                    textDialog();
+                }
+            });
+            alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+
                     if (getUsername() == "") {
                         openDialogName();
                     }
-                    Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
+                    favouriteLocationTXT.setText(getLocationFavourite());
+                    Toast.makeText(DashboardActivity.this,"Location Favourite not Updated",Toast.LENGTH_LONG).show();
+
                 }
             });
         }
 
 
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    public void textDialog(){
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder.setTitle("Alert");
+        alertDialogBuilder.setMessage("Do you want choose current location " + getActualLocation() + " with favourite location?");
+
+        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                saveFavouriteLocation();
+                if (getUsername() == "") {
+                    openDialogName();
+                }
+                favouriteLocationTXT.setText(getLocationFavourite());
+                Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();
+            }
+        });
+
+        alertDialogBuilder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (getUsername() == "") {
+                    openDialogName();
+                }
+                Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
+            }
+        });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
@@ -192,12 +216,14 @@ public class DashboardActivity extends GPSActivity {
 
 
 
+
+
     private String getActualLocation() {
         GPSUtils gpsUtils = new GPSUtils(this);
         Location currentLocation = gpsUtils.getLocation();
-        String actualLocation = "";
+        String actualLocation = "null";
         try {
-            actualLocation =  preferencesRead.getString("locationText", GPSUtils.getLocationDetails(this, currentLocation.getLatitude(), currentLocation.getLongitude()).getLocality());
+            actualLocation = preferencesRead.getString("locationText", GPSUtils.getLocationDetails(this, currentLocation.getLatitude(), currentLocation.getLongitude()).getLocality());
         } catch (Exception e) {
             e.getMessage();
         }
