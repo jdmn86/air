@@ -2,6 +2,7 @@ package pt.ipleiria.dei.iair.Utils;
 
 
 import android.content.Context;
+import android.location.LocationManager;
 import android.util.Pair;
 import android.widget.Toast;
 
@@ -31,9 +32,15 @@ public class ThinkSpeak {
     private static HttpCallBack callback;
 
     public static boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
+        final LocationManager manager = (LocationManager) context.getSystemService( Context.LOCATION_SERVICE );
+
         if(!InternetUtils.isNetworkConnected(context)) {
             Toast.makeText(context, R.string.No_internet_message, Toast.LENGTH_SHORT).show();
             return false;
+        } else if( manager.isProviderEnabled( LocationManager.GPS_PROVIDER )) {
+            Toast.makeText(context, R.string.No_gps_message, Toast.LENGTH_SHORT).show();
+            return false;
+
         }
         ThinkSpeak.humity = humity;
         ThinkSpeak.pressure = pressure;

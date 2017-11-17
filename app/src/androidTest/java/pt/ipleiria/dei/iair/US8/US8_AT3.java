@@ -1,8 +1,6 @@
 package pt.ipleiria.dei.iair.US8;
 
 
-import android.content.Context;
-import android.net.wifi.WifiManager;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -17,8 +15,6 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.lang.reflect.InvocationTargetException;
 
 import pt.ipleiria.dei.iair.MasterTest;
 import pt.ipleiria.dei.iair.R;
@@ -38,26 +34,13 @@ import static org.hamcrest.Matchers.not;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US8_AT2 extends MasterTest{
+public class US8_AT3 extends MasterTest{
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
 
     @Test
-    public void uS8_AT2() {
-        try {
-            setMobileData(false);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+    public void uS8_AT3() {
         ViewInteraction actionMenuItemView = onView(
                 allOf(withId(R.id.menu_send_data), withContentDescription("Send Data"),
                         childAtPosition(
@@ -67,20 +50,6 @@ public class US8_AT2 extends MasterTest{
                                 0),
                         isDisplayed()));
         actionMenuItemView.perform(click());
-
-        try {
-            mActivityTestRule.runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    WifiManager wifi = (WifiManager) getCurrentActivity().getSystemService(Context.WIFI_SERVICE);
-                    wifi.setWifiEnabled(false);
-
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
         onView(withText(R.string.No_internet_message)).inRoot(withDecorView(not(is(getCurrentActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
 
     }

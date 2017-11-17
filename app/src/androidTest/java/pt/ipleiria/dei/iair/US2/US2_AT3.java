@@ -1,9 +1,10 @@
-package pt.ipleiria.dei.iair;
+package pt.ipleiria.dei.iair.US2;
 
 
 import android.content.Context;
 import android.location.LocationManager;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -20,6 +21,10 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.TimeUnit;
 
+import pt.ipleiria.dei.iair.MasterTest;
+import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.view.DashboardActivity;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -31,7 +36,7 @@ import static org.hamcrest.Matchers.allOf;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US2_AT3 extends MasterTest{
+public class US2_AT3 extends MasterTest {
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
@@ -40,7 +45,7 @@ public class US2_AT3 extends MasterTest{
     public void uS2_AT3() {
         Context activity = getCurrentActivity().getApplicationContext();
         ViewInteraction actionMenuItemView = onView(
-                allOf(withId(R.id.menu_gps), withContentDescription("GPS"),
+                allOf(ViewMatchers.withId(R.id.menu_gps), withContentDescription("GPS"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.action_bar),
