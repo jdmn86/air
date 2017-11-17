@@ -154,7 +154,7 @@ public class ThinkSpeak {
         getData(callback, context, GPSUtils.getLocationDetails(context, latitude,longitude).getLocality());
     }
 
-    private static void getData(HttpCallBack callback, Context context, String location) {
+    public static void getData(HttpCallBack callback, Context context, String location) {
         ThinkSpeak.location = location;
         ThinkSpeak.context = context;
         ThinkSpeak.callback = callback;

@@ -2,23 +2,19 @@ package pt.ipleiria.dei.iair.view;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.support.v7.app.AlertDialog;
-import android.content.ServiceConnection;
-import android.location.Location;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.firebase.appindexing.internal.Thing;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,11 +23,8 @@ import org.json.JSONObject;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
-import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
-import pt.ipleiria.dei.iair.model.IAirSensorListener;
-import pt.ipleiria.dei.iair.Utils.GPSUtils;
 //import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -72,25 +65,24 @@ public class DashboardActivity extends AppCompatActivity {
         ThinkSpeak.getData(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
+                temperatureFavLocationValue.setText("N/A");
+                humidityFavLocationValue.setText("N/A");
+                pressureFavLocationValue.setText("N/A");
                 JSONArray feeds = response.getJSONArray("feeds");
                 if(feeds.length() == 0) {
-                    temperatureFavLocationValue.setText("N/A");
-                    humidityFavLocationValue.setText("N/A");
-                    pressureFavLocationValue.setText("N/A");
+
                     Toast.makeText(DashboardActivity.this,"Don't have data in your location",Toast.LENGTH_LONG).show();
                 } else {
                     //throw Exception;
                     temperatureFavLocationValue.setText(String.valueOf(feeds.length()));
-                    humidityFavLocationValue.setText("N/A1");
-                    pressureFavLocationValue.setText("N/A1");
 
-                    for (int i = feeds.length(); i >= 1; i--) {
+                    for (int i = feeds.length()-1; i >= 0; i--) {
                         JSONObject elem = (JSONObject) feeds.get(i);
-                        if (elem.getString("field1") != "N/A")
+                        if (temperatureFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field1").contains("N/A"))
                             temperatureFavLocationValue.setText(String.valueOf(elem.getString("field1")));
-                        if (elem.getString("field2") != "N/A")
+                        if (pressureFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field2").contains( "N/A"))
                             pressureFavLocationValue.setText(String.valueOf(elem.getString("field2")));
-                        if (elem.getString("field3") != "N/A")
+                        if (humidityFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field3").contains( "N/A"))
                             humidityFavLocationValue.setText(elem.getString("field3"));
                         //if(!(elem.getString("field1").equals("23") && elem.getString("field2").equals("900") && elem.getString("field3").equals("0"))) {
                         //fail("not working because" + elem.toString());
