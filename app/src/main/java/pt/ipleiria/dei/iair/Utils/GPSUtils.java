@@ -30,7 +30,8 @@ import java.util.Locale;
  * Created by kxtreme on 15-11-2017.
  */
 
-public class GPSUtils extends Service implements LocationListener {
+public class
+GPSUtils extends Service implements LocationListener {
 
 
     private final Context mContext;
