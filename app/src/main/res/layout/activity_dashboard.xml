@@ -74,6 +74,12 @@
                 tools:layout_editor_absoluteX="31dp"
                 tools:layout_editor_absoluteY="49dp" />
 
+            <Space
+                android:id="@+id/space4"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_weight="1" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -148,12 +154,6 @@
                 </LinearLayout>
 
             </LinearLayout>
-
-            <Space
-                android:id="@+id/space4"
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/textViewMsgInformative"

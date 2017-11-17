@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import pt.ipleiria.dei.iair.R;
 
@@ -103,7 +104,7 @@ public class ThinkSpeak {
         return true;
     }
 
-    public static boolean createNewChannel(final CallBack callBack, final Context context, String channelName, double latitude, double longitude, boolean status, String... fields) {
+    public static boolean createNewChannel(final CallBack callBack, final Context context, final String channelName, double latitude, double longitude, boolean status, String... fields) {
         try {
             ArrayList<Pair<String, String>> data = new ArrayList<>();
             data.add(new Pair<>("api_key", API_KEY_CREATE_CHANNEL));
@@ -154,6 +155,7 @@ public class ThinkSpeak {
 
 
                 }
+
             }, "https://api.thingspeak.com/channels.json", data, context);
 
         } catch (Exception e) {
@@ -166,7 +168,7 @@ public class ThinkSpeak {
         getData(callback, context, GPSUtils.getLocationDetails(context, latitude,longitude).getLocality());
     }
 
-    private static void getData(HttpCallBack callback, Context context, String location) {
+    public static void getData(HttpCallBack callback, Context context, String location) {
         ThinkSpeak.location = location;
         ThinkSpeak.context = context;
         ThinkSpeak.callback = callback;
