@@ -63,11 +63,11 @@ public class DashboardActivity extends GPSActivity {
         preferencesWrite = preferencesRead.edit();
 
         super.onCreate(savedInstanceState);
-        try {
+        /*try {
             runUnitTests();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
         setContentView(R.layout.activity_dashboard);
         //ThinkSpeak.createNewChannel("Coimbra",40.200939, -8.407976,true,"Temperatura","Pressão","Humidade");
         bindTextViews();
@@ -300,9 +300,10 @@ public class DashboardActivity extends GPSActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         } else if (id == R.id.menu_send_data) {
-            //Location location = GPSUtils.getLocation();
-            ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            GPSUtils gpsUtils = new GPSUtils(this);
+            Location location = gpsUtils.getLocation();
+            //ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
