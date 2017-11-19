@@ -61,9 +61,7 @@ public class DashboardActivity extends GPSActivity {
         if (favLocation == "") {
             textDialog();
         }
-        if (getUsername() == "") {
-            openDialogName();
-        }
+
 
         getDataLocation();
 
@@ -108,7 +106,7 @@ public class DashboardActivity extends GPSActivity {
             public void onResult(String response) {
 
             }
-        }, this, "Leiria");
+        }, this, "Mountain View");
     }
 
     private void bindTextViews() {
@@ -172,6 +170,9 @@ public class DashboardActivity extends GPSActivity {
                 if (intent != null) {
                     startActivity(intent);
                 }
+                if (getUsername() == "") {
+                    openDialogName();
+                }
                 /*
                 saveFavouriteLocation();
                 if (getUsername() == "") {
@@ -185,10 +186,12 @@ public class DashboardActivity extends GPSActivity {
         alertDialogBuilder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                enableGPS();
+                saveFavouriteLocation();
                 if (getUsername() == "") {
                     openDialogName();
                 }
-                Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
+                Toast.makeText(DashboardActivity.this,"Your favourite location is current location",Toast.LENGTH_LONG).show();
             }
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -229,7 +232,7 @@ public class DashboardActivity extends GPSActivity {
 
 
     private String getActualLocation() {
-
+        //TODO alterar método
         GPSUtils gpsUtils = new GPSUtils(DashboardActivity.this);
         Location currentLocation = gpsUtils.getLocation();
         String actualLocation = "";
