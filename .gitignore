@@ -26,10 +26,12 @@ local.properties
 .idea/scopes/scope_settings.xml
 .idea/vcs.xml
 *.iml
-
-# OS-specific files
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/modules.xml
+/.idea/libraries
 .DS_Store
-.DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
