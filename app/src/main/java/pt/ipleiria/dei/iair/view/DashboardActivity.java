@@ -24,6 +24,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.controller.IAirManager;
+
+import static android.app.PendingIntent.getActivity;
 
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
@@ -51,6 +54,16 @@ public class DashboardActivity extends GPSActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+        SharedPreferences sharedPref = this.getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        IAirManager.INSTANCE.setSharedPreferences(sharedPref);
+        TextView txtView = this.findViewById(R.id.textViewFavoriteLocation);
+        //Descomentar apenas para limpar as sharedpreferences
+        //SharedPreferences.Editor editor = sharedPref.edit();
+        //editor.clear();
+        //editor.commit();
+        IAirManager.INSTANCE.setFavoriteLocation(sharedPref.getString("favoriteLocation","null"));
+        txtView.setText(sharedPref.getString("favoriteLocation","null"));
 
         preferencesRead =getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
         preferencesWrite = preferencesRead.edit();
@@ -305,7 +318,6 @@ public class DashboardActivity extends GPSActivity {
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
-        }
         if(intent != null) {
             startActivity(intent);
 

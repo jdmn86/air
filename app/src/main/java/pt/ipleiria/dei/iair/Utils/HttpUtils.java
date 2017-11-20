@@ -46,7 +46,13 @@ public class HttpUtils {
         }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
             @Override
             public void onErrorResponse(VolleyError error) {
-            System.out.println(error.getMessage());
+
+                final int status = error.networkResponse.statusCode;
+                // Handle 30x
+                if(HttpURLConnection.HTTP_MOVED_PERM == status || status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                    final String location = error.networkResponse.headers.get("Location");
+                    Log.d(TAG, "Location: " + location);
+                }
 
                 //This code is executed if there is an error.
             }
@@ -75,7 +81,6 @@ MyRequestQueue.add(MyStringRequest);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        // display response
                         Log.d("Response", response.toString());
                     }
                 },

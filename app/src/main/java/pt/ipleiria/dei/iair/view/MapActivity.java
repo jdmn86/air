@@ -10,6 +10,7 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,18 +26,29 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
+import pt.ipleiria.dei.iair.Utils.HttpCallBack;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
+import pt.ipleiria.dei.iair.controller.IAirManager;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener  {
 
 
 public class MapActivity extends GPSActivity implements OnMapReadyCallback {
@@ -51,13 +63,15 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback {
     private Integer THRESHOLD = 2;
     private GoogleMap googleMap;
 
+    private List<Marker> markers;
+    private String vinicity="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-
+        markers = new ArrayList<>();
         permissions.add(ACCESS_FINE_LOCATION);
         permissions.add(ACCESS_COARSE_LOCATION);
 
@@ -85,7 +99,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback {
             Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
         } else {
 
-           // locationTrack.showSettingsAlert();
+            locationTrack.showSettingsAlert();
         }
 
 
@@ -93,6 +107,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
 
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
@@ -104,10 +119,51 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback {
 
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onPlaceSelected(Place place) {
+            public void onPlaceSelected(final Place place) {
                 // TODO: obter informações sobre o local selecionado.
                 //Log.i(TAG, "Place: " + place.getName());
                 LatLng chosenLocation = place.getLatLng();
+                Marker marker = googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
+                markers.add(marker);
+
+
+                googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                    @Override
+                    public void onMapLongClick(LatLng latLng) {
+                        for(Marker marker : markers) {
+                            if(Math.abs(marker.getPosition().latitude - latLng.latitude) < 0.05 && Math.abs(marker.getPosition().longitude - latLng.longitude) < 0.05) {
+                                IAirManager.INSTANCE.setSelectedPlace(place);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                                // Add the buttons
+                                builder.setPositiveButton(R.string.set_as_favorite_location, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        IAirManager.INSTANCE.saveFavoriteLocation(place);
+                                        googleMap.clear();
+                                        googleMap.addMarker(new MarkerOptions().position(place.getLatLng())
+                                                .title(IAirManager.INSTANCE.getFavoriteLocationName() + "\n This Is Yor Fvorite Location")
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
+                                        Toast.makeText(MapActivity.this,  place.getName() + " is now your favorite location!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                                builder.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // User cancelled the dialog
+                                    }
+                                });
+                                // Set other dialog properties
+                                builder.setTitle(place.getAddress());
+                                builder.setMessage(place.getLatLng().toString());
+
+                                // Create the AlertDialog
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+
+                                break;
+                            }
+                        }
+                    }
+                });
                 googleMap.clear();
                 googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
@@ -121,7 +177,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback {
             }
         });
     }
-
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -166,9 +221,9 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
-        if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION)
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -179,9 +234,27 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        //centro de portugal hardcoded deve ser a favorite location
-        LatLng chosenLocation = new LatLng(39.399872, -8.224454);
+
+
+
+        LatLng chosenLocation;
+        LatLng favoriteLocation = IAirManager.INSTANCE.getFavoriteLocationLatLng();
+        if(favoriteLocation==null){
+            //centro de portugal hardcoded quando não existe favoritelocation selecionada
+            chosenLocation = new LatLng(39.399872, -8.224454);
+            googleMap.addMarker(new MarkerOptions().position(chosenLocation)
+                    .title("Please Choose A Favorite Location"));
+        }
+        else {
+            chosenLocation = favoriteLocation;
+            Marker marker = googleMap.addMarker(new MarkerOptions().position(chosenLocation)
+                    .title(IAirManager.INSTANCE.getFavoriteLocationName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
+            markers.add(marker);
+        }
+
         this.googleMap.setMyLocationEnabled(true);
+        this.googleMap.setOnMapLongClickListener(this);
+
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
         this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(6));
 
@@ -267,6 +340,45 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback {
     }
 
 
+    @Override
+    public void onMapLongClick(final LatLng latLng) {
+
+
+
+        getVicinity(latLng,2000);
+
+         if(vinicity.isEmpty()){
+             getVicinity(latLng,3000);
+         }else if(vinicity.isEmpty()){
+             getVicinity(latLng,4000);
+         }else if(!vinicity.isEmpty()){
+             Toast.makeText(this, vinicity.toString(), Toast.LENGTH_LONG).show();
+
+         }
+
+    }
+
+
+    public void getVicinity(LatLng latLng,int radius){
+
+        HttpUtils.Get(new HttpCallBack() {
+
+            @Override
+            public void onResult(JSONObject response) throws JSONException {
+
+                if(response.getJSONArray("results").length()>0){
+
+                    vinicity = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
+                }
+
+            }
+
+            @Override
+            public void onResult(String response) {
+
+            }
+        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
+
+    }
 
 }
-
