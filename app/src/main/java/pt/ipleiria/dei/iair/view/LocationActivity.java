@@ -1,6 +1,7 @@
 package pt.ipleiria.dei.iair.view;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -8,6 +9,9 @@ import android.view.MenuItem;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
+import pt.ipleiria.dei.iair.Utils.GPSUtils;
+import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.controller.IAirManager;
 
 public class LocationActivity extends GPSActivity {
 
@@ -41,6 +45,11 @@ public class LocationActivity extends GPSActivity {
         }  else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
 
+        } else if (id == R.id.menu_send_data) {
+            GPSUtils gpsUtils = new GPSUtils(this);
+            Location location = gpsUtils.getLocation();
+            //ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
         } else if (id == R.id.menu_gps) {
             enableGPS();
 

@@ -21,8 +21,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,11 +69,11 @@ public class DashboardActivity extends GPSActivity {
         preferencesWrite = preferencesRead.edit();
 
         super.onCreate(savedInstanceState);
-        try {
+        /*try {
             runUnitTests();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
         setContentView(R.layout.activity_dashboard);
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -156,9 +154,8 @@ public class DashboardActivity extends GPSActivity {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Alert");
-        if(getActualLocation() == "") {
+        if(getActualLocation() == null) {
             alertDialogBuilder.setMessage("You don't have access to current location.");
-
             alertDialogBuilder.setPositiveButton("Turn on location",new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -255,6 +252,7 @@ public class DashboardActivity extends GPSActivity {
         Location currentLocation = gpsUtils.getLocation();
         String actualLocation = "null";
         try {
+            System.out.println(currentLocation.getLongitude() + "hjlgjhlgjhl");
             actualLocation = preferencesRead.getString("locationText", GPSUtils.getLocationDetails(this, currentLocation.getLatitude(), currentLocation.getLongitude()).getLocality());
         } catch (Exception e) {
             e.getMessage();
@@ -317,9 +315,10 @@ public class DashboardActivity extends GPSActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         } else if (id == R.id.menu_send_data) {
-            //Location location = GPSUtils.getLocation();
-            ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            GPSUtils gpsUtils = new GPSUtils(this);
+            Location location = gpsUtils.getLocation();
+            //ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
         } else if (id == R.id.menu_gps) {
             enableGPS();
 

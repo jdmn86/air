@@ -59,7 +59,7 @@ public class GPSUtils extends Service implements LocationListener {
         getLocation();
     }
 
-    private Location getLocation() {
+    public Location getLocation() {
 
         try {
             locationManager = (LocationManager) mContext
@@ -246,9 +246,11 @@ public class GPSUtils extends Service implements LocationListener {
         geocoder = new Geocoder(context, Locale.getDefault());
 
         try {
+            System.out.println(longitude + "thiohkjgjhv");
             addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
             return addresses.get(0);
         } catch (IOException e) {
+            System.out.print(e.getCause() + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -257,28 +259,4 @@ public class GPSUtils extends Service implements LocationListener {
 
 
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
 }
