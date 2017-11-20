@@ -21,8 +21,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -156,9 +154,8 @@ public class DashboardActivity extends GPSActivity {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Alert");
-        if(getActualLocation() == "") {
+        if(getActualLocation() == null) {
             alertDialogBuilder.setMessage("You don't have access to current location.");
-
             alertDialogBuilder.setPositiveButton("Turn on location",new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

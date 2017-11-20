@@ -59,7 +59,7 @@ public class GPSUtils extends Service implements LocationListener {
         getLocation();
     }
 
-    private Location getLocation() {
+    public Location getLocation() {
 
         try {
             locationManager = (LocationManager) mContext
@@ -259,28 +259,4 @@ public class GPSUtils extends Service implements LocationListener {
 
 
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
 }

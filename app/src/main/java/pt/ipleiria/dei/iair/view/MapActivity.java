@@ -329,11 +329,4 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback {
         locationTrack.stopListener();
     }
 
-
-
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
-    }
 }
