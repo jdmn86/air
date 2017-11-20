@@ -79,9 +79,11 @@ public class GPSUtils extends Service implements LocationListener {
         geocoder = new Geocoder(context, Locale.getDefault());
 
         try {
+            System.out.println(longitude + "thiohkjgjhv");
             addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
             return addresses.get(0);
         } catch (IOException e) {
+            System.out.print(e.getCause() + e.getMessage());
             e.printStackTrace();
             return null;
         }

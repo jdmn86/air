@@ -238,6 +238,7 @@ public class DashboardActivity extends GPSActivity {
         Location currentLocation = gpsUtils.getLocation();
         String actualLocation = "null";
         try {
+            System.out.println(currentLocation.getLongitude() + "hjlgjhlgjhl");
             actualLocation = preferencesRead.getString("locationText", GPSUtils.getLocationDetails(this, currentLocation.getLatitude(), currentLocation.getLongitude()).getLocality());
         } catch (Exception e) {
             e.getMessage();

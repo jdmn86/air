@@ -10,10 +10,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
-<<<<<<< Updated upstream
-=======
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
@@ -33,9 +38,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback {
     private GoogleMap googleMap;
 
     private List<Marker> markers;
->>>>>>> Stashed changes
 
-public class MapActivity extends GPSActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,5 +82,10 @@ public class MapActivity extends GPSActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
     }
 }
