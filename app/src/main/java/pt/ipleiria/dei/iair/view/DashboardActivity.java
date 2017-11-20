@@ -11,12 +11,15 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.content.ServiceConnection;
 import android.location.Location;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,9 +35,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.controller.IAirManager;
+
+import static android.app.PendingIntent.getActivity;
+
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 
@@ -69,6 +77,15 @@ public class DashboardActivity extends GPSActivity {
             e.printStackTrace();
         }*/
         setContentView(R.layout.activity_dashboard);
+        SharedPreferences sharedPref = this.getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        //Descomentar apenas para limpar as sharedpreferences
+        //SharedPreferences.Editor editor = sharedPref.edit();
+        //editor.clear();
+        //editor.commit();
+        IAirManager.INSTANCE.setSharedPreferences(sharedPref);
+        TextView txtView = this.findViewById(R.id.textViewFavoriteLocation);
+        txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
         //ThinkSpeak.createNewChannel("Coimbra",40.200939, -8.407976,true,"Temperatura","Pressão","Humidade");
         bindTextViews();
         favLocation = getLocationFavourite();
