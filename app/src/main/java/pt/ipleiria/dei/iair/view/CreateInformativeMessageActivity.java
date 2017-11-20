@@ -5,17 +5,37 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
+
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 
 public class CreateInformativeMessageActivity extends GPSActivity {
 
+    EditText editTextTimestampCreateInformativeMessage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_informative_message);
+
+        final Button buttonNow = findViewById(R.id.buttonNowCreateInformativeMessage);
+        editTextTimestampCreateInformativeMessage= (EditText)findViewById(R.id.editTextTimestampCreateInformativeMessage);
+        buttonNow.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                String format = s.format(new Date());
+                editTextTimestampCreateInformativeMessage.setText(format);
+            }
+        });
     }
 
     @Override
@@ -54,4 +74,5 @@ public class CreateInformativeMessageActivity extends GPSActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

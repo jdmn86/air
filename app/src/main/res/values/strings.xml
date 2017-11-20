@@ -23,5 +23,15 @@
     <string name="set_as_favorite_location">Set As Favorite Location</string>
     <string name="back">Back</string>
     <string name="preference_file_key">pt.ipleiria.dei.iair.favoriteLocation</string>
+    <string name="create_informative_message">Create Informative Message</string>
+    <string name="informative_message_type">Type</string>
+    <string name="textViewDescription">Description:</string>
+    <string name="textViewTimestamp">Timestamp:</string>
+    <string name="buttonNow">Now</string>
+    <string name="textViewLocation">Location:</string>
+    <string name="buttonMapCreateInformativeMessage">Map</string>
+    <string name="buttonCancelCreateInformativeMessage">Cancel</string>
+    <string name="buttonSaveCreateInformativeMessage">Save</string>
+
 
 </resources>
