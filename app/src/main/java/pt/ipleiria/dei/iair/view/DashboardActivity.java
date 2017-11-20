@@ -33,20 +33,16 @@ import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
-//import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 
 public class DashboardActivity extends GPSActivity {
-    public static final String SHARED_PREFERENCES = "Shared";
-    SharedPreferences preferencesRead;
-    SharedPreferences.Editor preferencesWrite;
-
-    private String txtUsername = "Username: ";
     private TextView favouriteLocationTXT;
     private TextView temperatureFavLocationValue;
     private TextView pressureFavLocationValue;
     private TextView humidityFavLocationValue;
-    private String favLocation;
     private TextView userNameTXT;
+
+    private String txtUsername = "Username: ";
 
     private ServiceConnection connection;
 
@@ -62,24 +58,21 @@ public class DashboardActivity extends GPSActivity {
         //SharedPreferences.Editor editor = sharedPref.edit();
         //editor.clear();
         //editor.commit();
-        IAirManager.INSTANCE.setFavoriteLocation(sharedPref.getString("favoriteLocation","null"));
-        txtView.setText(sharedPref.getString("favoriteLocation","null"));
+        IAirManager.INSTANCE.setFavoriteLocation(sharedPref.getString("favoriteLocation", "null"));
+        txtView.setText(sharedPref.getString("favoriteLocation", "null"));
 
-        preferencesRead =getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-        preferencesWrite = preferencesRead.edit();
 
         //ThinkSpeak.createNewChannel("Coimbra",40.200939, -8.407976,true,"Temperatura","Pressão","Humidade");
         bindTextViews();
-        favLocation = getLocationFavourite();
-        if (favLocation == "") {
+
+        if (IAirManager.INSTANCE.getFavoriteLocationName()== "null") {
             textDialog();
         }
 
 
+        favouriteLocationTXT.setText(IAirManager.INSTANCE.getFavoriteLocationName());
+        userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
         getDataLocation();
-
-        favouriteLocationTXT.setText(favLocation);
-        userNameTXT.setText(txtUsername + getUsername());
 
 
     }
@@ -92,10 +85,10 @@ public class DashboardActivity extends GPSActivity {
                 humidityFavLocationValue.setText("N/A");
                 pressureFavLocationValue.setText("N/A");
                 JSONArray feeds = response.getJSONArray("feeds");
-                if(feeds.length() == 0) {
+                if (feeds.length() == 0) {
 
-                    Toast.makeText(DashboardActivity.this,"Don't have data in your location",Toast.LENGTH_LONG).show();
-                }else {
+                    Toast.makeText(DashboardActivity.this, "Don't have data in your location", Toast.LENGTH_LONG).show();
+                } else {
                     //throw Exception;
                     //temperatureFavLocationValue.setText(String.valueOf(feeds.length()));
 
@@ -125,51 +118,12 @@ public class DashboardActivity extends GPSActivity {
     private void bindTextViews() {
         favouriteLocationTXT = findViewById(R.id.textViewFavoriteLocation);
         temperatureFavLocationValue = findViewById(R.id.textViewValueTemperature);
-        pressureFavLocationValue =  findViewById(R.id.textViewValuePressure);
+        pressureFavLocationValue = findViewById(R.id.textViewValuePressure);
         humidityFavLocationValue = findViewById(R.id.textViewValueHumidity);
         userNameTXT = findViewById(R.id.textViewUserName);
     }
 
-
-
-
-
-    public void openDialog(){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-        alertDialogBuilder.setTitle("Alert");
-        if(getActualLocation() == "") {
-            alertDialogBuilder.setMessage("You don't have access to current location.");
-
-            alertDialogBuilder.setPositiveButton("Turn on location",new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    enableGPS();
-                    Toast.makeText(DashboardActivity.this,"GPS enabled",Toast.LENGTH_LONG).show();
-                    textDialog();
-                }
-            });
-            alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface arg0, int arg1) {
-
-                    if (getUsername() == "") {
-                        openDialogName();
-                    }
-                    favouriteLocationTXT.setText(getLocationFavourite());
-                    Toast.makeText(DashboardActivity.this,"Location Favourite not Updated",Toast.LENGTH_LONG).show();
-
-                }
-            });
-        }
-
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
-
-    public void textDialog(){
-
+    public void textDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Alert");
@@ -183,35 +137,35 @@ public class DashboardActivity extends GPSActivity {
                 if (intent != null) {
                     startActivity(intent);
                 }
-                if (getUsername() == "") {
+                if (IAirManager.INSTANCE.getUsername() == "null") {
                     openDialogName();
                 }
-                /*
-                saveFavouriteLocation();
-                if (getUsername() == "") {
-                    openDialogName();
-                }
-                favouriteLocationTXT.setText(getLocationFavourite());
-                Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();*/
+                //Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();
             }
         });
 
-        alertDialogBuilder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 enableGPS();
-                saveFavouriteLocation();
-                if (getUsername() == "") {
+                GPSUtils locationTrack = new GPSUtils(getApplicationContext());;
+                if (locationTrack.canGetLocation()) {
+                    double longitude = locationTrack.getLongitude();
+                    double latitude = locationTrack.getLatitude();
+                    Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
+                }
+                if (IAirManager.INSTANCE.getUsername() == "null") {
                     openDialogName();
                 }
-                Toast.makeText(DashboardActivity.this,"Your favourite location is current location",Toast.LENGTH_LONG).show();
+                //saveFavouriteLocation();
+                //Toast.makeText(DashboardActivity.this, "Your favourite location is current location", Toast.LENGTH_LONG).show();
             }
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
-    public void openDialogName(){
+    public void openDialogName() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Insert Name");
@@ -223,74 +177,30 @@ public class DashboardActivity extends GPSActivity {
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                saveUsername(input.getText().toString());
-                userNameTXT.setText(txtUsername + getUsername());
-                Toast.makeText(DashboardActivity.this,"Save your Username",Toast.LENGTH_LONG).show();
-
+                IAirManager.INSTANCE.saveUsername(input.getText().toString());
+                userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
+                Toast.makeText(DashboardActivity.this, "Save your Username", Toast.LENGTH_LONG).show();
             }
         });
-        alertDialogBuilder.setNegativeButton("CANCEL",new DialogInterface.OnClickListener() {
+        /*alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(DashboardActivity.this,"Your username isn't choose",Toast.LENGTH_LONG).show();
+                Toast.makeText(DashboardActivity.this, "Your username isn't choose", Toast.LENGTH_LONG).show();
             }
         });
+        */
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
 
-
-
-
-    private String getActualLocation() {
-        //TODO alterar método
-        GPSUtils gpsUtils = new GPSUtils(DashboardActivity.this);
-        Location currentLocation = gpsUtils.getLocation();
-        String actualLocation = "";
-        try {
-            actualLocation = preferencesRead.getString("locationText", GPSUtils.getLocationDetails(this, currentLocation.getLatitude(), currentLocation.getLongitude()).getLocality());
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        return actualLocation;
-    }
-
-
-    public void saveFavouriteLocation() {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("locationFavourite", getActualLocation());
-        editor.apply();
-    }
-
-    private void saveUsername(String username) {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("userName", username);
-        editor.apply();
-    }
-
-    public String getLocationFavourite () {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-        String favLocation = sharedPreferences.getString("locationFavourite", "");
-        return  favLocation;
-    }
-
-    public String getUsername() {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-        String username = sharedPreferences.getString("userName", "");
-        return  username;
-    }
-
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -313,18 +223,20 @@ public class DashboardActivity extends GPSActivity {
 
         } else if (id == R.id.menu_send_data) {
             //Location location = GPSUtils.getLocation();
-            ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
             //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
         } else if (id == R.id.menu_gps) {
             enableGPS();
-
-        if(intent != null) {
-            startActivity(intent);
-
-            return true;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
+            if (intent != null) {
+                startActivity(intent);
+
+                return true;
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
+
 
 }

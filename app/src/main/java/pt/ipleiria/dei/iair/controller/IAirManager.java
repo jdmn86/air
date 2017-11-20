@@ -37,6 +37,7 @@ public enum IAirManager {
     SharedPreferences sharedPreferences;
     LatLng favoriteLocationLatLng;
     private String favoriteLocationName;
+    private String username;
 
 
     public String getHumity() {
@@ -111,6 +112,7 @@ public enum IAirManager {
         this.sharedPreferences = sharedPreferences;
         setFavoriteLocation(sharedPreferences.getString("favoriteLocation","null"));
         setFavoriteLocationName(sharedPreferences.getString("favoriteLocationName","null"));
+        setUsername(sharedPreferences.getString("username","null"));
     }
 
     public LatLng getFavoriteLocationLatLng() {
@@ -129,5 +131,20 @@ public enum IAirManager {
 
     public String getFavoriteLocationName() {
         return favoriteLocationName;
+    }
+
+    public void saveUsername(String username) {
+        this.username = username;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("username", username);
+        editor.commit();
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

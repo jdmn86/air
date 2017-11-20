@@ -60,7 +60,7 @@ GPSUtils extends Service implements LocationListener {
         getLocation();
     }
 
-    public Location getLocation() {
+    private Location getLocation() {
 
         try {
             locationManager = (LocationManager) mContext
