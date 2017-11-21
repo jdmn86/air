@@ -122,6 +122,7 @@ public class CreateInformativeMessageActivity extends GPSActivity {
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute){
                         mMinute=minute;
                         mHour=hourOfDay;
+
                         GregorianCalendar calendar = new GregorianCalendar(mYear,mMonth,mDay,mHour,mMinute);
                         String month=String.format("%02d",calendar.get(Calendar.MONTH));
                         String day=String.format("%02d",calendar.get(Calendar.DAY_OF_MONTH));
