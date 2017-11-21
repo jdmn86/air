@@ -37,7 +37,8 @@ public enum IAirManager {
     SharedPreferences sharedPreferences;
     LatLng favoriteLocationLatLng;
     private String favoriteLocationName;
-    private String username;
+
+
 
 
     public String getHumity() {
@@ -51,7 +52,6 @@ public enum IAirManager {
     public String getTemperature() {
         return temperature;
     }
-
 
     public void setSensorManager(SensorManager sensorManager) {
         this.sensorManager = sensorManager;
@@ -94,10 +94,6 @@ public enum IAirManager {
         return favoriteLocation;
     }
 
-
-
-
-
     public void saveFavoriteLocation(Place favoriteLocation) {
         this.favoriteLocation = favoriteLocation;
         this.favoriteLocationLatLng=favoriteLocation.getLatLng();
@@ -112,7 +108,6 @@ public enum IAirManager {
         this.sharedPreferences = sharedPreferences;
         setFavoriteLocation(sharedPreferences.getString("favoriteLocation","null"));
         setFavoriteLocationName(sharedPreferences.getString("favoriteLocationName","null"));
-        setUsername(sharedPreferences.getString("username","null"));
     }
 
     public LatLng getFavoriteLocationLatLng() {

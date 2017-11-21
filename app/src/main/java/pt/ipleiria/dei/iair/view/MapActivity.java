@@ -5,12 +5,14 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+<<<<<<<<< Temporary merge branch 1
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+=========
+>>>>>>>>> Temporary merge branch 2
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,17 +41,22 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.Utils.GPSActivity;
+<<<<<<<<< Temporary merge branch 1
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
-import pt.ipleiria.dei.iair.Utils.HttpCallBack;
-import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MapActivity extends GPSActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener  {
+public class MapActivity extends GPSActivity implements OnMapReadyCallback {
 
     private ArrayList permissionsToRequest;
     private ArrayList permissionsRejected = new ArrayList();
@@ -58,11 +65,10 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
     private final static int ALL_PERMISSIONS_RESULT = 101;
     GPSUtils locationTrack;
 
-    private Integer THRESHOLD = 2;
     private GoogleMap googleMap;
 
     private List<Marker> markers;
-    private String vinicity="";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +113,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         mapFragment.getMapAsync(this);
 
 
-
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
@@ -123,7 +128,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                 LatLng chosenLocation = place.getLatLng();
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
                 markers.add(marker);
-
 
                 googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                     @Override
@@ -162,8 +166,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                         }
                     }
                 });
-                googleMap.clear();
-                googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
             }
@@ -202,7 +204,12 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         } else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
 
-        } else if (id == R.id.menu_gps) {
+        }else if (id == R.id.menu_send_data) {
+            GPSUtils gpsUtils = new GPSUtils(this);
+            Location location = gpsUtils.getLocation();
+            //ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+        }  else if (id == R.id.menu_gps) {
             enableGPS();
 
         }
@@ -233,8 +240,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             return;
         }
 
-
-
         LatLng chosenLocation;
         LatLng favoriteLocation = IAirManager.INSTANCE.getFavoriteLocationLatLng();
         if(favoriteLocation==null){
@@ -254,7 +259,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         this.googleMap.setOnMapLongClickListener(this);
 
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
-        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(6));
+        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
 
     }
 

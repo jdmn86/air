@@ -48,12 +48,13 @@ public class ThinkSpeak {
         }else if(!InternetUtils.isNetworkConnected(context)) {
             Toast.makeText(context, R.string.No_internet_message, Toast.LENGTH_SHORT).show();
             return false;
-        } else if( manager.isProviderEnabled( LocationManager.GPS_PROVIDER )) {
+        } else if( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER )) {
             Toast.makeText(context, R.string.No_gps_message, Toast.LENGTH_SHORT).show();
             return false;
         }
 
           location = GPSUtils.getLocationDetails(context,latitude, longitude).getLocality();
+        System.out.println(location);
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
@@ -108,7 +109,7 @@ public class ThinkSpeak {
         try {
             ArrayList<Pair<String, String>> data = new ArrayList<>();
             data.add(new Pair<>("api_key", API_KEY_CREATE_CHANNEL));
-            data.add(new Pair<>("name", channelName));
+            data.add(new Pair<>("name", ThinkSpeak.location));
             data.add(new Pair<>("latitude", String.valueOf(latitude)));
             data.add(new Pair<>("longitude", String.valueOf(longitude)));
 
@@ -119,11 +120,11 @@ public class ThinkSpeak {
                 i += 1;
             }
 
-            MQTTHandler mqtt = new MQTTHandler(context, "channels/361937/subscribe/json/" + API_KEY_CREATE_ASSOCIATION, "pl12taes217", "0DT1756US8QLAZUK".toCharArray());
-            mqtt.connect();
-            mqtt.addActionListener(new MQTTThinkSpeakHandler() {
+            //MQTTHandler mqtt = new MQTTHandler(context, "channels/361937/subscribe/json/" + API_KEY_CREATE_ASSOCIATION, "pl12taes217", "0DT1756US8QLAZUK".toCharArray());
+            //mqtt.connect();
+            //mqtt.addActionListener(new MQTTThinkSpeakHandler() {
 
-            });
+            //});
 
             HttpUtils.Post(new HttpCallBack() {
                 @Override
@@ -176,6 +177,7 @@ public class ThinkSpeak {
             @Override
             public void onResult(JSONObject response) throws JSONException {
                 JSONArray feeds = response.getJSONArray("feeds");
+                System.out.println(feeds.length());
                 if (feeds.length() != 0) {
 
                     for (int i = 0; i < feeds.length(); i++) {

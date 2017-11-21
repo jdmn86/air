@@ -13,9 +13,6 @@
     <string name="toast_no_humidity_sensor_available">No humidity sensor available</string>
     <string name="toast_no_pressure_sensor_available">No pressure sensor available</string>
     <string name="toast_no_temperature_sensor_available">No temperature sensor available</string>
-    <string name="set_as_favorite_location">Set As Favorite Location</string>
-    <string name="back">Back</string>
-    <string name="preference_file_key">pt.ipleiria.dei.iair.favoriteLocation</string>
     <string name="No_internet_message">No internet Available</string>
     <string name="No_gps_message">No GPS Available</string>
     <string name="No_data_message">No Data Available</string>
@@ -23,4 +20,19 @@
     <string name="txt_dashboard_data">Data</string>
     <string name="txtViewMsgInformative">Informative Message</string>
     <string name="activity_dashboard_username">Username:</string>
+    <string name="set_as_favorite_location">Set As Favorite Location</string>
+    <string name="back">Back</string>
+    <string name="preference_file_key">pt.ipleiria.dei.iair.favoriteLocation</string>
+    <string name="create_informative_message">Create Informative Message</string>
+    <string name="informative_message_type">Type</string>
+    <string name="textViewDescription">Description:</string>
+    <string name="textViewTimestamp">Timestamp:</string>
+    <string name="buttonNow">Now</string>
+    <string name="textViewLocation">Location:</string>
+    <string name="buttonMapCreateInformativeMessage">Map</string>
+    <string name="buttonCancelCreateInformativeMessage">Cancel</string>
+    <string name="buttonSaveCreateInformativeMessage">Save</string>
+    <string name="buttonSelectDateTimeCreateInformativeMessage">Select Tmestamp</string>
+
+
 </resources>
