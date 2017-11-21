@@ -39,7 +39,6 @@ import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 
 import static junit.framework.Assert.fail;
-import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.context;
 //import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 
 public class DashboardActivity extends GPSActivity {
@@ -74,7 +73,7 @@ public class DashboardActivity extends GPSActivity {
         favLocation = getLocationFavourite();
         if (favLocation == "") {
 
-            openDialog();
+            //openDialog();
 
         }
         //textDialog();
@@ -86,7 +85,7 @@ public class DashboardActivity extends GPSActivity {
     }
 
     private void getDataLocation() {
-        ThinkSpeak.getData(new HttpCallBack() {
+        ThinkSpeak.INSTANCE.getData(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
                 temperatureFavLocationValue.setText("N/A");
@@ -238,8 +237,8 @@ public class DashboardActivity extends GPSActivity {
         Location currentLocation = gpsUtils.getLocation();
         String actualLocation = "null";
         try {
-            System.out.println(currentLocation.getLongitude() + "hjlgjhlgjhl");
-            actualLocation = preferencesRead.getString("locationText", GPSUtils.getLocationDetails(this, currentLocation.getLatitude(), currentLocation.getLongitude()).getLocality());
+            System.out.println(currentLocation.getLatitude() + "hjlgjhlgjhl");
+            actualLocation = preferencesRead.getString("locationText", gpsUtils.getLocationDetails(this, currentLocation.getLatitude(), currentLocation.getLongitude()).get(0).getLocality());
         } catch (Exception e) {
             e.getMessage();
         }
@@ -304,7 +303,7 @@ public class DashboardActivity extends GPSActivity {
             GPSUtils gpsUtils = new GPSUtils(this);
             Location location = gpsUtils.getLocation();
             //ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
@@ -319,10 +318,10 @@ public class DashboardActivity extends GPSActivity {
     }
     private void runUnitTests() throws InterruptedException {
 
-        Log.d("Unit Test_US8_AT5" , (ThinkSpeak.sendData(this, 39.039463, 125.763378, null, null, null) ? "Sending null for GPS and worked something Wrong" : "Sending null for GPS and not worked OK"));
-        ThinkSpeak.sendData(this, 39.039463, 125.763378, "80", null, null);
+        Log.d("Unit Test_US8_AT5" , (ThinkSpeak.INSTANCE.sendData(this, 39.039463, 125.763378, null, null, null) ? "Sending null for GPS and worked something Wrong" : "Sending null for GPS and not worked OK"));
+        ThinkSpeak.INSTANCE.sendData(this, 39.039463, 125.763378, "80", null, null);
         Thread.sleep(10000);
-        ThinkSpeak.getData(new HttpCallBack() {
+        ThinkSpeak.INSTANCE.getData(new HttpCallBack() {
 
             @Override
             public void onResult(JSONObject response) throws JSONException {

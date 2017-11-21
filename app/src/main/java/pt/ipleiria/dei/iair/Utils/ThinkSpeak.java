@@ -2,7 +2,9 @@ package pt.ipleiria.dei.iair.Utils;
 
 
 import android.content.Context;
+import android.location.Address;
 import android.location.LocationManager;
+import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
 
@@ -19,28 +21,29 @@ import pt.ipleiria.dei.iair.R;
  * Created by kxtreme on 08-11-2017.
  */
 
-public class ThinkSpeak {
+public enum ThinkSpeak {
+    INSTANCE;
     private final static String API_KEY_CREATE_CHANNEL = "6T4V93KT9K3ZVOWV";
     private final static String API_KEY_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
     private final static String CHANNEL_NUMBER_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
-    public static String location;
-    public static String temperature;
-    public static String pressure;
-    public static String humity;
-    public static double latitude;
-    public static double longitude;
-    public static Context context;
-    private static HttpCallBack callback;
+    public String location;
+    public  String temperature;
+    public  String pressure;
+    public  String humity;
+    public double latitude;
+    public double longitude;
+    public Context context;
+    private HttpCallBack callback;
 
 
-    public static boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
+    public boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
 
-        ThinkSpeak.humity = humity;
-        ThinkSpeak.pressure = pressure;
-        ThinkSpeak.temperature = temperature;
-        ThinkSpeak.latitude = latitude;
-        ThinkSpeak.longitude = longitude;
-        ThinkSpeak.context = context;
+        ThinkSpeak.INSTANCE.humity = humity;
+        ThinkSpeak.INSTANCE.pressure = pressure;
+        ThinkSpeak.INSTANCE.temperature = temperature;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.context = context;
         LocationManager manager = (LocationManager) context.getSystemService( Context.LOCATION_SERVICE );
         if(temperature == null && pressure == null && humity == null) {
             Toast.makeText(context, R.string.No_data_message, Toast.LENGTH_SHORT).show();
@@ -53,7 +56,14 @@ public class ThinkSpeak {
             return false;
         }
 
-          location = GPSUtils.getLocationDetails(context,latitude, longitude).getLocality();
+GPSUtils gpsUtils = new GPSUtils(context);
+        Log.d("APPSENSORS","LONGITUDE" + longitude);
+        List<Address> addresses = gpsUtils.getLocationDetails(context, latitude, longitude);
+        Address address = addresses.get(0);
+        if(address.getLocality() != null)
+        location = address.getLocality();
+        else
+            location = (address.getAddressLine(1).split(" "))[1];
         System.out.println(location);
         HttpUtils.Get(new HttpCallBack() {
             @Override
@@ -69,11 +79,11 @@ public class ThinkSpeak {
                             ArrayList<Pair<String, String>> data = new ArrayList<>();
                             data.add(new Pair<>("api_key", elem.getString("field1")));
                             data.add(new Pair<>("name", location));
-                            data.add(new Pair<>("field1", ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature));
-                            data.add(new Pair<>("field2", ThinkSpeak.pressure == null? "N/A": ThinkSpeak.pressure));
-                            data.add(new Pair<>("field3", ThinkSpeak.humity == null? "N/A": ThinkSpeak.humity));
+                            data.add(new Pair<>("field1", ThinkSpeak.INSTANCE.temperature == null? "N/A": ThinkSpeak.INSTANCE.temperature));
+                            data.add(new Pair<>("field2", ThinkSpeak.INSTANCE.pressure == null? "N/A": ThinkSpeak.INSTANCE.pressure));
+                            data.add(new Pair<>("field3", ThinkSpeak.INSTANCE.humity == null? "N/A": ThinkSpeak.INSTANCE.humity));
 
-                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("field1") + "&field1=" + (ThinkSpeak.temperature == null ? "N/A" : ThinkSpeak.temperature), data, ThinkSpeak.context);
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("field1") + "&field1=" + (ThinkSpeak.INSTANCE.temperature == null ? "N/A" : ThinkSpeak.INSTANCE.temperature), data, ThinkSpeak.INSTANCE.context);
                         return;
                         }
 
@@ -85,14 +95,14 @@ public class ThinkSpeak {
                             ArrayList<Pair<String, String>> data = new ArrayList<>();
                             data.add(new Pair<>("api_key", messages[0]));
                             data.add(new Pair<>("name", messages[1]));
-                            data.add(new Pair<>("field1", ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature));
-                            data.add(new Pair<>("field2", ThinkSpeak.pressure == null? "N/A": ThinkSpeak.pressure));
-                            data.add(new Pair<>("field3", ThinkSpeak.humity == null? "N/A": ThinkSpeak.humity));
+                            data.add(new Pair<>("field1", ThinkSpeak.INSTANCE.temperature == null? "N/A": ThinkSpeak.INSTANCE.temperature));
+                            data.add(new Pair<>("field2", ThinkSpeak.INSTANCE.pressure == null? "N/A": ThinkSpeak.INSTANCE.pressure));
+                            data.add(new Pair<>("field3", ThinkSpeak.INSTANCE.humity == null? "N/A": ThinkSpeak.INSTANCE.humity));
 
-                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + messages[0] + "&field1=" + (ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature), data, ThinkSpeak.context);
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + messages[0] + "&field1=" + (ThinkSpeak.INSTANCE.temperature == null? "N/A": ThinkSpeak.INSTANCE.temperature), data, ThinkSpeak.INSTANCE.context);
                         }
 
-                    }, ThinkSpeak.context,location, ThinkSpeak.latitude, ThinkSpeak.longitude,true, "temperature", "pressure", "humity");
+                    }, ThinkSpeak.INSTANCE.context,location, ThinkSpeak.INSTANCE.latitude, ThinkSpeak.INSTANCE.longitude,true, "temperature", "pressure", "humity");
 
 
             }
@@ -105,11 +115,11 @@ public class ThinkSpeak {
         return true;
     }
 
-    public static boolean createNewChannel(final CallBack callBack, final Context context, final String channelName, double latitude, double longitude, boolean status, String... fields) {
+    public  boolean createNewChannel(final CallBack callBack, final Context context, final String channelName, double latitude, double longitude, boolean status, String... fields) {
         try {
             ArrayList<Pair<String, String>> data = new ArrayList<>();
             data.add(new Pair<>("api_key", API_KEY_CREATE_CHANNEL));
-            data.add(new Pair<>("name", ThinkSpeak.location));
+            data.add(new Pair<>("name", ThinkSpeak.INSTANCE.location));
             data.add(new Pair<>("latitude", String.valueOf(latitude)));
             data.add(new Pair<>("longitude", String.valueOf(longitude)));
 
@@ -165,14 +175,16 @@ public class ThinkSpeak {
 
         return true;
     }
-    public static void getData( HttpCallBack callback,Context context, double latitude, double longitude) {
-        getData(callback, context, GPSUtils.getLocationDetails(context, latitude,longitude).getLocality());
+    public void getData( HttpCallBack callback,Context context, double latitude, double longitude) {
+        GPSUtils gpsUtils = new GPSUtils(context);
+
+        getData(callback, context, gpsUtils.getLocationDetails(context, latitude,longitude).get(0).getLocality());
     }
 
-    public static void getData(HttpCallBack callback, Context context, String location) {
-        ThinkSpeak.location = location;
-        ThinkSpeak.context = context;
-        ThinkSpeak.callback = callback;
+    public  void getData(HttpCallBack callback, Context context, String location) {
+        ThinkSpeak.INSTANCE.location = location;
+        ThinkSpeak.INSTANCE.context = context;
+        ThinkSpeak.INSTANCE.callback = callback;
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
@@ -182,8 +194,8 @@ public class ThinkSpeak {
 
                     for (int i = 0; i < feeds.length(); i++) {
                         JSONObject elem = new JSONObject( feeds.get(i).toString());
-                        if (elem.get("field2").equals(ThinkSpeak.location)) {
-                            HttpUtils.Get(ThinkSpeak.callback,"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.context);
+                        if (elem.get("field2").equals(ThinkSpeak.INSTANCE.location)) {
+                            HttpUtils.Get(ThinkSpeak.INSTANCE.callback,"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.INSTANCE.context);
 
                         }
                     }
