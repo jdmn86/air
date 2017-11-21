@@ -1,9 +1,20 @@
 package pt.ipleiria.dei.iair.controller;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.widget.Toast;
+
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import pt.ipleiria.dei.iair.model.IAirSensorListener;
+import pt.ipleiria.dei.iair.view.MapActivity;
 import pt.ipleiria.dei.iair.view.MySensorsActivity;
 
 /**
@@ -20,6 +31,11 @@ public enum IAirManager {
     private String humity;
     private String presure;
     private String temperature;
+    Place favoriteLocation;
+    Place selectedPlace;
+    SharedPreferences sharedPreferences;
+    LatLng favoriteLocationLatLng;
+    private String favoriteLocationName;
 
 
 
@@ -66,5 +82,47 @@ public enum IAirManager {
 
     public SensorManager getSensorManager() {
         return sensorManager;
+    }
+
+    public void setSelectedPlace(Place place) {
+        this.selectedPlace = place;
+    }
+
+    public Place getFavoriteLocation() {
+        return favoriteLocation;
+    }
+
+    public void saveFavoriteLocation(Place favoriteLocation) {
+        this.favoriteLocation = favoriteLocation;
+        this.favoriteLocationLatLng=favoriteLocation.getLatLng();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("favoriteLocation",favoriteLocation.getLatLng().latitude + ";" + favoriteLocation.getLatLng().longitude);
+        //guardar também dados que sejam necessarios no dashboard como o nome, da localização favorita por ex
+        editor.putString("favoriteLocationName",favoriteLocation.getName().toString());
+        editor.commit();
+    }
+
+    public void setSharedPreferences(SharedPreferences sharedPreferences) {
+        this.sharedPreferences = sharedPreferences;
+        setFavoriteLocation(sharedPreferences.getString("favoriteLocation","null"));
+        setFavoriteLocationName(sharedPreferences.getString("favoriteLocationName","null"));
+    }
+
+    public LatLng getFavoriteLocationLatLng() {
+        return favoriteLocationLatLng;
+    }
+
+    public void setFavoriteLocation(String string) {
+        if(string.equals("null")) return;
+        String[] strs = string.split(";");
+        favoriteLocationLatLng=new LatLng(Double.parseDouble(strs[0]),Double.parseDouble(strs[1]));
+    }
+
+    public void setFavoriteLocationName(String favoriteLocationName) {
+        this.favoriteLocationName = favoriteLocationName;
+    }
+
+    public String getFavoriteLocationName() {
+        return favoriteLocationName;
     }
 }

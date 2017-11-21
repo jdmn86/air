@@ -20,4 +20,8 @@
     <string name="txt_dashboard_data">Data</string>
     <string name="txtViewMsgInformative">Informative Message</string>
     <string name="activity_dashboard_username">Username:</string>
+    <string name="set_as_favorite_location">Set As Favorite Location</string>
+    <string name="back">Back</string>
+    <string name="preference_file_key">pt.ipleiria.dei.iair.favoriteLocation</string>
+
 </resources>
