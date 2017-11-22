@@ -1,15 +1,10 @@
 package pt.ipleiria.dei.iair.Utils;
 
 import android.Manifest;
-<<<<<<<<< Temporary merge branch 1
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
-=========
-import android.app.Service;
-import android.content.Context;
->>>>>>>>> Temporary merge branch 2
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -19,25 +14,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
-<<<<<<<<< Temporary merge branch 1
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-=========
-import android.support.v4.content.ContextCompat;
->>>>>>>>> Temporary merge branch 2
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class GPSUtils extends Service implements LocationListener {
-
-<<<<<<<<< Temporary merge branch 1
 public class GPSUtils extends Service implements LocationListener {
 
 
@@ -49,7 +32,7 @@ public class GPSUtils extends Service implements LocationListener {
 
     boolean checkNetwork = false;
 
-    boolean canGetLocation = false;
+    private boolean canGetLocation=false;
 
     Location loc;
     double latitude;
@@ -61,13 +44,14 @@ public class GPSUtils extends Service implements LocationListener {
 
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
     protected LocationManager locationManager;
+    ;
 
-    public GPSUtils(Context mContext) {
-        this.mContext = mContext;
-        getLocation();
+    public GPSUtils(Context context) {
+        this.mContext = context;
+
     }
 
-    private Location getLocation() {
+    public Location getLocation() {
 
         try {
             locationManager = (LocationManager) mContext
@@ -217,90 +201,8 @@ public class GPSUtils extends Service implements LocationListener {
         }
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
 
 
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
-
-
-
-
-
-=========
-    private final Context context;
-    boolean isGPSEnable=false;
-    boolean isNetworkEnable=false;
-    boolean canGetLocation=false;
-
-    Location location;
-    protected LocationManager locationManager;
-
-    public Location getLocation(){
-       // try {
-            locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
-            isGPSEnable= locationManager.isProviderEnabled(locationManager.GPS_PROVIDER);
-            isNetworkEnable=locationManager.isProviderEnabled(locationManager.NETWORK_PROVIDER);
-
-            if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)== PackageManager.PERMISSION_GRANTED){
-
-                if(isGPSEnable){
-                    if(location==null){
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,10,this);
-                        if(locationManager!=null){
-                            location=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        }
-                    }
-
-                }
-
-                if(location==null){
-                    if(isNetworkEnable){
-                        if(location==null){
-                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,10000,10,this);
-                            if(locationManager!=null){
-                                location=locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                            }
-                        }
-
-                    }
-                }
-            }
-
-      //  }catch (Exception ex){
-
-      //  }
-        return location;
-    }
-
-
-
-    public GPSUtils(Context context){
-        this.context =context;
-
-    }
->>>>>>>>> Temporary merge branch 2
     public static Address getLocationDetails(Context context, double latitude, double longitude) {
 
         Geocoder geocoder;

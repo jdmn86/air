@@ -2,52 +2,30 @@ package pt.ipleiria.dei.iair.view;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-<<<<<<<<< Temporary merge branch 1
-=========
 import android.location.Location;
 import android.support.v7.app.AlertDialog;
-import android.content.ServiceConnection;
-import android.location.Location;
->>>>>>>>> Temporary merge branch 2
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-<<<<<<<<< Temporary merge branch 1
 import android.widget.TextView;
 import android.widget.Toast;
-
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.controller.IAirManager;
-
-import static android.app.PendingIntent.getActivity;
-
-=========
 import android.widget.EditText;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.concurrent.TimeUnit;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
-import pt.ipleiria.dei.iair.controller.IAirManager;
-//import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
->>>>>>>>> Temporary merge branch 2
+
+import static junit.framework.Assert.fail;
 
 public class DashboardActivity extends GPSActivity {
     public static final String SHARED_PREFERENCES = "Shared";
@@ -61,6 +39,7 @@ public class DashboardActivity extends GPSActivity {
     private TextView humidityFavLocationValue;
     private String favLocation;
     private TextView userNameTXT;
+    private TextView txtView;
 
     private ServiceConnection connection;
 
@@ -71,24 +50,19 @@ public class DashboardActivity extends GPSActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-<<<<<<<<< Temporary merge branch 1
+
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        //Descomentar apenas para limpar as sharedpreferences
-        //SharedPreferences.Editor editor = sharedPref.edit();
-        //editor.clear();
-        //editor.commit();
+
         IAirManager.INSTANCE.setSharedPreferences(sharedPref);
-        TextView txtView = this.findViewById(R.id.textViewFavoriteLocation);
+         txtView = this.findViewById(R.id.textViewFavoriteLocation);
         txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
-=========
         //ThinkSpeak.createNewChannel("Coimbra",40.200939, -8.407976,true,"Temperatura","Pressão","Humidade");
         bindTextViews();
 
         if (IAirManager.INSTANCE.getFavoriteLocationName()== "null") {
             textDialog();
         }
-        //textDialog();
 
         favouriteLocationTXT.setText(favLocation);
         userNameTXT.setText(txtUsername + getUsername());
@@ -146,39 +120,7 @@ public class DashboardActivity extends GPSActivity {
 
 
 
-    public void openDialog(){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
-        alertDialogBuilder.setTitle("Alert");
-        if(getActualLocation() == "") {
-            alertDialogBuilder.setMessage("You don't have access to current location.");
-
-            alertDialogBuilder.setPositiveButton("Turn on location",new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    enableGPS();
-                    Toast.makeText(DashboardActivity.this,"GPS enabled",Toast.LENGTH_LONG).show();
-                    textDialog();
-                }
-            });
-            alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface arg0, int arg1) {
-
-                    if (getUsername() == "") {
-                        openDialogName();
-                    }
-                    favouriteLocationTXT.setText(getLocationFavourite());
-                    Toast.makeText(DashboardActivity.this,"Location Favourite not Updated",Toast.LENGTH_LONG).show();
-
-                }
-            });
-        }
-
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
 
     public void textDialog(){
 
@@ -256,7 +198,7 @@ public class DashboardActivity extends GPSActivity {
 
 
     private String getActualLocation() {
-        GPSUtils gpsUtils = new GPSUtils(this);
+        GPSUtils gpsUtils = new GPSUtils(getApplicationContext());
         Location currentLocation = gpsUtils.getLocation();
         String actualLocation = "null";
         try {
@@ -294,7 +236,7 @@ public class DashboardActivity extends GPSActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("userName", "");
         return  username;
->>>>>>>>> Temporary merge branch 2
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -364,5 +306,12 @@ public class DashboardActivity extends GPSActivity {
             }
         },  this,  39.039463, 125.763378);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
+        userNameTXT.setText(txtUsername + getUsername());
     }
 }
