@@ -1,5 +1,6 @@
 package pt.ipleiria.dei.iair.view;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -28,6 +29,8 @@ public class CreateInformativeMessageActivity extends GPSActivity {
 
     EditText editTextTimestampCreateInformativeMessage;
     int mYear,mMonth,mDay,mHour,mMinute;
+    static final int PICK_LOCATION_REQUEST = 1;  // The request code
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +40,7 @@ public class CreateInformativeMessageActivity extends GPSActivity {
         final Button buttonSelectDateTime = findViewById(R.id.buttonSelectDateTimeCreateInformativeMessage);
         final SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         final String format = s.format(new Date());
+        final Button buttonMap = findViewById(R.id.buttonMapCreateInformativeMessage);
 
         editTextTimestampCreateInformativeMessage= findViewById(R.id.editTextTimestampCreateInformativeMessage);
         editTextTimestampCreateInformativeMessage.setText(format);
@@ -46,7 +50,39 @@ public class CreateInformativeMessageActivity extends GPSActivity {
                 datePicker();
             }
         });
+
+
+
+        buttonMap.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                Intent pickLocation = new Intent( getApplicationContext() , MapActivity.class );
+                //pickLocation.setType(Phone.CONTENT_TYPE); // Show user only contacts w/ phone numbers
+                pickLocation.putExtra("SEND_LOCATION_REQUEST", 2);
+                startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
+            }
+        });
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == PICK_LOCATION_REQUEST) {
+            if (resultCode == RESULT_OK) { // Activity.RESULT_OK
+
+                String location=data.getStringExtra("location");
+                String locationName=data.getStringExtra("locationName");
+
+                System.out.println("location"+location);
+                System.out.println("locationName"+locationName);
+
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                System.out.println("fail  ");
+            }
+        }
+    }//onActivityResult
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -136,5 +172,6 @@ public class CreateInformativeMessageActivity extends GPSActivity {
                 }, mHour, mMinute, true);
         timePickerDialog.show();
     }
+
 
 }

@@ -94,7 +94,6 @@ public class ThinkSpeak {
 
                     }, ThinkSpeak.context,location, ThinkSpeak.latitude, ThinkSpeak.longitude,true, "temperature", "pressure", "humity");
 
-
             }
 
             @Override

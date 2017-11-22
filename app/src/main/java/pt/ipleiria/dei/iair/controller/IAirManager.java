@@ -95,7 +95,8 @@ public enum IAirManager {
 
     public void saveFavoriteLocation(LatLng latLng, String name) {
         IAirManager.INSTANCE.setFavoriteLocationName(name);
-        IAirManager.INSTANCE.setFavoriteLocation(latLng.latitude+";"+latLng.longitude);
+        System.out.println("lat "+latLng.latitude+" long"+latLng.longitude);
+        IAirManager.INSTANCE.setFavoriteLocation(latLng.latitude +";"+latLng.longitude);
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("favoriteLocation",latLng.latitude+ ";" + latLng.longitude);
