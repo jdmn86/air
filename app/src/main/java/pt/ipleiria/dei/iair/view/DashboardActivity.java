@@ -15,13 +15,17 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.controller.IAirManager;
@@ -41,6 +45,7 @@ public class DashboardActivity extends GPSActivity {
     private TextView pressureFavLocationValue;
     private TextView humidityFavLocationValue;
     private TextView userNameTXT;
+    private View listViewInformativeMessage;
 
     private String txtUsername = "Username: ";
 
@@ -70,6 +75,7 @@ public class DashboardActivity extends GPSActivity {
         }
 
 
+
         favouriteLocationTXT.setText(IAirManager.INSTANCE.getFavoriteLocationName());
         userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
         getDataLocation();
@@ -86,7 +92,6 @@ public class DashboardActivity extends GPSActivity {
                 pressureFavLocationValue.setText("N/A");
                 JSONArray feeds = response.getJSONArray("feeds");
                 if (feeds.length() == 0) {
-
                     Toast.makeText(DashboardActivity.this, "Don't have data in your location", Toast.LENGTH_LONG).show();
                 } else {
                     //throw Exception;
@@ -112,8 +117,9 @@ public class DashboardActivity extends GPSActivity {
             public void onResult(String response) {
 
             }
-        }, this, "Mountain View");
+        }, this, "test_porpose_only");
     }
+
 
     private void bindTextViews() {
         favouriteLocationTXT = findViewById(R.id.textViewFavoriteLocation);
@@ -121,6 +127,7 @@ public class DashboardActivity extends GPSActivity {
         pressureFavLocationValue = findViewById(R.id.textViewValuePressure);
         humidityFavLocationValue = findViewById(R.id.textViewValueHumidity);
         userNameTXT = findViewById(R.id.textViewUserName);
+        listViewInformativeMessage = findViewById(R.id.listViewInformativeMessage);
     }
 
     public void textDialog() {
@@ -193,7 +200,6 @@ public class DashboardActivity extends GPSActivity {
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
-
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
