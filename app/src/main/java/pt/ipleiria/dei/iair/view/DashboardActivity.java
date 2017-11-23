@@ -155,7 +155,6 @@ public class DashboardActivity extends GPSActivity {
                     latLng = new LatLng(Double.parseDouble(strs[0]), Double.parseDouble(strs[1]));
                 }
 
-
                 IAirManager.INSTANCE.saveFavoriteLocation(latLng, locationName);
 
             }
