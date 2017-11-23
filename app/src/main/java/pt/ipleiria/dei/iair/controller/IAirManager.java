@@ -1,20 +1,16 @@
 package pt.ipleiria.dei.iair.controller;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.widget.Toast;
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.LinkedList;
 
+import pt.ipleiria.dei.iair.model.CityAssociation;
 import pt.ipleiria.dei.iair.model.IAirSensorListener;
-import pt.ipleiria.dei.iair.view.MapActivity;
 import pt.ipleiria.dei.iair.view.MySensorsActivity;
 
 /**
@@ -39,6 +35,21 @@ public enum IAirManager {
     private String favoriteLocationName;
     private String username;
 
+    private LinkedList<CityAssociation> listCityAssotiation=new LinkedList<>();
+
+    public CityAssociation getCityAssociation(String LocationName){
+
+        for (CityAssociation city:listCityAssotiation) {
+           // if(city.getName().equals(LocationName)){
+              //  return city;
+            //}
+        }
+        return null;
+    }
+
+    public void addCityAssociation(CityAssociation city){
+        listCityAssotiation.add(city);
+    }
 
     public String getHumity() {
         return humity;
@@ -155,4 +166,7 @@ public enum IAirManager {
     public void setUsername(String username) {
         this.username = username;
     }
+
+
+
 }

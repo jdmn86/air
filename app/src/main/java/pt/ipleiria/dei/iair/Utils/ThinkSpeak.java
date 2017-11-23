@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.channels.Channel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -194,5 +195,39 @@ public class ThinkSpeak {
 
             }
         }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
+    }
+
+    public static void getAllCanalsDataFromAssociation(HttpCallBack callback, Context context, String location){
+
+            ThinkSpeak.location = location;
+            ThinkSpeak.context = context;
+            ThinkSpeak.callback = callback;
+            HttpUtils.Get(new HttpCallBack() {
+                @Override
+                public void onResult(JSONObject response) throws JSONException {
+                    JSONArray feeds = response.getJSONArray("feeds");
+                    System.out.println(feeds.length());
+                    if (feeds.length() != 0) {
+
+                        for (int i = 0; i < feeds.length(); i++) {
+                            JSONObject elem = new JSONObject( feeds.get(i).toString());
+                            if (elem.get("field2").equals(ThinkSpeak.location)) {
+                                HttpUtils.Get(ThinkSpeak.callback,"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.context);
+
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onResult(String response) {
+
+                }
+            }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
+
+    }
+
+    public void getAllLateData(Channel canal){
+
     }
 }

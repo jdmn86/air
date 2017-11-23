@@ -1,5 +1,7 @@
 package pt.ipleiria.dei.iair.view;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,11 +17,21 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import android.widget.EditText;
+
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.nio.channels.Channel;
+import java.util.Map;
+
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
@@ -43,6 +55,10 @@ public class DashboardActivity extends GPSActivity {
 
     private ServiceConnection connection;
 
+    static final int PICK_LOCATION_REQUEST = 1;  // The request code
+    private LatLng location;
+    private String locationName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         preferencesRead =getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
@@ -61,6 +77,7 @@ public class DashboardActivity extends GPSActivity {
         bindTextViews();
 
         if (IAirManager.INSTANCE.getFavoriteLocationName()== "null") {
+
             textDialog();
         }
 
@@ -118,7 +135,35 @@ public class DashboardActivity extends GPSActivity {
 
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        if (requestCode == PICK_LOCATION_REQUEST) {
+            if (resultCode == RESULT_OK) { // Activity.RESULT_OK
+
+                String location = data.getStringExtra("location");
+                String locationName = data.getStringExtra("locationName");
+
+                System.out.println("location" + location);
+                System.out.println("locationName" + locationName);
+
+                LatLng latLng;
+                if (location.isEmpty()) {
+                    return;
+                } else {
+                    String[] strs = location.split(";");
+                    latLng = new LatLng(Double.parseDouble(strs[0]), Double.parseDouble(strs[1]));
+                }
+
+
+                IAirManager.INSTANCE.saveFavoriteLocation(latLng, locationName);
+
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                System.out.println("fail  ");
+            }
+        }
+    }//onActivityResult
 
 
 
@@ -135,7 +180,10 @@ public class DashboardActivity extends GPSActivity {
                 Intent intent = null;
                 intent = new Intent(getApplicationContext(), MapActivity.class);
                 if (intent != null) {
-                    startActivity(intent);
+                    Intent pickLocation = new Intent( getApplicationContext() , MapActivity.class );
+                    //pickLocation.setType(Phone.CONTENT_TYPE); // Show user only contacts w/ phone numbers
+                    pickLocation.putExtra("SEND_LOCATION_REQUEST", 2);
+                    startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
                 }
                 if (IAirManager.INSTANCE.getUsername() == "null") {
                     openDialogName();
@@ -150,10 +198,14 @@ public class DashboardActivity extends GPSActivity {
             public void onClick(DialogInterface dialog, int which) {
                 enableGPS();
                 GPSUtils locationTrack = new GPSUtils(getApplicationContext());;
-                if (locationTrack.canGetLocation()) {
+                if (locationTrack.getLocation()!= null) {
                     double longitude = locationTrack.getLongitude();
                     double latitude = locationTrack.getLatitude();
-                    Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
+                    LatLng latLng=new LatLng(latitude,longitude);
+
+                    getVicinity(latLng,3500);
+
+                  //  Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
                 }
                 if (IAirManager.INSTANCE.getUsername() == "null") {
                     openDialogName();
@@ -314,4 +366,37 @@ public class DashboardActivity extends GPSActivity {
         txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
         userNameTXT.setText(txtUsername + getUsername());
     }
+
+
+    public void getVicinity(LatLng latLng, int radius){
+
+        HttpUtils.Get(new HttpCallBack() {
+
+            @SuppressLint("ResourceType")
+            @Override
+            public void onResult(JSONObject response) throws JSONException {
+
+                if(response.getJSONArray("results").length()>0){
+
+                    double latitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lat").toString());
+                    double longitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lng").toString());
+
+                    location = new LatLng(latitude,longitude);
+                    locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
+                    IAirManager.INSTANCE.saveFavoriteLocation(location,locationName);
+                    favouriteLocationTXT.setText(locationName);
+                }
+
+            }
+
+            @Override
+            public void onResult(String response) {
+
+            }
+        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
+
+    }
+
+
+
 }
