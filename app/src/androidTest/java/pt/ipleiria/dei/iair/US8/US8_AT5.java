@@ -9,6 +9,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.TimeUnit;
+
 import pt.ipleiria.dei.iair.MasterTest;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
@@ -18,6 +20,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -31,9 +34,14 @@ public class US8_AT5 extends MasterTest{
 
     @Test
     public void uS8_AT5() {
-            ThinkSpeak.sendData(getCurrentActivity(), 39.039463, 125.763378, null, null, null);
-        onView(withText(R.string.No_data_message)).inRoot(withDecorView(not(is(getCurrentActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
+        final DashboardActivity activity = mActivityTestRule.getActivity();
+        try {
+            onView(isRoot()).perform(waitId(R.id.menu_dashboard, TimeUnit.SECONDS.toMillis(10)));
 
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        onView(withText(R.string.No_data_message)).inRoot(withDecorView(not(is(getCurrentActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
 
     }
 

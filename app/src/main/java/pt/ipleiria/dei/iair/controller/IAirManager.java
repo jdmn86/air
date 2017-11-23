@@ -52,7 +52,6 @@ public enum IAirManager {
         return temperature;
     }
 
-
     public void setSensorManager(SensorManager sensorManager) {
         this.sensorManager = sensorManager;
     }
@@ -93,10 +92,6 @@ public enum IAirManager {
     public Place getFavoriteLocation() {
         return favoriteLocation;
     }
-
-
-
-
 
     public void saveFavoriteLocation(Place favoriteLocation) {
         this.favoriteLocation = favoriteLocation;

@@ -6,11 +6,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Pair;
+import android.support.v4.app.ActivityCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,10 +30,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,14 +43,15 @@ import java.util.List;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
-import pt.ipleiria.dei.iair.Utils.HttpCallBack;
-import pt.ipleiria.dei.iair.Utils.HttpUtils;
+import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MapActivity extends GPSActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener  {
+public class MapActivity extends GPSActivity implements OnMapReadyCallback {
 
     private ArrayList permissionsToRequest;
     private ArrayList permissionsRejected = new ArrayList();
@@ -58,11 +60,10 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
     private final static int ALL_PERMISSIONS_RESULT = 101;
     GPSUtils locationTrack;
 
-    private Integer THRESHOLD = 2;
     private GoogleMap googleMap;
 
     private List<Marker> markers;
-    private String vinicity="";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +108,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         mapFragment.getMapAsync(this);
 
 
-
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
@@ -123,7 +123,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                 LatLng chosenLocation = place.getLatLng();
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
                 markers.add(marker);
-
 
                 googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                     @Override
@@ -162,8 +161,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                         }
                     }
                 });
-                googleMap.clear();
-                googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
             }
@@ -174,12 +171,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                 //Log.i(TAG, "Ocorreu um erro: " + status);
             }
         });
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
     }
 
     @Override
@@ -202,7 +193,12 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         } else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
 
-        } else if (id == R.id.menu_gps) {
+        }else if (id == R.id.menu_send_data) {
+            GPSUtils gpsUtils = new GPSUtils(this);
+            Location location = gpsUtils.getLocation();
+            //ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+        }  else if (id == R.id.menu_gps) {
             enableGPS();
 
         }
@@ -233,8 +229,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             return;
         }
 
-
-
         LatLng chosenLocation;
         LatLng favoriteLocation = IAirManager.INSTANCE.getFavoriteLocationLatLng();
         if(favoriteLocation==null){
@@ -251,10 +245,8 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         }
 
         this.googleMap.setMyLocationEnabled(true);
-        this.googleMap.setOnMapLongClickListener(this);
-
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
-        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(6));
+        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
 
     }
 
@@ -335,48 +327,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
     protected void onDestroy() {
         super.onDestroy();
         locationTrack.stopListener();
-    }
-
-
-    @Override
-    public void onMapLongClick(final LatLng latLng) {
-
-
-
-        getVicinity(latLng,2000);
-
-         if(vinicity.isEmpty()){
-             getVicinity(latLng,3000);
-         }else if(vinicity.isEmpty()){
-             getVicinity(latLng,4000);
-         }else if(!vinicity.isEmpty()){
-             Toast.makeText(this, vinicity.toString(), Toast.LENGTH_LONG).show();
-
-         }
-
-    }
-
-
-    public void getVicinity(LatLng latLng,int radius){
-
-        HttpUtils.Get(new HttpCallBack() {
-
-            @Override
-            public void onResult(JSONObject response) throws JSONException {
-
-                if(response.getJSONArray("results").length()>0){
-
-                    vinicity = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
-                }
-
-            }
-
-            @Override
-            public void onResult(String response) {
-
-            }
-        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
-
     }
 
 }

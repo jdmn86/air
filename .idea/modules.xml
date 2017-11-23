@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Projecto.iml" filepath="$PROJECT_DIR$/Projecto.iml" />
       <module fileurl="file://D:\EI_ESTG\3ano\TopAvanEngSoft\Projeto\ProjetoTAES\iair\Projecto.iml" filepath="D:\EI_ESTG\3ano\TopAvanEngSoft\Projeto\ProjetoTAES\iair\Projecto.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://D:\TAES\ProjetoTAES\iair\app\app.iml" filepath="D:\TAES\ProjetoTAES\iair\app\app.iml" />
