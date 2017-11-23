@@ -202,7 +202,7 @@ public class DashboardActivity extends GPSActivity {
                     double latitude = locationTrack.getLatitude();
                     LatLng latLng=new LatLng(latitude,longitude);
 
-                    getVicinity(latLng,3500);
+                    getVicinity(latLng,4000);
 
                   //  Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
                 }
