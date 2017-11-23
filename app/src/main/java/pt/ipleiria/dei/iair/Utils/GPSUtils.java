@@ -246,22 +246,4 @@ public class GPSUtils extends Service implements LocationListener {
     }
 
 
-
-
-
-    public static Address getLocationDetails(Context context, double latitude, double longitude) {
-
-        Geocoder geocoder;
-        List<Address> addresses;
-        geocoder = new Geocoder(context, Locale.getDefault());
-
-        try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            return addresses.get(0);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-    }
 }

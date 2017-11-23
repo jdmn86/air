@@ -1,5 +1,7 @@
 package pt.ipleiria.dei.iair.view;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Context;
@@ -12,6 +14,7 @@ import android.content.ServiceConnection;
 import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,6 +27,8 @@ import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import android.widget.EditText;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,11 +98,9 @@ public class DashboardActivity extends GPSActivity {
             textDialog();
         }
 
+
+        favLocation=IAirManager.INSTANCE.getFavoriteLocationName();
         favouriteLocationTXT.setText(favLocation);
-        userNameTXT.setText(txtUsername + getUsername());
-
-
-        favouriteLocationTXT.setText(IAirManager.INSTANCE.getFavoriteLocationName());
         userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
         getDataLocation();
     }
@@ -146,7 +149,7 @@ public class DashboardActivity extends GPSActivity {
         pressureFavLocationValue =  findViewById(R.id.textViewValuePressure);
         humidityFavLocationValue = findViewById(R.id.textViewValueHumidity);
         userNameTXT = findViewById(R.id.textViewUserName);
-        listViewInformativeMessage = findViewById(R.id.listViewInformativeMessage);
+        //listViewInformativeMessage = findViewById(R.id.listViewInformativeMessage);
     }
 
 
@@ -181,15 +184,14 @@ public class DashboardActivity extends GPSActivity {
     }//onActivityResult
 
 
-
     public void textDialog(){
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Alert");
-        alertDialogBuilder.setMessage("Do you want choose current location " + getActualLocation() + " with favourite location?");
+        alertDialogBuilder.setMessage("Your current favorite location isn't set, please choose one option.");
 
-        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("Go To Map", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
                 Intent intent = null;
@@ -200,7 +202,7 @@ public class DashboardActivity extends GPSActivity {
                     pickLocation.putExtra("SEND_LOCATION_REQUEST", 2);
                     startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
                 }
-                if (IAirManager.INSTANCE.getUsername() == "null") {
+                if (IAirManager.INSTANCE.getUsername() == null) {
                     openDialogName();
                 }
                 favouriteLocationTXT.setText(getLocationFavourite());
@@ -208,7 +210,7 @@ public class DashboardActivity extends GPSActivity {
             }
         });
 
-        alertDialogBuilder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNegativeButton("My Current Location",new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 enableGPS();
@@ -220,12 +222,12 @@ public class DashboardActivity extends GPSActivity {
 
                     getVicinity(latLng,4000);
 
-                  //  Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
+                    //  Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
                 }
                 if (IAirManager.INSTANCE.getUsername() == "null") {
                     openDialogName();
                 }
-                Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
+                //Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
             }
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -255,7 +257,7 @@ public class DashboardActivity extends GPSActivity {
                 Toast.makeText(DashboardActivity.this,"Your username isn't choose",Toast.LENGTH_LONG).show();
             }
         });
-        */
+
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
@@ -334,21 +336,14 @@ public class DashboardActivity extends GPSActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         } else if (id == R.id.menu_send_data) {
-<<<<<<<<< Temporary merge branch 1
+
             //Location location = GPSUtils.getLocation();
             ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
             //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
         } else if (id == R.id.menu_gps) {
             enableGPS();
-=========
-            GPSUtils gpsUtils = new GPSUtils(this);
-            Location location = gpsUtils.getLocation();
-            //ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-        } else if (id == R.id.menu_gps) {
-            enableGPS();
 
->>>>>>>>> Temporary merge branch 2
+
         }
         if(intent != null) {
             startActivity(intent);
@@ -357,34 +352,6 @@ public class DashboardActivity extends GPSActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-    private void runUnitTests() throws InterruptedException {
-
-        Log.d("Unit Test_US8_AT5" , (ThinkSpeak.sendData(this, 39.039463, 125.763378, null, null, null) ? "Sending null for GPS and worked something Wrong" : "Sending null for GPS and not worked OK"));
-        ThinkSpeak.sendData(this, 39.039463, 125.763378, "80", null, null);
-        Thread.sleep(10000);
-        ThinkSpeak.getData(new HttpCallBack() {
-
-            @Override
-            public void onResult(JSONObject response) throws JSONException {
-                JSONArray feeds = response.getJSONArray("feeds");
-                if(feeds.length() == 0)
-                    fail();
-                JSONObject elem = (JSONObject) feeds.get(feeds.length()-1);
-                if(!(elem.getString("field1").equals("80") && elem.getString("field2").equals("N/A") && elem.getString("field3").equals("N/A"))) {
-                   Log.d("Unit Test_US8_AT6", "Parcial data send failed");
-                } else {
-                    Log.d("Unit Test_US8_AT6", "Parcial data send success");
-
-                }
-            }
-
-            @Override
-            public void onResult(String response) {
-
-            }
-        },  this,  39.039463, 125.763378);
-
     }
 
     @Override
