@@ -1,18 +1,15 @@
 package pt.ipleiria.dei.iair.controller;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.widget.Toast;
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.LinkedList;
 
+import pt.ipleiria.dei.iair.model.CityAssociation;
 import pt.ipleiria.dei.iair.model.IAirSensorListener;
 import pt.ipleiria.dei.iair.view.MapActivity;
 import pt.ipleiria.dei.iair.view.MySensorsActivity;
@@ -39,6 +36,21 @@ public enum IAirManager {
     private String favoriteLocationName;
     private String username;
 
+    private LinkedList<CityAssociation> listCityAssotiation=new LinkedList<>();
+
+    public CityAssociation getCityAssociation(String LocationName){
+
+        for (CityAssociation city:listCityAssotiation) {
+           // if(city.getName().equals(LocationName)){
+              //  return city;
+            //}
+        }
+        return null;
+    }
+
+    public void addCityAssociation(CityAssociation city){
+        listCityAssotiation.add(city);
+    }
 
     public String getHumity() {
         return humity;
@@ -93,6 +105,20 @@ public enum IAirManager {
         return favoriteLocation;
     }
 
+    public void saveFavoriteLocation(LatLng latLng, String name) {
+        IAirManager.INSTANCE.setFavoriteLocationName(name);
+        System.out.println("lat "+latLng.latitude+" long"+latLng.longitude);
+        IAirManager.INSTANCE.setFavoriteLocation(latLng.latitude +";"+latLng.longitude);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("favoriteLocation",latLng.latitude+ ";" + latLng.longitude);
+        //guardar também dados que sejam necessarios no dashboard como o nome, da localização favorita por ex
+        editor.putString("favoriteLocationName",name.toString());
+        editor.commit();
+
+    }
+
+
     public void saveFavoriteLocation(Place favoriteLocation) {
         this.favoriteLocation = favoriteLocation;
         this.favoriteLocationLatLng=favoriteLocation.getLatLng();
@@ -107,7 +133,6 @@ public enum IAirManager {
         this.sharedPreferences = sharedPreferences;
         setFavoriteLocation(sharedPreferences.getString("favoriteLocation","null"));
         setFavoriteLocationName(sharedPreferences.getString("favoriteLocationName","null"));
-        setUsername(sharedPreferences.getString("username","null"));
     }
 
     public LatLng getFavoriteLocationLatLng() {

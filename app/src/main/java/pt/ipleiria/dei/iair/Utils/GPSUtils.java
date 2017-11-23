@@ -17,21 +17,11 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Created by kxtreme on 15-11-2017.
- */
-
-public class
-GPSUtils extends Service implements LocationListener {
+public class GPSUtils extends Service implements LocationListener {
 
 
     private final Context mContext;
@@ -42,7 +32,7 @@ GPSUtils extends Service implements LocationListener {
 
     boolean checkNetwork = false;
 
-    boolean canGetLocation = false;
+    private boolean canGetLocation=false;
 
     Location loc;
     double latitude;
@@ -55,12 +45,12 @@ GPSUtils extends Service implements LocationListener {
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
     protected LocationManager locationManager;
 
-    public GPSUtils(Context mContext) {
-        this.mContext = mContext;
-        getLocation();
+    public GPSUtils(Context context) {
+        this.mContext = context;
+
     }
 
-    private Location getLocation() {
+    public Location getLocation() {
 
         try {
             locationManager = (LocationManager) mContext
@@ -210,6 +200,26 @@ GPSUtils extends Service implements LocationListener {
         }
     }
 
+
+
+    public static Address getLocationDetails(Context context, double latitude, double longitude) {
+
+        Geocoder geocoder;
+        List<Address> addresses;
+        geocoder = new Geocoder(context, Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+            return addresses.get(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -217,7 +227,6 @@ GPSUtils extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-
 
     }
 
