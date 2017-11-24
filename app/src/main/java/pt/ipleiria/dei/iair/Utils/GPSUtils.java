@@ -16,8 +16,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.widget.Toast;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -203,22 +205,26 @@ public class GPSUtils extends Service implements LocationListener {
 
 
 
-    public static Address getLocationDetails(Context context, double latitude, double longitude) {
 
+
+    public List<Address> getLocationDetails(Context context, double latitude, double longitude) {
+        Log.d("APPSENSORS","LONGITUDE" + longitude);
+        //latitude = 39.753396;
+        //longitude = -8.807000;
         Geocoder geocoder;
-        List<Address> addresses;
+        List<Address> addresses = new LinkedList<>();
         geocoder = new Geocoder(context, Locale.getDefault());
 
+        System.out.println(String.valueOf(longitude) + "thiohkjgjhv");
         try {
             addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            return addresses.get(0);
+
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
+        return addresses;
 
     }
-
 
 
     @Override

@@ -34,7 +34,7 @@ public class US8_AT4 extends MasterTest{
     @Test
     public void uS8_AT4() {
 
-        ThinkSpeak.sendData(getCurrentActivity(), 39.039463, 125.763378, "23", "900", "0");
+        ThinkSpeak.INSTANCE.sendData(getCurrentActivity(), 39.039463, 125.763378, "23", "900", "0");
         //get Data Pyongyang
 
         try {
@@ -44,7 +44,7 @@ public class US8_AT4 extends MasterTest{
             System.out.println(e.getMessage());
             //fail(e.toString());
         }
-ThinkSpeak.getData(new HttpCallBack() {
+ThinkSpeak.INSTANCE.getData(new HttpCallBack() {
 
     @Override
     public void onResult(JSONObject response) throws JSONException {

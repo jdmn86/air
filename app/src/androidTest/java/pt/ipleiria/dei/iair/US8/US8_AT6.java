@@ -33,7 +33,7 @@ public class US8_AT6 extends MasterTest{
 
     @Test
     public void uS8_AT6() {
-        ThinkSpeak.sendData(getCurrentActivity(), 39.039463, 125.763378, "80", null, null);
+        ThinkSpeak.INSTANCE.sendData(getCurrentActivity(), 39.039463, 125.763378, "80", null, null);
         try {
             onView(isRoot()).perform(waitId(R.id.menu_dashboard, TimeUnit.SECONDS.toMillis(10)));
 
@@ -41,7 +41,7 @@ public class US8_AT6 extends MasterTest{
             System.out.println(e.getMessage());
             //fail(e.toString());
         }
-        ThinkSpeak.getData(new HttpCallBack() {
+        ThinkSpeak.INSTANCE.getData(new HttpCallBack() {
 
             @Override
             public void onResult(JSONObject response) throws JSONException {
