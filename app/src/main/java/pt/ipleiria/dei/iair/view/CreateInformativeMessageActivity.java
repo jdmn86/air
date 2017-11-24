@@ -1,6 +1,5 @@
 package pt.ipleiria.dei.iair.view;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -18,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -36,6 +36,10 @@ import java.util.GregorianCalendar;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
+import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.Alerts;
+import pt.ipleiria.dei.iair.model.CityAssociation;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
@@ -54,11 +58,15 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
     private Button buttonCancel;
     private ImageView imageGetMyLocation;
     private Location currentLocation;
+    private ArrayAdapter<String> adapter;
+    private Spinner spinner;
+    private Spinner spinner1;
+    private ArrayAdapter<String> adapter1;
+    private EditText editTextDescriptionCreateInformativeMessage;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_informative_message);
         IAirManager.INSTANCE.setCreateInformativeMessageActivity(this);
@@ -118,6 +126,43 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
             }
         });
 
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                Alerts alert=new Alerts(spinner.getSelectedItem().toString(),spinner1.getSelectedItem().toString(),editTextDescriptionCreateInformativeMessage.getText().toString(),editTextTimestampCreateInformativeMessage.getText().toString());
+                ThinkSpeak.insertInAlerts(alert,getApplicationContext());
+
+                Toast.makeText(CreateInformativeMessageActivity.this, "THE alert was send", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        spinner = (Spinner) findViewById(R.id.spinnerLocations) ;
+        java.util.ArrayList<String> strings = new java.util.ArrayList<>();
+        for (CityAssociation city: IAirManager.INSTANCE.getAllCityAssociations()) {
+            strings.add(city.getREGION_NAME());
+        }
+         adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, strings);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner1 = (Spinner) findViewById(R.id.spinnerInformativeMesageTypes) ;
+        java.util.ArrayList<String> strings1 = new java.util.ArrayList<>();
+        strings1.add("fire");
+        strings1.add("rain");
+        strings1.add("wind");
+        strings1.add("gas_leak");
+        strings1.add("other");
+
+        adapter1 = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, strings1);
+
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner1.setAdapter(adapter1);
+
+    }
+
         buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,9 +192,26 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                 currentLocation.setLongitude(data.getDoubleExtra("longitude",0.0));
                 currentLocation.setLocationName(data.getStringExtra("locationName"));
                 editTextLocation.setText(currentLocation.getLocationName());
+                String location=data.getStringExtra("location");
+                String locationName=data.getStringExtra("locationName");
+
+                System.out.println("location"+location);
+                System.out.println("locationName"+locationName);
+
+                if(IAirManager.INSTANCE.getCityAssociation(locationName)==null){
+                    ThinkSpeak.createNewChannel(locationName,this);
+                    adapter.add(locationName);
+                    for (int position = 0; position < adapter.getCount(); position++) {
+                        if(adapter.getItem(position).equalsIgnoreCase( locationName)) {
+                            spinner.setSelection(position);
+                            return;
+                        }
+                    }
+                }
+
             }
             if (resultCode == Activity.RESULT_CANCELED) {
-                System.out.println("fail");
+                System.out.println("fail  ");
             }
         }
     }//onActivityResult
