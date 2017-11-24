@@ -11,6 +11,8 @@ import java.util.LinkedList;
 
 import pt.ipleiria.dei.iair.model.CityAssociation;
 import pt.ipleiria.dei.iair.model.IAirSensorListener;
+import pt.ipleiria.dei.iair.model.Location;
+import pt.ipleiria.dei.iair.view.CreateInformativeMessageActivity;
 import pt.ipleiria.dei.iair.view.MySensorsActivity;
 
 /**
@@ -24,18 +26,21 @@ public enum IAirManager {
 
     MySensorsActivity mySensorsActivity;
 
+
+
+    CreateInformativeMessageActivity createInformativeMessageActivity;
+
     private String humity;
     private String presure;
     private String temperature;
 
-    Place favoriteLocation;
-    Place selectedPlace;
     SharedPreferences sharedPreferences;
     LatLng favoriteLocationLatLng;
     private String favoriteLocationName;
     private String username;
 
     private LinkedList<CityAssociation> listCityAssotiation=new LinkedList<>();
+    private Location currentLocation;
 
     public CityAssociation getCityAssociation(String LocationName){
 
@@ -86,6 +91,9 @@ public enum IAirManager {
     public void setMySensorsActivity(MySensorsActivity mySensorsActivity) {
         this.mySensorsActivity = mySensorsActivity;
     }
+    public void setCreateInformativeMessageActivity(CreateInformativeMessageActivity createInformativeMessageActivity) {
+        this.createInformativeMessageActivity = createInformativeMessageActivity;
+    }
 
     public void setSensor(Sensor sensor) {
 
@@ -96,17 +104,10 @@ public enum IAirManager {
         return sensorManager;
     }
 
-    public void setSelectedPlace(Place place) {
-        this.selectedPlace = place;
-    }
 
-    public Place getFavoriteLocation() {
-        return favoriteLocation;
-    }
 
     public void saveFavoriteLocation(LatLng latLng, String name) {
         IAirManager.INSTANCE.setFavoriteLocationName(name);
-        System.out.println("lat "+latLng.latitude+" long"+latLng.longitude);
         IAirManager.INSTANCE.setFavoriteLocation(latLng.latitude +";"+latLng.longitude);
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -119,7 +120,8 @@ public enum IAirManager {
 
 
     public void saveFavoriteLocation(Place favoriteLocation) {
-        this.favoriteLocation = favoriteLocation;
+
+        favoriteLocationName= favoriteLocation.getName().toString();
         this.favoriteLocationLatLng=favoriteLocation.getLatLng();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("favoriteLocation",favoriteLocation.getLatLng().latitude + ";" + favoriteLocation.getLatLng().longitude);
@@ -168,5 +170,10 @@ public enum IAirManager {
     }
 
 
-
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
+        if (createInformativeMessageActivity!=null){
+            createInformativeMessageActivity.setCurrentLocation(this.currentLocation);
+        }
+    }
 }

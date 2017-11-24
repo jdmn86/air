@@ -21,4 +21,8 @@ public class Alerts {
     public void setType(String type) {
         this.type = type;
     }
+
+    public String getMessage() {
+        return message;
+    }
 }

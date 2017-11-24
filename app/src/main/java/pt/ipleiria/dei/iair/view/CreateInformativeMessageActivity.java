@@ -1,20 +1,32 @@
 package pt.ipleiria.dei.iair.view;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+
+import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -24,34 +36,77 @@ import java.util.GregorianCalendar;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
+import pt.ipleiria.dei.iair.Utils.GPSUtils;
+import pt.ipleiria.dei.iair.Utils.HttpCallBack;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
+import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.InformativeMessageType;
+import pt.ipleiria.dei.iair.model.Location;
 
-public class CreateInformativeMessageActivity extends GPSActivity {
+public class CreateInformativeMessageActivity extends GetVinicityActivity {
 
-    EditText editTextTimestampCreateInformativeMessage;
+    private EditText editTextTimestampCreateInformativeMessage;
     int mYear,mMonth,mDay,mHour,mMinute;
     static final int PICK_LOCATION_REQUEST = 1;  // The request code
+    private EditText editTextLocation;
+    private TextView textViewLocation;
+    private TextView textViewTimestamp;
+    private Button buttonCancel;
+    private ImageView imageGetMyLocation;
+    private Location currentLocation;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_informative_message);
-
+        IAirManager.INSTANCE.setCreateInformativeMessageActivity(this);
+        buttonCancel = findViewById(R.id.buttonCancelCreateInformativeMessage);
+        textViewLocation = findViewById(R.id.textViewLocationCreateInformativeMessage);
+        textViewTimestamp = findViewById(R.id.textViewTimestamp);
         final Button buttonSelectDateTime = findViewById(R.id.buttonSelectDateTimeCreateInformativeMessage);
         final SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         final String format = s.format(new Date());
         final Button buttonMap = findViewById(R.id.buttonMapCreateInformativeMessage);
+        final Button buttonSave = findViewById(R.id.buttonSaveCreateInformativeMessage);
+        final Spinner spinnerTypes = findViewById(R.id.spinnerInformativeMesageTypes);
+        final EditText editTextDescription = findViewById(R.id.editTextDescriptionCreateInformativeMessage);
+        final TextView textViewDescription = findViewById(R.id.textViewDescription);
+        editTextLocation = findViewById(R.id.editTextLocationCreateInformativeMessage);
+        imageGetMyLocation = findViewById(R.id.imageGetMyLocationCreateInformativeMessage);
+
+
+        if(!getMyLocation()){
+            Toast.makeText(this,"Error Getting Actual Location", Toast.LENGTH_SHORT);
+        }
 
         editTextTimestampCreateInformativeMessage= findViewById(R.id.editTextTimestampCreateInformativeMessage);
         editTextTimestampCreateInformativeMessage.setText(format);
-
+        spinnerTypes.setAdapter(new ArrayAdapter<InformativeMessageType>(this, android.R.layout.simple_spinner_item, InformativeMessageType.values()));
         buttonSelectDateTime.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 datePicker();
             }
         });
 
-
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (editTextDescription.getText().length()<20){
+                    textViewDescription.setTextColor(Color.RED);
+                    textViewDescription.setText("Description: Please insert a description (at least 20 characters)");
+                }
+                if (editTextLocation.getText().length()==0 || currentLocation.getLatitude() == null || currentLocation.getLongitude() == null){
+                    textViewLocation.setTextColor(Color.RED);
+                    textViewLocation.setText("Location: Please Insert A Valid Location");
+                }
+                if (editTextTimestampCreateInformativeMessage.getText().length()==0){
+                    textViewTimestamp.setTextColor(Color.RED);
+                    textViewTimestamp.setText("Timestamp: Please Insert A Valid Timestamp");
+                }
+            }
+        });
 
         buttonMap.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -60,6 +115,23 @@ public class CreateInformativeMessageActivity extends GPSActivity {
                 //pickLocation.setType(Phone.CONTENT_TYPE); // Show user only contacts w/ phone numbers
                 pickLocation.putExtra("SEND_LOCATION_REQUEST", 2);
                 startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
+            }
+        });
+
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        imageGetMyLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(!getMyLocation()){
+                    Toast.makeText(getApplicationContext(),"Error Getting Actual Location", Toast.LENGTH_SHORT);
+                }
             }
         });
     }
@@ -71,15 +143,13 @@ public class CreateInformativeMessageActivity extends GPSActivity {
         if (requestCode == PICK_LOCATION_REQUEST) {
             if (resultCode == RESULT_OK) { // Activity.RESULT_OK
 
-                String location=data.getStringExtra("location");
-                String locationName=data.getStringExtra("locationName");
-
-                System.out.println("location"+location);
-                System.out.println("locationName"+locationName);
-
+                currentLocation.setLatitude(data.getDoubleExtra("latitude",0.0));
+                currentLocation.setLongitude(data.getDoubleExtra("longitude",0.0));
+                currentLocation.setLocationName(data.getStringExtra("locationName"));
+                editTextLocation.setText(currentLocation.getLocationName());
             }
             if (resultCode == Activity.RESULT_CANCELED) {
-                System.out.println("fail  ");
+                System.out.println("fail");
             }
         }
     }//onActivityResult
@@ -136,7 +206,7 @@ public class CreateInformativeMessageActivity extends GPSActivity {
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 
                         mYear=year;
-                        mMonth=monthOfYear;
+                        mMonth=monthOfYear+1;
                         mDay=dayOfMonth;
                         timePicker();
                     }
@@ -174,4 +244,22 @@ public class CreateInformativeMessageActivity extends GPSActivity {
     }
 
 
+    public boolean getMyLocation() {
+        enableGPS();
+        GPSUtils locationTrack = new GPSUtils(getApplicationContext());;
+        if (locationTrack.getLocation()!= null) {
+            double longitude = locationTrack.getLongitude();
+            double latitude = locationTrack.getLatitude();
+            LatLng latLng = new LatLng(latitude, longitude);
+
+            getVicinity(latLng, 4000);
+            return true;
+        }
+        return false;
+    }
+
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
+        editTextLocation.setText(currentLocation.getLocationName());
+    }
 }

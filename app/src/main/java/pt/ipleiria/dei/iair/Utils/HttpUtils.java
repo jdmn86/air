@@ -30,7 +30,6 @@ public class HttpUtils {
 
     public  static void Post(final HttpCallBack callBack, String url, final List<Pair<String, String>> params, Context context) {
 
-            System.out.println(url);
         final RequestQueue MyRequestQueue = Volley.newRequestQueue(context);
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -65,7 +64,6 @@ public class HttpUtils {
                 return MyData;
             }
         };
-        //System.out.println(MyStringRequest.getHeaders().toString());
 
 MyRequestQueue.add(MyStringRequest);
 
@@ -130,7 +128,6 @@ MyRequestQueue.add(MyStringRequest);
                 return MyData;
             }
         };
-        //System.out.println(MyStringRequest.getHeaders().toString());
 
         MyRequestQueue.add(MyStringRequest);
     }

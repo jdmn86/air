@@ -42,7 +42,7 @@ import pt.ipleiria.dei.iair.controller.IAirManager;
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MapActivity extends GPSActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
+public class MapActivity extends GPSActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener{
 
     private ArrayList permissionsToRequest;
     private ArrayList permissionsRejected = new ArrayList();
@@ -126,7 +126,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                     public void onMapLongClick(LatLng latLng) {
                         for(Marker marker : markers) {
                             if(Math.abs(marker.getPosition().latitude - latLng.latitude) < 0.05 && Math.abs(marker.getPosition().longitude - latLng.longitude) < 0.05) {
-                                IAirManager.INSTANCE.setSelectedPlace(place);
                                 AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
                                 // Add the buttons
                                 builder.setPositiveButton(R.string.set_as_favorite_location, new DialogInterface.OnClickListener() {
@@ -351,7 +350,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                     location = new LatLng(latitude,longitude);
                     locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
 
-                    System.out.println("location : "+location.toString());
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
                     // Add the buttons
@@ -365,7 +363,8 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                             if(sendLocation==2 &&location!=null && !locationName.isEmpty()){
 
                                 Intent intent = new Intent();
-                                intent.putExtra("location", location);
+                                intent.putExtra("latitude", location.latitude);
+                                intent.putExtra("longitude", location.longitude);
                                 intent.putExtra("locationName", locationName);
                                 setResult(RESULT_OK, intent);
                                 finish();
@@ -376,7 +375,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                                     .title(IAirManager.INSTANCE.getFavoriteLocationName() + "\n This Is Yor Favorite Location")
                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
                             Toast.makeText(MapActivity.this,  location.toString() + " is now your favorite location!", Toast.LENGTH_SHORT).show();
-                            location=null;
+                            //location=null;
                             m.finish();
                         }
                     });

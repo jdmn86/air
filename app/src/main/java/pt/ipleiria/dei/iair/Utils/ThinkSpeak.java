@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.model.Alerts;
 
 /**
  * Created by kxtreme on 08-11-2017.
@@ -226,6 +227,7 @@ public class ThinkSpeak {
             }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
 
     }
+
 
     public void getAllLateData(Channel canal){
 

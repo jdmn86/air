@@ -39,7 +39,7 @@ import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 
 import static junit.framework.Assert.fail;
 
-public class DashboardActivity extends GPSActivity {
+public class DashboardActivity extends GetVinicityActivity{
     public static final String SHARED_PREFERENCES = "Shared";
     SharedPreferences preferencesRead;
     SharedPreferences.Editor preferencesWrite;
@@ -84,7 +84,7 @@ public class DashboardActivity extends GPSActivity {
         favouriteLocationTXT.setText(favLocation);
         userNameTXT.setText(txtUsername + getUsername());
 
-        getDataLocation();
+        //getDataLocation();
     }
 
     private void getDataLocation() {
@@ -144,8 +144,6 @@ public class DashboardActivity extends GPSActivity {
                 String location = data.getStringExtra("location");
                 String locationName = data.getStringExtra("locationName");
 
-                System.out.println("location" + location);
-                System.out.println("locationName" + locationName);
 
                 LatLng latLng;
                 if (location.isEmpty()) {
@@ -171,9 +169,9 @@ public class DashboardActivity extends GPSActivity {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Alert");
-        alertDialogBuilder.setMessage("Do you want choose current location " + getActualLocation() + " with favourite location?");
+        alertDialogBuilder.setMessage("Your current favorite location isn't set, please choose one option.");
 
-        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("Go To Map", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
                 Intent intent = null;
@@ -184,7 +182,7 @@ public class DashboardActivity extends GPSActivity {
                     pickLocation.putExtra("SEND_LOCATION_REQUEST", 2);
                     startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
                 }
-                if (IAirManager.INSTANCE.getUsername() == "null") {
+                if (IAirManager.INSTANCE.getUsername() == null) {
                     openDialogName();
                 }
                 favouriteLocationTXT.setText(getLocationFavourite());
@@ -192,7 +190,7 @@ public class DashboardActivity extends GPSActivity {
             }
         });
 
-        alertDialogBuilder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNegativeButton("My Current Location",new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 enableGPS();
@@ -209,7 +207,7 @@ public class DashboardActivity extends GPSActivity {
                 if (IAirManager.INSTANCE.getUsername() == "null") {
                     openDialogName();
                 }
-                Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
+                //Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
             }
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
