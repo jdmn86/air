@@ -326,7 +326,7 @@ public class DashboardActivity extends GetVinicityActivity{
             System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
 
             if (city == null) {
-                ThinkSpeak.createNewChannel(locationName, this);
+                ThinkSpeak.INSTANCE.createNewChannel(locationName, this);
                 System.out.println("LOCAL :" + locationName);
 
                 city = IAirManager.INSTANCE.getCityAssociation(locationName);

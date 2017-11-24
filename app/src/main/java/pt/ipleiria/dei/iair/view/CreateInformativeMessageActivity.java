@@ -6,8 +6,6 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,9 +13,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -25,31 +21,23 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.CityAssociation;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
-import pt.ipleiria.dei.iair.Utils.HttpCallBack;
-import pt.ipleiria.dei.iair.Utils.HttpUtils;
-import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.InformativeMessageType;
 import pt.ipleiria.dei.iair.model.Location;
 
 public class CreateInformativeMessageActivity extends GetVinicityActivity {
 
-    private EditText editTextTimestampCreateInformativeMessage;
+    private EditText editTextTimestamp;
     int mYear,mMonth,mDay,mHour,mMinute;
     static final int PICK_LOCATION_REQUEST = 1;  // The request code
     private Spinner spinnerLocations;
@@ -62,7 +50,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
     private Spinner spinner;
     private Spinner spinner1;
     private ArrayAdapter<String> adapter1;
-    private EditText editTextDescriptionCreateInformativeMessage;
+    private EditText editTextDescription;
 
 
     @Override
@@ -79,7 +67,8 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         final Button buttonMap = findViewById(R.id.buttonMapCreateInformativeMessage);
         final Button buttonSave = findViewById(R.id.buttonSaveCreateInformativeMessage);
         final Spinner spinnerTypes = findViewById(R.id.spinnerInformativeMesageTypes);
-        final EditText editTextDescription = findViewById(R.id.editTextDescriptionCreateInformativeMessage);
+        editTextDescription = findViewById(R.id.editTextDescriptionCreateInformativeMessage);
+        editTextTimestamp = findViewById(R.id.editTextTimestampCreateInformativeMessage);
         final TextView textViewDescription = findViewById(R.id.textViewDescription);
         spinnerLocations = findViewById(R.id.spinnerLocations);
         imageGetMyLocation = findViewById(R.id.imageGetMyLocationCreateInformativeMessage);
@@ -89,8 +78,8 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
             Toast.makeText(this,"Error Getting Actual Location", Toast.LENGTH_SHORT);
         }
 
-        editTextTimestampCreateInformativeMessage= findViewById(R.id.editTextTimestampCreateInformativeMessage);
-        editTextTimestampCreateInformativeMessage.setText(format);
+        editTextTimestamp = findViewById(R.id.editTextTimestampCreateInformativeMessage);
+        editTextTimestamp.setText(format);
         spinnerTypes.setAdapter(new ArrayAdapter<InformativeMessageType>(this, android.R.layout.simple_spinner_item, InformativeMessageType.values()));
         buttonSelectDateTime.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -107,18 +96,18 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                     textViewDescription.setText("Description: Please insert a description (at least 20 characters)");
                     flag=false;
                 }
-                if (spinnerLocations.getSelectedItem().toString().length()==0 || currentLocation.getLatitude() == null || currentLocation.getLongitude() == null){
+                if (spinnerLocations.getSelectedItem().toString().length()==0  ){
                     textViewLocation.setTextColor(Color.RED);
                     textViewLocation.setText("Location: Please Insert A Valid Location");
                     flag=false;
                 }
-                if (editTextTimestampCreateInformativeMessage.getText().length()==0){
+                if (editTextTimestamp.getText().length()==0){
                     textViewTimestamp.setTextColor(Color.RED);
                     textViewTimestamp.setText("Timestamp: Please Insert A Valid Timestamp");
                     flag=false;
                 }
                 if(flag) {
-                    Alerts alert=new Alerts(spinner.getSelectedItem().toString(),spinner1.getSelectedItem().toString(),editTextDescriptionCreateInformativeMessage.getText().toString(),editTextTimestampCreateInformativeMessage.getText().toString());
+                    Alerts alert=new Alerts(spinner.getSelectedItem().toString(),spinner1.getSelectedItem().toString(), CreateInformativeMessageActivity.this.editTextDescription.getText().toString(), editTextTimestamp.getText().toString());
                     ThinkSpeak.insertInAlerts(alert,getApplicationContext());
 
                     Toast.makeText(CreateInformativeMessageActivity.this, "THE alert was send", Toast.LENGTH_LONG).show();
@@ -184,7 +173,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                         for (int position = 0; position < adapter.getCount(); position++) {
                             if (adapter.getItem(position).equalsIgnoreCase(currentLocation.getLocationName())) {
 
-                                ThinkSpeak.createNewChannel(currentLocation.getLocationName(), getApplicationContext());
+                                ThinkSpeak.INSTANCE.createNewChannel(currentLocation.getLocationName(), getApplicationContext());
                                 spinner.setSelection(position);
 
                                 return;
@@ -233,7 +222,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                     for (int position = 0; position < adapter.getCount(); position++) {
                         if(adapter.getItem(position).equalsIgnoreCase( locationName)) {
                             spinner.setSelection(position);
-                            ThinkSpeak.createNewChannel(locationName,this);
+                            ThinkSpeak.INSTANCE.createNewChannel(locationName,this);
                             return;
                         }
                     }
@@ -337,7 +326,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                         String hours=String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
                         String minutes=String.format("%02d",calendar.get(Calendar.MINUTE));
 
-                        editTextTimestampCreateInformativeMessage.setText(day + "/" + month + "/" + year
+                        editTextTimestamp.setText(day + "/" + month + "/" + year
                                 + " " + hours + ":" + minutes);
                     }
                 }, mHour, mMinute, true);
@@ -363,7 +352,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         this.currentLocation = currentLocation;
         String locationName = currentLocation.getLocationName();
         if(IAirManager.INSTANCE.getCityAssociation(locationName) == null){
-            ThinkSpeak.createNewChannel(locationName,this);
+            ThinkSpeak.INSTANCE.createNewChannel(locationName,this);
             adapter.add(locationName);
             for (int position = 0; position < adapter.getCount(); position++) {
                 if(adapter.getItem(position).equalsIgnoreCase( locationName)) {
