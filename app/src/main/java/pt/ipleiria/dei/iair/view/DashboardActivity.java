@@ -96,6 +96,10 @@ public class DashboardActivity extends GetVinicityActivity{
             textDialog();
         }
 
+        if (IAirManager.INSTANCE.getUsername()==null) {
+
+            openDialogName();
+        }
         favouriteLocationTXT.setText(favLocation);
         userNameTXT.setText(txtUsername + getUsername());
 
@@ -222,9 +226,7 @@ public class DashboardActivity extends GetVinicityActivity{
                     pickLocation.putExtra("SEND_LOCATION_REQUEST", 2);
                     startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
                 }
-                if (IAirManager.INSTANCE.getUsername() == null) {
-                    openDialogName();
-                }
+
                 favouriteLocationTXT.setText(getLocationFavourite());
                 Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();
             }
@@ -268,7 +270,7 @@ public class DashboardActivity extends GetVinicityActivity{
             public void onClick(DialogInterface arg0, int arg1) {
                 IAirManager.INSTANCE.saveUsername(input.getText().toString());
                 userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
-                Toast.makeText(DashboardActivity.this, "Save your Username", Toast.LENGTH_LONG).show();
+                Toast.makeText(DashboardActivity.this, "Username Saved", Toast.LENGTH_LONG).show();
             }
         });
         alertDialogBuilder.setNegativeButton("CANCEL",new DialogInterface.OnClickListener() {
@@ -404,34 +406,6 @@ public class DashboardActivity extends GetVinicityActivity{
 
         return super.onOptionsItemSelected(item);
     }
-   /* private void runUnitTests() throws InterruptedException {
-
-        Log.d("Unit Test_US8_AT5" , (ThinkSpeak.sendData(this, 39.039463, 125.763378, null, null, null) ? "Sending null for GPS and worked something Wrong" : "Sending null for GPS and not worked OK"));
-        ThinkSpeak.sendData(this, 39.039463, 125.763378, "80", null, null);
-        Thread.sleep(10000);
-        ThinkSpeak.getData(new HttpCallBack() {
-
-            @Override
-            public void onResult(JSONObject response) throws JSONException {
-                JSONArray feeds = response.getJSONArray("feeds");
-                if(feeds.length() == 0)
-                    fail();
-                JSONObject elem = (JSONObject) feeds.get(feeds.length()-1);
-                if(!(elem.getString("field1").equals("80") && elem.getString("field2").equals("N/A") && elem.getString("field3").equals("N/A"))) {
-                   Log.d("Unit Test_US8_AT6", "Parcial data send failed");
-                } else {
-                    Log.d("Unit Test_US8_AT6", "Parcial data send success");
-
-                }
-            }
-
-            @Override
-            public void onResult(String response) {
-
-            }
-        },  this,  39.039463, 125.763378);
-
-    }*/
 
     @Override
     protected void onResume() {
@@ -470,32 +444,4 @@ public class DashboardActivity extends GetVinicityActivity{
 
     }
 
-    public void getTreta(LatLng latLng, int radius){
-
-        HttpUtils.Get(new HttpCallBack() {
-
-            @SuppressLint("ResourceType")
-            @Override
-            public void onResult(JSONObject response) throws JSONException {
-
-                if(response.getJSONArray("results").length()>0){
-
-                    double latitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lat").toString());
-                    double longitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lng").toString());
-
-                    location = new LatLng(latitude,longitude);
-                    locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
-                    IAirManager.INSTANCE.saveFavoriteLocation(location,locationName);
-
-                }
-
-            }
-
-            @Override
-            public void onResult(String response) {
-
-            }
-        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
-
-    }
 }

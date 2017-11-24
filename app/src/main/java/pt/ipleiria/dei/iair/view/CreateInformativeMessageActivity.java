@@ -52,7 +52,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
     private EditText editTextTimestampCreateInformativeMessage;
     int mYear,mMonth,mDay,mHour,mMinute;
     static final int PICK_LOCATION_REQUEST = 1;  // The request code
-    private EditText editTextLocation;
+    private Spinner spinnerLocations;
     private TextView textViewLocation;
     private TextView textViewTimestamp;
     private Button buttonCancel;
@@ -81,7 +81,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         final Spinner spinnerTypes = findViewById(R.id.spinnerInformativeMesageTypes);
         final EditText editTextDescription = findViewById(R.id.editTextDescriptionCreateInformativeMessage);
         final TextView textViewDescription = findViewById(R.id.textViewDescription);
-        editTextLocation = findViewById(R.id.editTextLocationCreateInformativeMessage);
+        spinnerLocations = findViewById(R.id.spinnerLocations);
         imageGetMyLocation = findViewById(R.id.imageGetMyLocationCreateInformativeMessage);
 
 
@@ -101,17 +101,27 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                boolean flag =true;
                 if (editTextDescription.getText().length()<20){
                     textViewDescription.setTextColor(Color.RED);
                     textViewDescription.setText("Description: Please insert a description (at least 20 characters)");
+                    flag=false;
                 }
-                if (editTextLocation.getText().length()==0 || currentLocation.getLatitude() == null || currentLocation.getLongitude() == null){
+                if (spinnerLocations.getSelectedItem().toString().length()==0 || currentLocation.getLatitude() == null || currentLocation.getLongitude() == null){
                     textViewLocation.setTextColor(Color.RED);
                     textViewLocation.setText("Location: Please Insert A Valid Location");
+                    flag=false;
                 }
                 if (editTextTimestampCreateInformativeMessage.getText().length()==0){
                     textViewTimestamp.setTextColor(Color.RED);
                     textViewTimestamp.setText("Timestamp: Please Insert A Valid Timestamp");
+                    flag=false;
+                }
+                if(flag) {
+                    Alerts alert=new Alerts(spinner.getSelectedItem().toString(),spinner1.getSelectedItem().toString(),editTextDescriptionCreateInformativeMessage.getText().toString(),editTextTimestampCreateInformativeMessage.getText().toString());
+                    ThinkSpeak.insertInAlerts(alert,getApplicationContext());
+
+                    Toast.makeText(CreateInformativeMessageActivity.this, "THE alert was send", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -126,15 +136,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
             }
         });
 
-        buttonSave.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
 
-                Alerts alert=new Alerts(spinner.getSelectedItem().toString(),spinner1.getSelectedItem().toString(),editTextDescriptionCreateInformativeMessage.getText().toString(),editTextTimestampCreateInformativeMessage.getText().toString());
-                ThinkSpeak.insertInAlerts(alert,getApplicationContext());
-
-                Toast.makeText(CreateInformativeMessageActivity.this, "THE alert was send", Toast.LENGTH_LONG).show();
-            }
-        });
 
         spinner = (Spinner) findViewById(R.id.spinnerLocations) ;
         java.util.ArrayList<String> strings = new java.util.ArrayList<>();
@@ -161,8 +163,6 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner1.setAdapter(adapter1);
 
-    }
-
         buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -179,7 +179,13 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                 }
             }
         });
+
     }
+
+
+
+
+
 
 
     @Override
@@ -191,7 +197,6 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                 currentLocation.setLatitude(data.getDoubleExtra("latitude",0.0));
                 currentLocation.setLongitude(data.getDoubleExtra("longitude",0.0));
                 currentLocation.setLocationName(data.getStringExtra("locationName"));
-                editTextLocation.setText(currentLocation.getLocationName());
                 String location=data.getStringExtra("location");
                 String locationName=data.getStringExtra("locationName");
 
@@ -322,6 +327,16 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
 
     public void setCurrentLocation(Location currentLocation) {
         this.currentLocation = currentLocation;
-        editTextLocation.setText(currentLocation.getLocationName());
+        String locationName = currentLocation.getLocationName();
+        if(IAirManager.INSTANCE.getCityAssociation(locationName) == null){
+            ThinkSpeak.createNewChannel(locationName,this);
+            adapter.add(locationName);
+            for (int position = 0; position < adapter.getCount(); position++) {
+                if(adapter.getItem(position).equalsIgnoreCase( locationName)) {
+                    spinner.setSelection(position);
+                    return;
+                }
+            }
+        }
     }
 }
