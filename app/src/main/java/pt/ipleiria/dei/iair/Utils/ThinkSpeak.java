@@ -41,7 +41,7 @@ public enum ThinkSpeak {
     private HttpCallBack callback;
 
 
-    public boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
+    public boolean sendData(Context context, double latitude, final double longitude, String temperature, String pressure, String humity) {
 
         ThinkSpeak.INSTANCE.humity = humity;
         ThinkSpeak.INSTANCE.pressure = pressure;
@@ -121,11 +121,12 @@ public enum ThinkSpeak {
 
     public  boolean createNewChannel(final CallBack callBack, final Context context, final String channelName, double latitude, double longitude, boolean status, String... fields) {
         try {
-            ArrayList<Pair<String, String>> data = new ArrayList<>();
+           ArrayList<Pair<String, String>> data = new ArrayList<>();
             data.add(new Pair<>("api_key", API_KEY_CREATE_CHANNEL));
             data.add(new Pair<>("name", ThinkSpeak.INSTANCE.location));
             data.add(new Pair<>("latitude", String.valueOf(latitude)));
             data.add(new Pair<>("longitude", String.valueOf(longitude)));
+
 
             int i = 1;
             for (String field : fields) {
@@ -144,6 +145,13 @@ public enum ThinkSpeak {
                 @Override
                 public void onResult(JSONObject response) throws JSONException {
                     callBack.onFinish(new JSONObject(response.getJSONArray("api_keys").get(0).toString()).getString("api_key"), response.getString("name"));
+                    String key =response.getJSONArray("api_keys").getJSONObject(0).get("api_key").toString();
+                    String id = response.get("id").toString();
+
+                    CityAssociation city=new CityAssociation(key,"",ThinkSpeak.INSTANCE.location,id,"");
+
+                    createNewAlert(city,ThinkSpeak.INSTANCE.context);
+                    /*
 
                     ArrayList<Pair<String, String>> data = new ArrayList<>();
                     data.add(new Pair<>("API_KEY_CHANNEL", API_KEY_CREATE_ASSOCIATION));
@@ -155,6 +163,7 @@ public enum ThinkSpeak {
                         public void onResult(JSONObject response) throws JSONException {
                             //Inserted into API_Table
 
+
                         }
 
                         @Override
@@ -162,7 +171,7 @@ public enum ThinkSpeak {
                             System.out.println(response);
                         }
                     }, "https://api.thingspeak.com/update.json?api_key=" + API_KEY_CREATE_ASSOCIATION + "&field1=" + new JSONObject(response.getJSONArray("api_keys").get(0).toString()).getString("api_key"), data, context);
-
+*/
                 }
 
                 @Override
@@ -245,7 +254,7 @@ public enum ThinkSpeak {
 
 
 
-    public void createNewChannel(final String name,  Context context) {
+    public void createNewChannel( final String name, Context context) {
         ThinkSpeak.INSTANCE.context = context;
 
         CityAssociation city=IAirManager.INSTANCE.getCityAssociation(name);
