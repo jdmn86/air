@@ -174,8 +174,32 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
             @Override
             public void onClick(View v) {
 
-                if(!getMyLocation()){
-                    Toast.makeText(getApplicationContext(),"Error Getting Actual Location", Toast.LENGTH_SHORT);
+                if (!getMyLocation()) {
+                    Toast.makeText(getApplicationContext(), "Error Getting Actual Location", Toast.LENGTH_SHORT);
+                } else {
+
+                    if (IAirManager.INSTANCE.getCityAssociation(currentLocation.getLocationName()) == null) {
+
+                        adapter.add(currentLocation.getLocationName());
+                        for (int position = 0; position < adapter.getCount(); position++) {
+                            if (adapter.getItem(position).equalsIgnoreCase(currentLocation.getLocationName())) {
+
+                                ThinkSpeak.createNewChannel(currentLocation.getLocationName(), getApplicationContext());
+                                spinner.setSelection(position);
+
+                                return;
+                            }
+                        }
+                    } else {
+                        for (int position = 0; position < adapter.getCount(); position++) {
+                            if (adapter.getItem(position).equalsIgnoreCase(currentLocation.getLocationName())) {
+                                spinner.setSelection(position);
+
+                                return;
+                            }
+
+                        }
+                    }
                 }
             }
         });
@@ -204,15 +228,25 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                 System.out.println("locationName"+locationName);
 
                 if(IAirManager.INSTANCE.getCityAssociation(locationName)==null){
-                    ThinkSpeak.createNewChannel(locationName,this);
+
                     adapter.add(locationName);
                     for (int position = 0; position < adapter.getCount(); position++) {
                         if(adapter.getItem(position).equalsIgnoreCase( locationName)) {
                             spinner.setSelection(position);
+                            ThinkSpeak.createNewChannel(locationName,this);
                             return;
                         }
                     }
+                } else {
+                for (int position = 0; position < adapter.getCount(); position++) {
+                    if (adapter.getItem(position).equalsIgnoreCase(currentLocation.getLocationName())) {
+                        spinner.setSelection(position);
+
+                        return;
+                    }
+
                 }
+            }
 
             }
             if (resultCode == Activity.RESULT_CANCELED) {

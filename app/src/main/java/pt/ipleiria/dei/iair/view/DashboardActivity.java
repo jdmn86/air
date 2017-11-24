@@ -73,8 +73,6 @@ public class DashboardActivity extends GetVinicityActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        preferencesRead =getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-        preferencesWrite = preferencesRead.edit();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
@@ -101,8 +99,7 @@ public class DashboardActivity extends GetVinicityActivity{
             openDialogName();
         }
         favouriteLocationTXT.setText(favLocation);
-        userNameTXT.setText(txtUsername + getUsername());
-
+        userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
 
         ThinkSpeak.getThingDataAssociations(this);
          getDataLocation();
@@ -215,7 +212,7 @@ public class DashboardActivity extends GetVinicityActivity{
         alertDialogBuilder.setTitle("Alert");
         alertDialogBuilder.setMessage("Your current favorite location isn't set, please choose one option.");
 
-        alertDialogBuilder.setPositiveButton("Go To Map", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
                 Intent intent = null;
@@ -226,9 +223,11 @@ public class DashboardActivity extends GetVinicityActivity{
                     pickLocation.putExtra("SEND_LOCATION_REQUEST", 2);
                     startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
                 }
-
-                favouriteLocationTXT.setText(getLocationFavourite());
-                Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();
+                if (IAirManager.INSTANCE.getUsername() == "null") {
+                    openDialogName();
+                }
+                favouriteLocationTXT.setText(IAirManager.INSTANCE.getFavoriteLocationName());
+                Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + IAirManager.INSTANCE.getFavoriteLocationName(),Toast.LENGTH_LONG).show();
             }
         });
 
@@ -249,7 +248,7 @@ public class DashboardActivity extends GetVinicityActivity{
                 if (IAirManager.INSTANCE.getUsername() == "null") {
                     openDialogName();
                 }
-                //Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
+                Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
             }
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -284,51 +283,6 @@ public class DashboardActivity extends GetVinicityActivity{
         alertDialog.show();
     }
 
-
-
-
-
-    private String getActualLocation() {
-        GPSUtils gpsUtils = new GPSUtils(getApplicationContext());
-        Location currentLocation = gpsUtils.getLocation();
-        String actualLocation = "null";
-        try {
-            actualLocation = preferencesRead.getString("locationText", GPSUtils.getLocationDetails(this, currentLocation.getLatitude(), currentLocation.getLongitude()).getLocality());
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        return actualLocation;
-    }
-
-
-    public void saveFavouriteLocation() {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("locationFavourite", getActualLocation());
-        editor.apply();
-    }
-
-    private void saveUsername(String username) {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("userName", username);
-        editor.apply();
-    }
-
-    public String getLocationFavourite () {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-        String favLocation = sharedPreferences.getString("locationFavourite", "");
-        return  favLocation;
-    }
-
-    public String getUsername() {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-        String username = sharedPreferences.getString("userName", "");
-        return  username;
-
-    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -411,7 +365,7 @@ public class DashboardActivity extends GetVinicityActivity{
     protected void onResume() {
         super.onResume();
         txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
-        userNameTXT.setText(txtUsername + getUsername());
+        userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
     }
 
 
