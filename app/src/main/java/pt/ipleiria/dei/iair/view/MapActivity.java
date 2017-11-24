@@ -237,10 +237,13 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             Marker marker = googleMap.addMarker(new MarkerOptions().position(IAirManager.INSTANCE.getFavoriteLocationLatLng())
                     .title(IAirManager.INSTANCE.getFavoriteLocationName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
             markers.add(marker);
+
+            this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(IAirManager.INSTANCE.getFavoriteLocationLatLng()));
+            this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(6));
+
+
         }
 
-        this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(IAirManager.INSTANCE.getFavoriteLocationLatLng()));
-        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(6));
 
     }
 

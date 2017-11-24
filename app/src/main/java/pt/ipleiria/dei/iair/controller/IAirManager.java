@@ -9,6 +9,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.LinkedList;
 
+import pt.ipleiria.dei.iair.model.Alerts;
+import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
 import pt.ipleiria.dei.iair.model.IAirSensorListener;
 import pt.ipleiria.dei.iair.view.MySensorsActivity;
@@ -36,13 +38,18 @@ public enum IAirManager {
     private String username;
 
     private LinkedList<CityAssociation> listCityAssotiation=new LinkedList<>();
+    private LinkedList<Alerts> listAlerts=new LinkedList<>();
+    private LinkedList<Channel> listChannel=new LinkedList<>();
+
+    private int cityIdList;
 
     public CityAssociation getCityAssociation(String LocationName){
 
         for (CityAssociation city:listCityAssotiation) {
-           // if(city.getName().equals(LocationName)){
-              //  return city;
-            //}
+            if(city.getREGION_NAME().equalsIgnoreCase(LocationName)){
+                return city;
+            }
+            System.out.println("qq:"+city.getREGION_NAME());
         }
         return null;
     }
@@ -50,6 +57,37 @@ public enum IAirManager {
     public void addCityAssociation(CityAssociation city){
         listCityAssotiation.add(city);
     }
+
+    public Alerts getAlerts(String alertName){
+
+        for (Alerts alert:listAlerts) {
+            if(alert.getName().equals(alertName)){
+                return alert;
+            }
+        }
+        return null;
+    }
+
+    public void addAlert(Alerts alert){
+        listAlerts.add(alert);
+    }
+
+    public Channel getChannel(String channelname){
+
+        for (Channel channel:listChannel) {
+            if(channel.getName().equals(channelname)){
+                return channel;
+            }
+        }
+        return null;
+    }
+
+    public void addChannel(Channel channel){
+        listChannel.add(channel);
+    }
+
+
+
 
     public String getHumity() {
         return humity;
@@ -168,5 +206,23 @@ public enum IAirManager {
     }
 
 
+    public LinkedList<CityAssociation> getAllCityAssociations() {
+        return listCityAssotiation;
+    }
 
+    public LinkedList<Alerts> getAllAlerts() {
+        return listAlerts;
+    }
+
+    public LinkedList<Channel> getAllChannels() {
+        return listChannel;
+    }
+
+    public int getCityIdLast() {
+        return cityIdList;
+    }
+
+    public void setCityIdLast(int cityIdList) {
+        this.cityIdList = cityIdList;
+    }
 }

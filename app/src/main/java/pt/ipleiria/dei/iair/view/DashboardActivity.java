@@ -14,6 +14,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import pt.ipleiria.dei.iair.R;
@@ -30,14 +34,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.channels.Channel;
+import java.util.ArrayList;
 import java.util.Map;
 
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.model.Alerts;
+import pt.ipleiria.dei.iair.model.CityAssociation;
 
 import static junit.framework.Assert.fail;
+import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.getThingDataAlertsLast;
 
 public class DashboardActivity extends GPSActivity {
     public static final String SHARED_PREFERENCES = "Shared";
@@ -58,6 +66,10 @@ public class DashboardActivity extends GPSActivity {
     static final int PICK_LOCATION_REQUEST = 1;  // The request code
     private LatLng location;
     private String locationName;
+    private ListView lista;
+    private ArrayAdapter<String> adapter;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +84,9 @@ public class DashboardActivity extends GPSActivity {
 
         IAirManager.INSTANCE.setSharedPreferences(sharedPref);
          txtView = this.findViewById(R.id.textViewFavoriteLocation);
+
+         lista= this.findViewById(R.id.listViewInformativeMessage);
+
         txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
         //ThinkSpeak.createNewChannel("Coimbra",40.200939, -8.407976,true,"Temperatura","Pressão","Humidade");
         bindTextViews();
@@ -84,45 +99,72 @@ public class DashboardActivity extends GPSActivity {
         favouriteLocationTXT.setText(favLocation);
         userNameTXT.setText(txtUsername + getUsername());
 
-        getDataLocation();
+
+        ThinkSpeak.getThingDataAssociations(this);
+         getDataLocation();
     }
 
     private void getDataLocation() {
-        ThinkSpeak.getData(new HttpCallBack() {
-            @Override
-            public void onResult(JSONObject response) throws JSONException {
-                temperatureFavLocationValue.setText("N/A");
-                humidityFavLocationValue.setText("N/A");
-                pressureFavLocationValue.setText("N/A");
-                JSONArray feeds = response.getJSONArray("feeds");
-                if(feeds.length() == 0) {
+        pt.ipleiria.dei.iair.model.Channel channel=null;
+        // busca a localização
+        GPSUtils gps = new GPSUtils(this);
+        LatLng latLng= new LatLng(gps.getLocation().getLatitude(),gps.getLongitude());
+        // faz get vinicity
+        getVicinity(latLng,4000);
 
-                    Toast.makeText(DashboardActivity.this,"Don't have data in your location",Toast.LENGTH_LONG).show();
-                } else {
-                    //throw Exception;
-                    //temperatureFavLocationValue.setText(String.valueOf(feeds.length()));
+        //poe dados
+        temperatureFavLocationValue.setText("N/A");
+        humidityFavLocationValue.setText("N/A");
+        pressureFavLocationValue.setText("N/A");
 
-                    for (int i = feeds.length()-1; i >= 0; i--) {
-                        JSONObject elem = (JSONObject) feeds.get(i);
-                        if (temperatureFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field1").contains("N/A"))
-                            temperatureFavLocationValue.setText(String.valueOf(elem.getString("field1")));
-                        if (pressureFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field2").contains( "N/A"))
-                            pressureFavLocationValue.setText(String.valueOf(elem.getString("field2")));
-                        if (humidityFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field3").contains( "N/A"))
-                            humidityFavLocationValue.setText(elem.getString("field3"));
-                        //if(!(elem.getString("field1").equals("23") && elem.getString("field2").equals("900") && elem.getString("field3").equals("0"))) {
-                        //fail("not working because" + elem.toString());
-                        //}
+        if(IAirManager.INSTANCE.getAllChannels().size()!=0){
+             channel=IAirManager.INSTANCE.getAllChannels().get(IAirManager.INSTANCE.getCityIdLast());
 
-                    }
+        }
+
+        if(channel!=null){
+            if (temperatureFavLocationValue.getText().toString().contains("N/A") && !channel.getTemperature().contains("N/A"))
+                temperatureFavLocationValue.setText(channel.getTemperature());
+            if (pressureFavLocationValue.getText().toString().contains("N/A") && !channel.getPressure().contains( "N/A"))
+                pressureFavLocationValue.setText(channel.getPressure());
+            if (humidityFavLocationValue.getText().toString().contains("N/A") && !channel.getHumity().contains( "N/A"))
+                humidityFavLocationValue.setText(channel.getHumity());
+        }
+
+
+        System.out.println("favorito"+IAirManager.INSTANCE.getFavoriteLocationName());
+
+        CityAssociation city=IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
+
+        if(city!=null){
+            getThingDataAlertsLast(city,this);
+
+            System.out.println("number of alertas"+IAirManager.INSTANCE.getAllAlerts().size());
+            if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
+                // Convert ArrayList to array
+
+
+                ArrayList<String> strings = new ArrayList<>();
+
+                adapter = new ArrayAdapter<String>(this,
+                        android.R.layout.simple_list_item_1, strings);
+
+
+                for (Alerts alert :IAirManager.INSTANCE.getAllAlerts()) {
+                    //strings.add(alert.toString());
+                    adapter.add(alert.toString());
                 }
-            }
 
-            @Override
-            public void onResult(String response) {
+
+
+                lista.setAdapter(adapter);
+               // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
 
             }
-        }, this, favLocation);
+        }
+
+
+
     }
 
     private void bindTextViews() {
@@ -317,8 +359,44 @@ public class DashboardActivity extends GPSActivity {
 
         } else if (id == R.id.menu_send_data) {
             //Location location = GPSUtils.getLocation();
-            ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
             //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+
+
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+            String temp = IAirManager.INSTANCE.getTemperature();
+            String press = IAirManager.INSTANCE.getPresure();
+            String hum = IAirManager.INSTANCE.getHumity();
+
+            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, locationName);
+
+            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+
+            if (city == null) {
+                ThinkSpeak.createNewChannel(locationName, this);
+                System.out.println("LOCAL :" + locationName);
+
+                city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+                System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+                if (city != null){
+
+                    //ThinkSpeak.insertInChannel(channel,this);
+
+                    //channel=IAirManager.INSTANCE.getChannel(local);
+                    ThinkSpeak.insertInChannel(channel, this);
+                }
+
+            }else{
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.insertInChannel(channel, this);
+            }
+
+
+
+
+
         } else if (id == R.id.menu_gps) {
             enableGPS();
         }
@@ -330,7 +408,7 @@ public class DashboardActivity extends GPSActivity {
 
         return super.onOptionsItemSelected(item);
     }
-    private void runUnitTests() throws InterruptedException {
+   /* private void runUnitTests() throws InterruptedException {
 
         Log.d("Unit Test_US8_AT5" , (ThinkSpeak.sendData(this, 39.039463, 125.763378, null, null, null) ? "Sending null for GPS and worked something Wrong" : "Sending null for GPS and not worked OK"));
         ThinkSpeak.sendData(this, 39.039463, 125.763378, "80", null, null);
@@ -357,7 +435,7 @@ public class DashboardActivity extends GPSActivity {
             }
         },  this,  39.039463, 125.763378);
 
-    }
+    }*/
 
     @Override
     protected void onResume() {
@@ -396,6 +474,34 @@ public class DashboardActivity extends GPSActivity {
 
     }
 
+    public void getTreta(LatLng latLng, int radius){
+
+        HttpUtils.Get(new HttpCallBack() {
+
+            @SuppressLint("ResourceType")
+            @Override
+            public void onResult(JSONObject response) throws JSONException {
+
+                if(response.getJSONArray("results").length()>0){
+
+                    double latitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lat").toString());
+                    double longitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lng").toString());
+
+                    location = new LatLng(latitude,longitude);
+                    locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
+                    IAirManager.INSTANCE.saveFavoriteLocation(location,locationName);
+
+                }
+
+            }
+
+            @Override
+            public void onResult(String response) {
+
+            }
+        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
+
+    }
 
 
 }

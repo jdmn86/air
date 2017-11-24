@@ -61,4 +61,15 @@ public class CityAssociation {
     public void setALERTS_ID(String ALERTS_ID) {
         this.ALERTS_ID = ALERTS_ID;
     }
+
+    @Override
+    public String toString() {
+        return "CityAssociation{" +
+                "API_KEY_CHANNEL='" + API_KEY_CHANNEL + '\'' +
+                ", API_KEY_ALERTS='" + API_KEY_ALERTS + '\'' +
+                ", REGION_NAME='" + REGION_NAME + '\'' +
+                ", CHANNEL_ID=" + CHANNEL_ID +
+                ", ALERTS_ID=" + ALERTS_ID +
+                '}';
+    }
 }

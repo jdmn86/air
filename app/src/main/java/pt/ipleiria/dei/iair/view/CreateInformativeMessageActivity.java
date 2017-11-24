@@ -9,11 +9,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 
 import java.sql.Timestamp;
@@ -24,12 +28,21 @@ import java.util.GregorianCalendar;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
+import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.Alerts;
+import pt.ipleiria.dei.iair.model.CityAssociation;
 
 public class CreateInformativeMessageActivity extends GPSActivity {
 
     EditText editTextTimestampCreateInformativeMessage;
     int mYear,mMonth,mDay,mHour,mMinute;
     static final int PICK_LOCATION_REQUEST = 1;  // The request code
+    private ArrayAdapter<String> adapter;
+    private Spinner spinner;
+    private Spinner spinner1;
+    private ArrayAdapter<String> adapter1;
+    private EditText editTextDescriptionCreateInformativeMessage;
 
 
     @Override
@@ -37,13 +50,17 @@ public class CreateInformativeMessageActivity extends GPSActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_informative_message);
 
+
         final Button buttonSelectDateTime = findViewById(R.id.buttonSelectDateTimeCreateInformativeMessage);
         final SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         final String format = s.format(new Date());
         final Button buttonMap = findViewById(R.id.buttonMapCreateInformativeMessage);
+        final Button buttonSave = findViewById(R.id.buttonSaveCreateInformativeMessage);
 
         editTextTimestampCreateInformativeMessage= findViewById(R.id.editTextTimestampCreateInformativeMessage);
         editTextTimestampCreateInformativeMessage.setText(format);
+
+        editTextDescriptionCreateInformativeMessage= findViewById(R.id.editTextDescriptionCreateInformativeMessage);
 
         buttonSelectDateTime.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -62,6 +79,42 @@ public class CreateInformativeMessageActivity extends GPSActivity {
                 startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
             }
         });
+
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                Alerts alert=new Alerts(spinner.getSelectedItem().toString(),spinner1.getSelectedItem().toString(),editTextDescriptionCreateInformativeMessage.getText().toString(),editTextTimestampCreateInformativeMessage.getText().toString());
+                ThinkSpeak.insertInAlerts(alert,getApplicationContext());
+
+                Toast.makeText(CreateInformativeMessageActivity.this, "THE alert was send", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        spinner = (Spinner) findViewById(R.id.spinnerLocations) ;
+        java.util.ArrayList<String> strings = new java.util.ArrayList<>();
+        for (CityAssociation city: IAirManager.INSTANCE.getAllCityAssociations()) {
+            strings.add(city.getREGION_NAME());
+        }
+         adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, strings);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner1 = (Spinner) findViewById(R.id.spinnerInformativeMesageTypes) ;
+        java.util.ArrayList<String> strings1 = new java.util.ArrayList<>();
+        strings1.add("fire");
+        strings1.add("rain");
+        strings1.add("wind");
+        strings1.add("gas_leak");
+        strings1.add("other");
+
+        adapter1 = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, strings1);
+
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner1.setAdapter(adapter1);
+
     }
 
 
@@ -76,6 +129,17 @@ public class CreateInformativeMessageActivity extends GPSActivity {
 
                 System.out.println("location"+location);
                 System.out.println("locationName"+locationName);
+
+                if(IAirManager.INSTANCE.getCityAssociation(locationName)==null){
+                    ThinkSpeak.createNewChannel(locationName,this);
+                    adapter.add(locationName);
+                    for (int position = 0; position < adapter.getCount(); position++) {
+                        if(adapter.getItem(position).equalsIgnoreCase( locationName)) {
+                            spinner.setSelection(position);
+                            return;
+                        }
+                    }
+                }
 
             }
             if (resultCode == Activity.RESULT_CANCELED) {
