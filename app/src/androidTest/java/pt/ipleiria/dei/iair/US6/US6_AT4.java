@@ -111,7 +111,7 @@ public class US6_AT4 {
                                 3)));
         appCompatButton.perform(scrollTo(), click());
         try {
-            assertEquals(marker.getContentDescription().trim(),"Lisbon\nThis Is Your Favorite Location.");
+            assertEquals(marker.getContentDescription().trim(),"Lisbon This Is Your Favorite Location.");
         } catch (UiObjectNotFoundException e) {
             fail("Marker not Found!");
         }

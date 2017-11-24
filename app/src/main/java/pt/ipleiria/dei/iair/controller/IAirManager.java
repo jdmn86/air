@@ -167,6 +167,7 @@ public enum IAirManager {
         this.sharedPreferences = sharedPreferences;
         setFavoriteLocation(sharedPreferences.getString("favoriteLocation","null"));
         setFavoriteLocationName(sharedPreferences.getString("favoriteLocationName","null"));
+        setUsername(sharedPreferences.getString("username","null"));
     }
 
     public LatLng getFavoriteLocationLatLng() {

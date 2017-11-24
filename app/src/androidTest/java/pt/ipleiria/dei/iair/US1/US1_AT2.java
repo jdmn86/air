@@ -17,7 +17,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import pt.ipleiria.dei.iair.MasterTest;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.view.DashboardActivity;
 
@@ -34,7 +33,7 @@ import static org.hamcrest.Matchers.allOf;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US1_AT2 extends MasterTest{
+public class US1_AT2 {
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
@@ -54,7 +53,7 @@ public class US1_AT2 extends MasterTest{
         textView.check(matches(withText("Username: teste")));
 
         ViewInteraction textView2 = onView(
-                allOf(withId(R.id.textViewFavoriteLocation),
+                allOf(withId(R.id.textViewFavoriteLocation), withText("Leiria"),
                         childAtPosition(
                                 allOf(withId(R.id.layouy2),
                                         childAtPosition(

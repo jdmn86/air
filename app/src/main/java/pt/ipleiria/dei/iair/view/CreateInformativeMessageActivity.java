@@ -63,6 +63,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
     private Spinner spinner1;
     private ArrayAdapter<String> adapter1;
     private EditText editTextDescriptionCreateInformativeMessage;
+    private EditText editTextTimestamp;
 
 
     @Override
@@ -85,12 +86,13 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         imageGetMyLocation = findViewById(R.id.imageGetMyLocationCreateInformativeMessage);
 
 
+
         if(!getMyLocation()){
             Toast.makeText(this,"Error Getting Actual Location", Toast.LENGTH_SHORT);
         }
 
-        editTextTimestampCreateInformativeMessage= findViewById(R.id.editTextTimestampCreateInformativeMessage);
-        editTextTimestampCreateInformativeMessage.setText(format);
+        editTextTimestamp= findViewById(R.id.editTextTimestampCreateInformativeMessage);
+        editTextTimestamp.setText(format);
         spinnerTypes.setAdapter(new ArrayAdapter<InformativeMessageType>(this, android.R.layout.simple_spinner_item, InformativeMessageType.values()));
         buttonSelectDateTime.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -107,18 +109,18 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                     textViewDescription.setText("Description: Please insert a description (at least 20 characters)");
                     flag=false;
                 }
-                if (spinnerLocations.getSelectedItem().toString().length()==0 || currentLocation.getLatitude() == null || currentLocation.getLongitude() == null){
+                if (spinnerLocations.getSelectedItem().toString().length()==0){
                     textViewLocation.setTextColor(Color.RED);
                     textViewLocation.setText("Location: Please Insert A Valid Location");
                     flag=false;
                 }
-                if (editTextTimestampCreateInformativeMessage.getText().length()==0){
+                if (editTextTimestamp.getText().length()==0){
                     textViewTimestamp.setTextColor(Color.RED);
                     textViewTimestamp.setText("Timestamp: Please Insert A Valid Timestamp");
                     flag=false;
                 }
                 if(flag) {
-                    Alerts alert=new Alerts(spinner.getSelectedItem().toString(),spinner1.getSelectedItem().toString(),editTextDescriptionCreateInformativeMessage.getText().toString(),editTextTimestampCreateInformativeMessage.getText().toString());
+                    Alerts alert=new Alerts(spinner.getSelectedItem().toString(),spinner1.getSelectedItem().toString(),editTextDescription.getText().toString(),editTextTimestamp.getText().toString());
                     ThinkSpeak.insertInAlerts(alert,getApplicationContext());
 
                     Toast.makeText(CreateInformativeMessageActivity.this, "THE alert was send", Toast.LENGTH_LONG).show();
@@ -303,7 +305,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                         String hours=String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY));
                         String minutes=String.format("%02d",calendar.get(Calendar.MINUTE));
 
-                        editTextTimestampCreateInformativeMessage.setText(day + "/" + month + "/" + year
+                        editTextTimestamp.setText(day + "/" + month + "/" + year
                                 + " " + hours + ":" + minutes);
                     }
                 }, mHour, mMinute, true);

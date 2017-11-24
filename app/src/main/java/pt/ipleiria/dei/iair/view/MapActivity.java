@@ -133,7 +133,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                                         IAirManager.INSTANCE.saveFavoriteLocation(place);
                                         googleMap.clear();
                                         googleMap.addMarker(new MarkerOptions().position(place.getLatLng())
-                                                .title(IAirManager.INSTANCE.getFavoriteLocationName() + "\n This Is Yor Fvorite Location")
+                                                .title(IAirManager.INSTANCE.getFavoriteLocationName() + " This Is Your Favorite Location")
                                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
                                         Toast.makeText(MapActivity.this,  place.getName() + " is now your favorite location!", Toast.LENGTH_SHORT).show();
                                     }

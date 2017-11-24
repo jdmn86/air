@@ -22,7 +22,6 @@ abstract class GetVinicityActivity extends GPSActivity {
 
     public void getVicinity(LatLng latLng, int radius){
 
-        final Location location = new Location();
         HttpUtils.Get(new HttpCallBack() {
 
             @SuppressLint("ResourceType")
@@ -30,7 +29,7 @@ abstract class GetVinicityActivity extends GPSActivity {
             public void onResult(JSONObject response) throws JSONException {
 
                 if(response.getJSONArray("results").length()>0){
-
+                    Location location = new Location();
                     location.setLatitude(Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lat").toString()));
                     location.setLongitude(Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lng").toString()));
                     location.setLocationName(response.getJSONArray("results").getJSONObject(0).get("vicinity").toString());
