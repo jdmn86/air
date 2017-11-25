@@ -7,37 +7,29 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.Utils.AlertCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import android.widget.EditText;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.nio.channels.Channel;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 
-import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
@@ -49,6 +41,7 @@ import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.getThingDataAlertsLast;
 
 public class DashboardActivity extends GetVinicityActivity{
     public static final String SHARED_PREFERENCES = "Shared";
+    private static Context context;
     SharedPreferences preferencesRead;
     SharedPreferences.Editor preferencesWrite;
 
@@ -75,6 +68,7 @@ public class DashboardActivity extends GetVinicityActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+        context = this;
 
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -138,30 +132,36 @@ public class DashboardActivity extends GetVinicityActivity{
         CityAssociation city=IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
 
         if(city!=null){
-            getThingDataAlertsLast(city,this);
+            getThingDataAlertsLast(new AlertCallBack() {
 
-            System.out.println("number of alertas"+IAirManager.INSTANCE.getAllAlerts().size());
-            if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
-                // Convert ArrayList to array
-
-
-                ArrayList<String> strings = new ArrayList<>();
-
-                adapter = new ArrayAdapter<String>(this,
-                        android.R.layout.simple_list_item_1, strings);
+                @Override
+                public void onResult(List<Alerts> response) {
+                    System.out.println("number of alertas"+IAirManager.INSTANCE.getAllAlerts().size());
+                    if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
+                        // Convert ArrayList to array
 
 
-                for (Alerts alert :IAirManager.INSTANCE.getAllAlerts()) {
-                    //strings.add(alert.toString());
-                    adapter.add(alert.toString());
+                        ArrayList<String> strings = new ArrayList<>();
+
+                        adapter = new ArrayAdapter<String>(DashboardActivity.context,
+                                android.R.layout.simple_list_item_1, strings);
+
+
+                        for (Alerts alert :response) {
+                            //strings.add(alert.toString());
+                            adapter.add(alert.toString());
+                        }
+
+
+
+                        lista.setAdapter(adapter);
+                        // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
+
+                    }
                 }
+            }, city,this);
 
 
-
-                lista.setAdapter(adapter);
-               // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
-
-            }
         }
 
 
@@ -184,14 +184,13 @@ public class DashboardActivity extends GetVinicityActivity{
         if (requestCode == PICK_LOCATION_REQUEST) {
             if (resultCode == RESULT_OK) { // Activity.RESULT_OK
 
-                String location = data.getStringExtra("location");
                 String locationName = data.getStringExtra("locationName");
                 LatLng latLng;
-                if (location.isEmpty()) {
+                if (locationName.isEmpty()) {
                     return;
                 } else {
-                    String[] strs = location.split(";");
-                    latLng = new LatLng(Double.parseDouble(strs[0]), Double.parseDouble(strs[1]));
+                    String[] strs = locationName.split(";");
+                    latLng = new LatLng(data.getDoubleExtra("latitude", 0), data.getDoubleExtra("longitude", 0));
                 }
 
                 IAirManager.INSTANCE.saveFavoriteLocation(latLng, locationName);
