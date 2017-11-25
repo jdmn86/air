@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="set_as_favorite_location" type="id">Set as Favourite</item>
+    <item name="set_as_choose_this_location" type="id">Set Location</item>
+</resources>
