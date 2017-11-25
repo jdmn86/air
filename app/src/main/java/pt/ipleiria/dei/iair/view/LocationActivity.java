@@ -3,8 +3,6 @@ package pt.ipleiria.dei.iair.view;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import pt.ipleiria.dei.iair.R;
@@ -19,11 +17,6 @@ public class LocationActivity extends GPSActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
-    }
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

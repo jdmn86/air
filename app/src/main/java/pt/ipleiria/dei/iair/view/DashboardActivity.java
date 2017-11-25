@@ -1,5 +1,6 @@
 package pt.ipleiria.dei.iair.view;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -7,20 +8,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.Utils.AlertCallBack;
-import pt.ipleiria.dei.iair.Utils.HttpUtils;
-import pt.ipleiria.dei.iair.controller.IAirManager;
-import android.widget.EditText;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -30,13 +26,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.Utils.AlertCallBack;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.CityAssociation;
 
-import static junit.framework.Assert.fail;
 import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.getThingDataAlertsLast;
 
 public class DashboardActivity extends GetVinicityActivity{
@@ -62,6 +61,8 @@ public class DashboardActivity extends GetVinicityActivity{
     private ListView lista;
     private ArrayAdapter<String> adapter;
 
+    private static final String[] permissions = {Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WAKE_LOCK, Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.CHANGE_NETWORK_STATE};
 
 
     @Override
@@ -69,6 +70,7 @@ public class DashboardActivity extends GetVinicityActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
         context = this;
+        requestPermission(permissions);
 
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -279,14 +281,6 @@ public class DashboardActivity extends GetVinicityActivity{
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
-
-
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -394,6 +388,12 @@ public class DashboardActivity extends GetVinicityActivity{
             }
         }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
 
+    }
+
+    private void requestPermission(String[] permission) {
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permission[0])) {
+            ActivityCompat.requestPermissions(this, permission, 0);
+        }
     }
 
 }
