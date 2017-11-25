@@ -4,20 +4,48 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.CityAssociation;
 
 public class LocationActivity extends GPSActivity {
+    private ListView listViewLocations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
+        bindLayoutElements();
+        populateList();
     }
+
+    private void bindLayoutElements() {
+        listViewLocations = (ListView) findViewById(R.id.listViewLocations);
+    }
+
+    private void populateList() {
+        List<String> your_array_list = new ArrayList<String>();
+        for (CityAssociation cityAssociation:
+        IAirManager.INSTANCE.getAllCityAssociations()) {
+your_array_list.add(cityAssociation.getREGION_NAME());
+        };
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_list_item_1,
+                your_array_list );
+
+        listViewLocations.setAdapter(arrayAdapter);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -55,4 +83,5 @@ public class LocationActivity extends GPSActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

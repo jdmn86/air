@@ -24,10 +24,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.Utils.AlertCallBack;
+import pt.ipleiria.dei.iair.Utils.AlertCallback;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
@@ -134,7 +135,7 @@ public class DashboardActivity extends GetVinicityActivity{
         CityAssociation city=IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
 
         if(city!=null){
-            getThingDataAlertsLast(new AlertCallBack() {
+            getThingDataAlertsLast(new AlertCallback() {
 
                 @Override
                 public void onResult(List<Alerts> response) {
@@ -160,6 +161,11 @@ public class DashboardActivity extends GetVinicityActivity{
                         // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
 
                     }
+                }
+
+                @Override
+                public void onResult(LinkedList<CityAssociation> cityAssociations) {
+
                 }
             }, city,this);
 

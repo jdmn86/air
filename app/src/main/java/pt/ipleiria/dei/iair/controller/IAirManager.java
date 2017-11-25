@@ -229,4 +229,9 @@ public enum IAirManager {
     public void setCityIdLast(int cityIdList) {
         this.cityIdList = cityIdList;
     }
+
+
+    public void CityAssociation(LinkedList<CityAssociation> cityAssociations) {
+        this.listCityAssotiation = cityAssociations;
+    }
 }

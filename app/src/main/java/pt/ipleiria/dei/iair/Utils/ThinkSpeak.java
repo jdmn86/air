@@ -422,12 +422,16 @@ public enum ThinkSpeak {
         return;
 
     }
-
     public static void getThingDataAssociations( Context context) {
+        getThingDataAssociations(null, context);
+    }
+
+    public static void getThingDataAssociations(final AlertCallback alertCallBack, Context context) {
 
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
+                LinkedList<CityAssociation> cityAssociations = new LinkedList<>();
                 JSONArray feeds = response.getJSONArray("feeds");
                 System.out.println(feeds.length());
                 if (feeds.length() != 0) {
@@ -442,6 +446,10 @@ public enum ThinkSpeak {
 
                         CityAssociation city = new CityAssociation(KEY_CHANNEL,KEY_ALERT,nome,id_CHANNEL,id_ALERT);
                         IAirManager.INSTANCE.addCityAssociation(city);
+                        cityAssociations.add(city);
+                    }
+                    if(alertCallBack != null) {
+                        alertCallBack.onResult(cityAssociations);
                     }
                 }
 
@@ -561,7 +569,7 @@ public enum ThinkSpeak {
     }
 
     public List<Alerts> alerts;
-    public static void getThingDataAlertsLast(final AlertCallBack callBack, CityAssociation city, Context context) {
+    public static void getThingDataAlertsLast(final AlertCallback callBack, CityAssociation city, Context context) {
 
         //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
 
