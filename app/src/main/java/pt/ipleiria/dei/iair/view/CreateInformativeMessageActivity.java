@@ -6,6 +6,8 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -43,6 +45,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
     private Spinner spinnerLocations;
     private TextView textViewLocation;
     private TextView textViewTimestamp;
+    private TextView textViewcharacterCount;
     private Button buttonCancel;
     private ImageView imageGetMyLocation;
     private Location currentLocation;
@@ -72,7 +75,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         final TextView textViewDescription = findViewById(R.id.textViewDescription);
         spinnerLocations = findViewById(R.id.spinnerLocations);
         imageGetMyLocation = findViewById(R.id.imageGetMyLocationCreateInformativeMessage);
-
+        textViewcharacterCount  = (TextView) findViewById(R.id.textViewCreateInformativeMessageCharacterCount);
 
 
         if(!getMyLocation()){
@@ -123,6 +126,26 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                 //pickLocation.setType(Phone.CONTENT_TYPE); // Show user only contacts w/ phone numbers
                 pickLocation.putExtra("SEND_LOCATION_REQUEST", 2);
                 startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
+            }
+        });
+        editTextDescription.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textViewcharacterCount.setText(count + " Characters");
+                if(count<20 || count >160)
+                    textViewcharacterCount.setTextColor(Color.RED);
+                else
+                    textViewcharacterCount.setTextColor(Color.GREEN);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 

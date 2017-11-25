@@ -40,6 +40,6 @@ public class Location {
     }
 
     public String getLocationName() {
-        return locationName;
+        return locationName.split(",", 2)[0];
     }
 }
