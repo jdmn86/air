@@ -375,7 +375,7 @@ public class DashboardActivity extends GetVinicityActivity{
                     double longitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lng").toString());
 
                     location = new LatLng(latitude,longitude);
-                    locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
+                    locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString().split(",",2)[0];
                     IAirManager.INSTANCE.saveFavoriteLocation(location,locationName);
                     favouriteLocationTXT.setText(locationName);
                 }
