@@ -560,7 +560,7 @@ public enum ThinkSpeak {
         getThingDataAlertsLast(null, city, context);
     }
 
-    public List<Alerts> alert = new LinkedList<>();
+    public List<Alerts> alerts;
     public static void getThingDataAlertsLast(final AlertCallBack callBack, CityAssociation city, Context context) {
 
         //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
@@ -569,6 +569,7 @@ public enum ThinkSpeak {
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
+                ThinkSpeak.INSTANCE.alerts = new LinkedList<>();
                 JSONArray feeds = response.getJSONArray("feeds");
                 System.out.println(feeds.length());
                 if (feeds.length() != 0) {
@@ -579,7 +580,7 @@ public enum ThinkSpeak {
 
                         Alerts alert = new Alerts(name,type,message,timestamp);
                         IAirManager.INSTANCE.addAlert(alert);
-                        ThinkSpeak.INSTANCE.alert.add(alert);
+                        ThinkSpeak.INSTANCE.alerts.add(alert);
 
                 }
 
@@ -587,7 +588,7 @@ public enum ThinkSpeak {
                     System.out.println("alert : "+alert.toString());
                 }
                 if(callBack != null)
-                    callBack.onResult(ThinkSpeak.INSTANCE.alert);
+                    callBack.onResult(ThinkSpeak.INSTANCE.alerts);
             }
 
             @Override
