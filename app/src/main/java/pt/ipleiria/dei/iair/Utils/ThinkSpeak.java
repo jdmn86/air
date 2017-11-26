@@ -207,8 +207,8 @@ public enum ThinkSpeak {
 
                     for (int i = 0; i < feeds.length(); i++) {
                         JSONObject elem = new JSONObject( feeds.get(i).toString());
-                        if (elem.get("field2").equals(ThinkSpeak.INSTANCE.location)) {
-                            HttpUtils.Get(ThinkSpeak.INSTANCE.callback,"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.INSTANCE.context);
+                        if (elem.get("field1").equals(ThinkSpeak.INSTANCE.location)) {
+                            HttpUtils.Get(ThinkSpeak.INSTANCE.callback,"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field2") + "&results=2" , ThinkSpeak.INSTANCE.context);
 
                         }
                     }

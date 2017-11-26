@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -26,6 +28,17 @@ public class LocationActivity extends GPSActivity {
         setContentView(R.layout.activity_location);
         bindLayoutElements();
         populateList();
+
+        //listener
+        listViewLocations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(LocationActivity.this, LocationDetailsActivity.class);
+                CityAssociation citiesAssociation = IAirManager.INSTANCE.getAllCityAssociations().get(position);
+                intent.putExtra("locationName", citiesAssociation.getREGION_NAME());
+                startActivity(intent);
+            }
+        });
     }
 
     private void bindLayoutElements() {
@@ -33,16 +46,12 @@ public class LocationActivity extends GPSActivity {
     }
 
     private void populateList() {
-        List<String> your_array_list = new ArrayList<String>();
-        for (CityAssociation cityAssociation:
-        IAirManager.INSTANCE.getAllCityAssociations()) {
-your_array_list.add(cityAssociation.getREGION_NAME());
+        List<String> cityNames = new ArrayList<String>();
+        for (CityAssociation cityAssociation: IAirManager.INSTANCE.getAllCityAssociations())
+        {
+            cityNames.add(cityAssociation.getREGION_NAME());
         };
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_list_item_1,
-                your_array_list );
-
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cityNames);
         listViewLocations.setAdapter(arrayAdapter);
     }
 
