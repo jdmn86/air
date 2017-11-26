@@ -435,6 +435,7 @@ public enum ThinkSpeak {
                 JSONArray feeds = response.getJSONArray("feeds");
                 System.out.println(feeds.length());
                 if (feeds.length() != 0) {
+                    IAirManager.INSTANCE.CityAssociation(new LinkedList<CityAssociation>());
 
                     for (int i = 0; i < feeds.length(); i++) {
                         //int id=feeds.getJSONObject(i).getInt("entry_id");

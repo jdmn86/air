@@ -19,12 +19,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        android:name="android.support.multidex.MultiDexApplication" >
         <activity android:name=".view.DashboardActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
@@ -52,7 +54,6 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".view.LocationDetailsActivity"></activity>
     </application>
 
 </manifest>

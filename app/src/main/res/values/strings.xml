@@ -35,5 +35,7 @@
     <string name="buttonSelectDateTimeCreateInformativeMessage">Select Tmestamp</string>
     set_as_choose_this_location
     <string name="set_as_choose_this_location">Set As Location</string>
+    <string name="list_tab">List</string>
+    <string name="graphical_tab">Graphical</string>
 
 </resources>

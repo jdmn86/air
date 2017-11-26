@@ -1,13 +1,20 @@
 package pt.ipleiria.dei.iair.view;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.multidex.MultiDex;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
+
+import com.jjoe64.graphview.GraphView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,28 +28,66 @@ import pt.ipleiria.dei.iair.model.CityAssociation;
 
 public class LocationActivity extends GPSActivity {
     private ListView listViewLocations;
+    private GraphView graph;
+    private TabLayout tabLayout;
+    private ArrayList<LinearLayout> linearLayouts = new ArrayList();
+    private Spinner locationsSpinner;
+    private ListView listViewData;
 
+    @Override
+    protected void attachBaseContext(Context context) {
+        super.attachBaseContext(context);
+        MultiDex.install(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
         bindLayoutElements();
         populateList();
+        setListeners();
+    }
 
-        //listener
-        listViewLocations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    private void setListeners() {
+        locationsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(LocationActivity.this, LocationDetailsActivity.class);
-                CityAssociation citiesAssociation = IAirManager.INSTANCE.getAllCityAssociations().get(position);
-                intent.putExtra("locationName", citiesAssociation.getREGION_NAME());
-                startActivity(intent);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println("selected" + position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                linearLayouts.get(tab.getPosition()).setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                linearLayouts.get(tab.getPosition()).setVisibility(View.INVISIBLE);
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
             }
         });
     }
 
-    private void bindLayoutElements() {
-        listViewLocations = (ListView) findViewById(R.id.listViewLocations);
+    private void bindLayoutElements()
+    {
+
+        graph = (GraphView) findViewById(R.id.graphAirQuality);
+        tabLayout = (TabLayout) findViewById(R.id.tabLayoutLocationActivity);
+        linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityGraphical));
+        linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityList));
+        locationsSpinner = (Spinner) findViewById(R.id.spinnerLocationList);
+        listViewData = (ListView) findViewById(R.id.listViewData);
     }
 
     private void populateList() {
@@ -52,7 +97,7 @@ public class LocationActivity extends GPSActivity {
             cityNames.add(cityAssociation.getREGION_NAME());
         };
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cityNames);
-        listViewLocations.setAdapter(arrayAdapter);
+        locationsSpinner.setAdapter(arrayAdapter);
     }
 
     @Override
