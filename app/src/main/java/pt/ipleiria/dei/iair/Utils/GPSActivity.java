@@ -34,6 +34,7 @@ public class GPSActivity extends AppCompatActivity {
     protected GoogleApiClient googleApiClient;
     public  Menu menu;
     protected void enableGPS() {
+        System.out.println("no enable");
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(getApplicationContext()) .addApi(LocationServices.API) .build(); googleApiClient.connect();
 

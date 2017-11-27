@@ -49,6 +49,7 @@ public class GPSUtils extends Service implements LocationListener {
     public GPSUtils(Context context) {
         this.mContext = context;
 
+
     }
 
     public Location getLocation() {

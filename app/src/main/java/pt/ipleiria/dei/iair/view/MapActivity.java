@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
@@ -38,25 +39,25 @@ import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.Channel;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class MapActivity extends GPSActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener{
 
-    private ArrayList permissionsToRequest;
-    private ArrayList permissionsRejected = new ArrayList();
-    private ArrayList permissions = new ArrayList();
 
-    private final static int ALL_PERMISSIONS_RESULT = 101;
+    private List<Marker> markers;
     GPSUtils locationTrack;
 
     private GoogleMap googleMap;
 
-    private List<Marker> markers;
+
     private LatLng location;
     private String locationName=null;
     private int sendLocation;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,18 +73,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         }
 
         markers = new ArrayList<>();
-        permissions.add(ACCESS_FINE_LOCATION);
-        permissions.add(ACCESS_COARSE_LOCATION);
 
-        permissionsToRequest = findUnAskedPermissions(permissions);
-        //get the permissions we have asked for before but are not granted..
-        //we will store this in a global list to access later.
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            if (permissionsToRequest.size() > 0)
-                requestPermissions((String[]) permissionsToRequest.toArray(new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
-        }
 
         locationTrack = new GPSUtils(this);
 
@@ -240,81 +230,23 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(IAirManager.INSTANCE.getFavoriteLocationLatLng()));
             this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(6));
 
-
         }
 
+        if(IAirManager.INSTANCE.getAllChannels().size()!=0 && IAirManager.INSTANCE.getAllAlerts().size()!=0){
 
-    }
 
-    private ArrayList findUnAskedPermissions(ArrayList wanted) {
-        ArrayList result = new ArrayList();
+            for (Channel channel:IAirManager.INSTANCE.getAllChannels()) {
 
-        for (Object perm : wanted) {
-            if (!hasPermission((String) perm)) {
-                result.add(perm);
+                googleMap.addMarker(new MarkerOptions().position(location).title(channel.getName()));
             }
-        }
-        return result;
-    }
 
-    private boolean hasPermission(String permission) {
-        if (canMakeSmores()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                return (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
-            }
-        }
-        return true;
-    }
 
-    private boolean canMakeSmores() {
-        return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-
-        switch (requestCode) {
-
-            case ALL_PERMISSIONS_RESULT:
-                for (Object perms : permissionsToRequest) {
-                    if (!hasPermission((String) perms)) {
-                        permissionsRejected.add(perms);
-                    }
-                }
-
-                if (permissionsRejected.size() > 0) {
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (shouldShowRequestPermissionRationale((String) permissionsRejected.get(0))) {
-                            showMessageOKCancel("These permissions are mandatory for the application. Please allow access.",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                                requestPermissions((String[]) permissionsRejected.toArray(new String[permissionsRejected.size()]), ALL_PERMISSIONS_RESULT);
-                                            }
-                                        }
-                                    });
-                            return;
-                        }
-                    }
-
-                }
-
-                break;
         }
 
+
     }
 
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
-    }
+
 
     @Override
     protected void onDestroy() {
@@ -409,5 +341,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
 
     }
+
 
 }

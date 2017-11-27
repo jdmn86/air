@@ -28,8 +28,6 @@ public enum IAirManager {
 
     MySensorsActivity mySensorsActivity;
 
-
-
     CreateInformativeMessageActivity createInformativeMessageActivity;
 
     private String humity;
@@ -37,15 +35,19 @@ public enum IAirManager {
     private String temperature;
 
     SharedPreferences sharedPreferences;
-    LatLng favoriteLocationLatLng;
+
+    private LatLng currentLocation;
+    private String currentLocationName;
+
+    private LatLng favoriteLocationLatLng;
     private String favoriteLocationName;
     private String username;
 
     private LinkedList<CityAssociation> listCityAssotiation=new LinkedList<>();
-    private Location currentLocation;
+
     private LinkedList<Alerts> listAlerts=new LinkedList<>();
     private LinkedList<Channel> listChannel=new LinkedList<>();
-
+    private LinkedList<String> listaStrings;
     private int cityIdList;
 
     public CityAssociation getCityAssociation(String LocationName){
@@ -203,13 +205,6 @@ public enum IAirManager {
         this.username = username;
     }
 
-
-    public void setCurrentLocation(Location currentLocation) {
-        this.currentLocation = currentLocation;
-        if (createInformativeMessageActivity!=null){
-            createInformativeMessageActivity.setCurrentLocation(this.currentLocation);
-        }
-    }
     public LinkedList<CityAssociation> getAllCityAssociations() {
         return listCityAssotiation;
     }
@@ -228,5 +223,33 @@ public enum IAirManager {
 
     public void setCityIdLast(int cityIdList) {
         this.cityIdList = cityIdList;
+    }
+
+    public void addToListStrings(String str){
+        listaStrings.add(str);
+    }
+
+    public LinkedList<String> getListaStrings() {
+        return listaStrings;
+    }
+
+    public void setListaStrings(LinkedList<String> listaStrings) {
+        this.listaStrings = listaStrings;
+    }
+
+    public LatLng getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public  void setCurrentLocation(LatLng latLng) {
+         this.currentLocation= latLng;
+    }
+
+    public String getCurrentLocationName() {
+        return currentLocationName;
+    }
+
+    public void setCurrentLocationName(String currentLocationName) {
+        this.currentLocationName = currentLocationName;
     }
 }

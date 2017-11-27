@@ -1,5 +1,7 @@
 package pt.ipleiria.dei.iair.model;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by joaonascimento on 23/11/2017.
  */
@@ -10,13 +12,17 @@ public class Channel {
     private String temperature;
     private String pressure;
     private String humity;
+    private String latitude;
+    private String longitude;
 
 
-    public Channel(String temperature, String pressure, String humity, String name) {
+    public Channel(String temperature, String pressure, String humity, String name,String latitude,String longitude) {
         this.temperature = temperature;
         this.pressure = pressure;
         this.humity = humity;
         this.name=name;
+        this.latitude=latitude;
+        this.longitude=longitude;
     }
 
     public String getPressure() {
@@ -51,13 +57,19 @@ public class Channel {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "name='" + name + '\'' +
-                ", temperature='" + temperature + '\'' +
-                ", pressure='" + pressure + '\'' +
-                ", humity='" + humity + '\'' +
-                '}';
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 }

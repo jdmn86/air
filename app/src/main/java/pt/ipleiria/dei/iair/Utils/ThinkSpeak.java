@@ -4,12 +4,16 @@ package pt.ipleiria.dei.iair.Utils;
 import android.content.Context;
 import android.location.LocationManager;
 import android.util.Pair;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -18,6 +22,7 @@ import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
+import pt.ipleiria.dei.iair.view.DashboardActivity;
 
 /**
  * Created by kxtreme on 08-11-2017.
@@ -233,17 +238,22 @@ public class ThinkSpeak {
 
 
 
-    public static void createNewChannel(final String name,  final Context context) {
+    public static void createNewChannel(final String name, final String latitude, final String longitude , final Context context) {
 
         CityAssociation city=IAirManager.INSTANCE.getCityAssociation(name);
         if(city!=null){
+            System.out.println("RETURN in create channel");
             return;
         }
+        System.out.println("CREATE in create channel");
+
         ArrayList<Pair<String, String>> data = new ArrayList<>();
         //data.add(new Pair<>("API_KEY_CHANNEL", API_KEY_CREATE_ASSOCIATION));
         data.add(new Pair<>("field1", "TEMPERATURE"));
         data.add(new Pair<>("field2", "PRESSURE"));
         data.add(new Pair<>("field3", "HUMITY"));
+        data.add(new Pair<>("latitude",  latitude.toString()));
+        data.add(new Pair<>("longitude", longitude.toString()));
 
         HttpUtils.Post(new HttpCallBack() {
             @Override
@@ -251,8 +261,10 @@ public class ThinkSpeak {
 
                 String key =response.getJSONArray("api_keys").getJSONObject(0).get("api_key").toString();
                 String id = response.get("id").toString();
+               String latitude = response.get("latitude").toString();
+                String longitude = response.get("longitude").toString();
 
-                CityAssociation city=new CityAssociation(key,"",name,id,"");
+                CityAssociation city=new CityAssociation(key,"",name,id,"",latitude,longitude);
 
                 createNewAlert(city,context);
 
@@ -277,6 +289,7 @@ public class ThinkSpeak {
         data.add(new Pair<>("field1", "TYPE"));
         data.add(new Pair<>("field2", "MESSAGE"));
         data.add(new Pair<>("field3", "TIMESTAMP"));
+
 
         HttpUtils.Post(new HttpCallBack() {
             @Override
@@ -314,6 +327,8 @@ public class ThinkSpeak {
             data.add(new Pair<>("field3", String.valueOf(city.getCHANNEL_ID()) ));
             data.add(new Pair<>("field4", city.getAPI_KEY_ALERTS() ));
             data.add(new Pair<>("field5",String.valueOf(city.getALERTS_ID()) ));
+            data.add(new Pair<>("field6", city.getLatitude() ));
+            data.add(new Pair<>("field7",city.getLongitude() ));
 
             HttpUtils.Post(new HttpCallBack() {
                 @Override
@@ -380,6 +395,8 @@ public class ThinkSpeak {
         data.add(new Pair<>("field1", channel.getTemperature() == null? "N/A":channel.getTemperature() ));
         data.add(new Pair<>("field2",channel.getPressure() == null? "N/A": channel.getPressure()));
         data.add(new Pair<>("field3", channel.getHumity() == null? "N/A": channel.getHumity()));
+        data.add(new Pair<>("latitude",city.getLatitude()));
+        data.add(new Pair<>("longitude", city.getLongitude()));
 
         System.out.println("getAPI_KEY "+city.getAPI_KEY_CHANNEL().toString());
 
@@ -400,7 +417,7 @@ public class ThinkSpeak {
 
     }
 
-    public static void getThingDataAssociations( Context context) {
+    public static void getThingDataAssociations(final Context context) {
 
         HttpUtils.Get(new HttpCallBack() {
             @Override
@@ -416,15 +433,19 @@ public class ThinkSpeak {
                         String id_CHANNEL=feeds.getJSONObject(i).getString("field3");
                         String KEY_ALERT=feeds.getJSONObject(i).getString("field4");
                         String id_ALERT=feeds.getJSONObject(i).getString("field5");
+                        String Latitude=feeds.getJSONObject(i).getString("field6");
+                        String longitude=feeds.getJSONObject(i).getString("field7");
 
-                        CityAssociation city = new CityAssociation(KEY_CHANNEL,KEY_ALERT,nome,id_CHANNEL,id_ALERT);
+                        CityAssociation city = new CityAssociation(KEY_CHANNEL,KEY_ALERT,nome,id_CHANNEL,id_ALERT,Latitude,longitude);
                         IAirManager.INSTANCE.addCityAssociation(city);
                     }
                 }
 
-                for (CityAssociation city:IAirManager.INSTANCE.getAllCityAssociations()) {
-                    System.out.println("city : "+city.toString());
-                }
+
+                    getThingDataChannels(IAirManager.INSTANCE.getAllCityAssociations(),context);
+                    getThingDataAlerts(IAirManager.INSTANCE.getAllCityAssociations(),context);
+
+                    verificaLocationFavourite(context);
             }
 
             @Override
@@ -432,6 +453,31 @@ public class ThinkSpeak {
 
             }
         }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key="+API_KEY_CREATE_ASSOCIATION, context);
+    }
+
+    private static void verificaLocationFavourite(Context context) {
+        CityAssociation city=IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
+
+        if(city!=null){
+
+            DashboardActivity.putDataOnDashboard(context);
+
+
+        }else{
+            System.out.println("TESTE:" +IAirManager.INSTANCE.getCurrentLocationName());
+            ThinkSpeak.createNewChannel(IAirManager.INSTANCE.getCurrentLocationName().toString(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude), context);
+
+            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+            if (city != null){
+
+                //ThinkSpeak.insertInChannel(channel,this);
+                pt.ipleiria.dei.iair.model.Channel channel2 = new pt.ipleiria.dei.iair.model.Channel(IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity(), city.getREGION_NAME(),city.getLatitude().toString(),city.getLongitude().toString());
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.insertInChannel(channel2, context);
+            }
+
+        }
+
     }
 
     public static void getThingDataAlerts(LinkedList<CityAssociation> listaCitys, Context context) {
@@ -442,15 +488,15 @@ public class ThinkSpeak {
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
-                JSONArray feeds = response.getJSONArray("channel");
+                JSONArray feeds = response.getJSONArray("feeds");
                 System.out.println(feeds.length());
                 if (feeds.length() != 0) {
 
                     for (int i = 0; i < feeds.length(); i++) {
-                        String name=feeds.getJSONObject(i).getString("name");
-                        String type=feeds.getJSONObject(i).getString("field2");
-                        String message=feeds.getJSONObject(i).getString("field3");
-                        String timestamp=feeds.getJSONObject(i).getString("field4");
+                        String name=response.getJSONObject("channel").getString("name");
+                        String type=feeds.getJSONObject(i).getString("field1");
+                        String message=feeds.getJSONObject(i).getString("field2");
+                        String timestamp=feeds.getJSONObject(i).getString("field3");
 
                         Alerts alert = new Alerts(name,type,message,timestamp);
                         IAirManager.INSTANCE.addAlert(alert);
@@ -478,18 +524,20 @@ public class ThinkSpeak {
             HttpUtils.Get(new HttpCallBack() {
                 @Override
                 public void onResult(JSONObject response) throws JSONException {
-                    JSONArray feeds = response.getJSONArray("channel");
+                    JSONArray feeds = response.getJSONArray("feeds");
                     System.out.println(feeds.length());
                     if (feeds.length() != 0) {
 
                         for (int i = 0; i < feeds.length(); i++) {
-                            int id=feeds.getJSONObject(i).getInt("entry_id");
-                            String name=feeds.getJSONObject(i).getString("name");
+                            //int id=response.getJSONArray("channel").getJSONObject(i).getInt("entry_id");
+                            String name=response.getJSONObject("channel").getString("name");
                             String temperature=feeds.getJSONObject(i).getString("field1");
                             String PRESSURE=feeds.getJSONObject(i).getString("field2");
                             String HUMITY=feeds.getJSONObject(i).getString("field3");
+                            String latitude=response.getJSONObject("channel").getString("latitude");
+                            String longitude=response.getJSONObject("channel").getString("longitude");
 
-                            Channel channel = new Channel(temperature,PRESSURE,HUMITY,name);
+                            Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,latitude,longitude);
                             IAirManager.INSTANCE.addChannel(channel);
                         }
                     }
@@ -511,17 +559,21 @@ public class ThinkSpeak {
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
+                JSONArray feeds = response.getJSONArray("feeds");
+              //  int id=response.getInt("entry_id");
+                String name=response.getJSONObject("channel").getString("name");
+                String temperature=feeds.getJSONObject(0).getString("field1");
+                String PRESSURE=feeds.getJSONObject(0).getString("field2");
+                String HUMITY=feeds.getJSONObject(0).getString("field3");
+                String latitude=response.getJSONObject("channel").getString("latitude");
+                String longitude=response.getJSONObject("channel").getString("longitude");
 
-                int id=response.getInt("entry_id");
-                String name=response.getString("name");
-                String temperature=response.getString("field1");
-                String PRESSURE=response.getString("field2");
-                String HUMITY=response.getString("field3");
-
-               // Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,id);
-               // IAirManager.INSTANCE.addChannel(channel);
+               // Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,id,location);
+                //IAirManager.INSTANCE.addChannel(channel);
                 System.out.println("Last channel : "+name + temperature + "etc" );
-                Channel channel = new Channel(temperature,PRESSURE,HUMITY,name);
+                LatLng latLng= new LatLng(Double.parseDouble(latitude),Double.parseDouble(longitude));
+
+                Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,latitude,longitude);
                 IAirManager.INSTANCE.addChannel(channel);
                 IAirManager.INSTANCE.setCityIdLast(IAirManager.INSTANCE.getAllChannels().lastIndexOf(channel));
             }

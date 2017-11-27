@@ -34,6 +34,7 @@ public class MySensorsActivity extends GPSActivity {
     private TextView temperatureSensorValue,humiditySensorValue,pressureSensorValue;
     private SensorManager sensorManager;
     private String locationName;
+    private LatLng location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,12 +123,12 @@ public class MySensorsActivity extends GPSActivity {
             CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
 
 
-            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temperatureSensorValue.toString(), pressureSensorValue.toString(), humiditySensorValue.toString(), locationName);
+            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temperatureSensorValue.toString(), pressureSensorValue.toString(), humiditySensorValue.toString(), locationName,String.valueOf(location.latitude),String.valueOf(location.longitude));
 
             System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
 
             if (city == null) {
-                ThinkSpeak.createNewChannel(locationName, this);
+                ThinkSpeak.createNewChannel(locationName, String.valueOf(location.latitude),String.valueOf(location.longitude),this);
                 System.out.println("LOCAL :" + locationName);
 
                 city = IAirManager.INSTANCE.getCityAssociation(locationName);
@@ -197,7 +198,7 @@ public class MySensorsActivity extends GPSActivity {
                     double latitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lat").toString());
                     double longitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lng").toString());
 
-                    LatLng location = new LatLng(latitude, longitude);
+                     location = new LatLng(latitude, longitude);
                     locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
 
 
