@@ -15,13 +15,25 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
+import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.CityAssociation;
@@ -31,8 +43,11 @@ public class LocationActivity extends GPSActivity {
     private GraphView graph;
     private TabLayout tabLayout;
     private ArrayList<LinearLayout> linearLayouts = new ArrayList();
+    private LinearLayout loadingScreen;
     private Spinner locationsSpinner;
     private ListView listViewData;
+    public List<String> cityNames;
+    public Context context;
 
     @Override
     protected void attachBaseContext(Context context) {
@@ -43,6 +58,7 @@ public class LocationActivity extends GPSActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
+        context = this;
         bindLayoutElements();
         populateList();
         setListeners();
@@ -52,7 +68,43 @@ public class LocationActivity extends GPSActivity {
         locationsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("selected" + position);
+               showLoading(true);
+                ThinkSpeak.INSTANCE.getData(new HttpCallBack() {
+                   @Override
+                   public void onResult(JSONObject response) throws JSONException {
+                       //data incoming
+                       System.out.println(response.toString());
+                       JSONArray feeds = response.getJSONArray("feeds");
+                       LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[]{
+
+                       });
+                       if(feeds.length() != 0) {
+                           Date startDate = parseDate(feeds.getJSONObject(0).getString("created_at"));
+                           Date endDate = parseDate(feeds.getJSONObject(feeds.length()-1).getString("created_at"));
+
+
+                           for (int i = 0; i < feeds.length(); i++) {
+                               JSONObject feed = feeds.getJSONObject(i);
+                               if (!feed.getString("field1").equals("N/A"))
+                                   series.appendData(new DataPoint(parseDate(feed.getString("created_at")).getTime(), Double.parseDouble(feed.getString("field1"))), true, 0);
+                           }
+                           graph.getViewport().setYAxisBoundsManual(true);
+                           graph.getViewport().setMinY(0);
+                           graph.getViewport().setMaxY(100);
+                           graph.addSeries(series);
+                           graph.getViewport().setXAxisBoundsManual(true);
+                           graph.getViewport().setMinX(startDate.getTime());
+                           graph.getViewport().setMaxX(endDate.getTime());
+                       }
+
+                       showLoading(false);
+                   }
+
+                   @Override
+                   public void onResult(String response) {
+
+                   }
+               }, context, cityNames.get(position));
             }
 
             @Override
@@ -79,6 +131,23 @@ public class LocationActivity extends GPSActivity {
         });
     }
 
+    private Date parseDate(String created_at) {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
+
+
+        try {
+            Date date = format.parse(created_at);
+       return date;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void showLoading(boolean b) {
+        loadingScreen.setVisibility(b ? View.VISIBLE : View.INVISIBLE);
+    }
+
     private void bindLayoutElements()
     {
 
@@ -88,14 +157,16 @@ public class LocationActivity extends GPSActivity {
         linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityList));
         locationsSpinner = (Spinner) findViewById(R.id.spinnerLocationList);
         listViewData = (ListView) findViewById(R.id.listViewData);
+        loadingScreen = (LinearLayout) findViewById(R.id.linearLayoutLoadingLocationActivity);
+
     }
 
     private void populateList() {
-        List<String> cityNames = new ArrayList<String>();
+        cityNames = new ArrayList<String>();
         for (CityAssociation cityAssociation: IAirManager.INSTANCE.getAllCityAssociations())
         {
             cityNames.add(cityAssociation.getREGION_NAME());
-        };
+        }
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cityNames);
         locationsSpinner.setAdapter(arrayAdapter);
     }
@@ -128,6 +199,43 @@ public class LocationActivity extends GPSActivity {
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
+        }else if (id == R.id.menu_send_data) {
+            GPSUtils gpsUtils = new GPSUtils(this);
+            Location location = gpsUtils.getLocation();
+            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            /*
+
+
+
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+
+            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temperatureSensorValue.toString(), pressureSensorValue.toString(), humiditySensorValue.toString(), locationName);
+
+            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+
+            if (city == null) {
+                ThinkSpeak.INSTANCE.createNewChannel(locationName, this);
+                System.out.println("LOCAL :" + locationName);
+
+                city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+                System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+                if (city != null){
+
+                    //ThinkSpeak.insertInChannel(channel,this);
+
+                    //channel=IAirManager.INSTANCE.getChannel(local);
+                    ThinkSpeak.insertInChannel(channel, this);
+                }
+
+            }else{
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.insertInChannel(channel, this);
+            }
+
+            */
         }
         if(intent != null) {
             startActivity(intent);

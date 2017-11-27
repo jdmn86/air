@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -308,9 +309,42 @@ public class DashboardActivity extends GetVinicityActivity{
             intent = new Intent(this, SettingsActivity.class);
 
         } else if (id == R.id.menu_send_data) {
-            //Location location = GPSUtils.getLocation();
+            GPSUtils gpsUtils = new GPSUtils(this);
+            Location location = gpsUtils.getLocation();
             //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            /*
+
+
+
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+
+            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temperatureSensorValue.toString(), pressureSensorValue.toString(), humiditySensorValue.toString(), locationName);
+
+            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+
+            if (city == null) {
+                ThinkSpeak.INSTANCE.createNewChannel(locationName, this);
+                System.out.println("LOCAL :" + locationName);
+
+                city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+                System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+                if (city != null){
+
+                    //ThinkSpeak.insertInChannel(channel,this);
+
+                    //channel=IAirManager.INSTANCE.getChannel(local);
+                    ThinkSpeak.insertInChannel(channel, this);
+                }
+
+            }else{
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.insertInChannel(channel, this);
+            }
+
+            */
 
 
             CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);

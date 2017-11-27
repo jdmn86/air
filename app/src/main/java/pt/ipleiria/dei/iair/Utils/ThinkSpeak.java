@@ -79,7 +79,7 @@ public enum ThinkSpeak {
 
                     for (int i = 0; i < feeds.length(); i++) {
                         JSONObject elem = new JSONObject(feeds.get(i).toString());
-                        if (elem.getString("field2").equals(location)) {
+                        if (elem.getString("field1").equals(location)) {
                             //insert if already exists
                             ArrayList<Pair<String, String>> data = new ArrayList<>();
                             data.add(new Pair<>("api_key", elem.getString("field1")));
@@ -88,7 +88,7 @@ public enum ThinkSpeak {
                             data.add(new Pair<>("field2", ThinkSpeak.INSTANCE.pressure == null? "N/A": ThinkSpeak.INSTANCE.pressure));
                             data.add(new Pair<>("field3", ThinkSpeak.INSTANCE.humity == null? "N/A": ThinkSpeak.INSTANCE.humity));
 
-                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("field1") + "&field1=" + (ThinkSpeak.INSTANCE.temperature == null ? "N/A" : ThinkSpeak.INSTANCE.temperature), data, ThinkSpeak.INSTANCE.context);
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("field2") + "&field1=" + (ThinkSpeak.INSTANCE.temperature == null ? "N/A" : ThinkSpeak.INSTANCE.temperature), data, ThinkSpeak.INSTANCE.context);
                             return;
                         }
 
@@ -219,7 +219,7 @@ public enum ThinkSpeak {
             public void onResult(String response) {
 
             }
-        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
+        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H", context);
     }
 
     public void getAllCitysAssociation(HttpCallBack callback, Context context, String location){

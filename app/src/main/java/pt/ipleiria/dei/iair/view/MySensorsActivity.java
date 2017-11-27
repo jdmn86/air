@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -16,11 +17,11 @@ import org.json.JSONObject;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
+import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
-import pt.ipleiria.dei.iair.model.CityAssociation;
 
 public class MySensorsActivity extends GPSActivity {
 
@@ -105,6 +106,13 @@ public class MySensorsActivity extends GPSActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         }else if (id == R.id.menu_send_data) {
+            GPSUtils gpsUtils = new GPSUtils(this);
+            Location location = gpsUtils.getLocation();
+            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            /*
+
+
 
             CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
 
@@ -133,7 +141,7 @@ public class MySensorsActivity extends GPSActivity {
                 ThinkSpeak.insertInChannel(channel, this);
             }
 
-
+            */
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
