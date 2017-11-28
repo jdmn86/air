@@ -45,25 +45,20 @@ import static junit.framework.Assert.fail;
 import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.getThingDataAlertsLast;
 
 public class DashboardActivity extends GetVinicityActivity{
-    public static final String SHARED_PREFERENCES = "Shared";
-    SharedPreferences preferencesRead;
-    SharedPreferences.Editor preferencesWrite;
 
     private String txtUsername = "Username: ";
     private TextView favouriteLocationTXT;
     private static TextView temperatureFavLocationValue;
     private static TextView pressureFavLocationValue;
     private static TextView humidityFavLocationValue;
-    //private String favLocation;
     private TextView userNameTXT;
     private TextView txtView;
 
     private ServiceConnection connection;
 
     static final int PICK_LOCATION_REQUEST = 1;  // The request code
-    //private LatLng location;
-    //private String locationName;
-    private static ListView lista;
+
+    private static ListView lista;// lista de quê?
     private static ArrayAdapter<String> adapter;
 
     private ArrayList permissionsToRequest;
@@ -131,14 +126,14 @@ public class DashboardActivity extends GetVinicityActivity{
         if (requestCode == PICK_LOCATION_REQUEST) {
             if (resultCode == RESULT_OK) { // Activity.RESULT_OK
 
-                String location = data.getStringExtra("location");
+                double latitude = data.getDoubleExtra("latitude",0.0);
+                double longitude = data.getDoubleExtra("longitude", 0.0);
                 String locationName = data.getStringExtra("locationName");
                 LatLng latLng;
-                if (location.isEmpty()) {
+                if (latitude==0.0||longitude==0.0||locationName.isEmpty()) {
                     return;
                 } else {
-                    String[] strs = location.split(";");
-                    latLng = new LatLng(Double.parseDouble(strs[0]), Double.parseDouble(strs[1]));
+                    latLng = new LatLng(latitude, longitude);
                 }
 
                 IAirManager.INSTANCE.saveFavoriteLocation(latLng, locationName);

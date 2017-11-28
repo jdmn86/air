@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.Utils.CallBack;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
@@ -120,32 +121,21 @@ public class MySensorsActivity extends GPSActivity {
 
         }else if (id == R.id.menu_send_data) {
 
-            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
+            GPSUtils locationTrack = new GPSUtils(this);
 
+            //  if (
+            Location loc =locationTrack.getLocation();
 
-            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temperatureSensorValue.toString(), pressureSensorValue.toString(), humiditySensorValue.toString(), locationName,String.valueOf(location.latitude),String.valueOf(location.longitude));
-
-            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
-
-            if (city == null) {
-                ThinkSpeak.createNewChannel(locationName, String.valueOf(location.latitude),String.valueOf(location.longitude),this);
-                System.out.println("LOCAL :" + locationName);
-
-                city = IAirManager.INSTANCE.getCityAssociation(locationName);
-
-                System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
-                if (city != null){
-
-                    //ThinkSpeak.insertInChannel(channel,this);
-
-                    //channel=IAirManager.INSTANCE.getChannel(local);
-                    ThinkSpeak.insertInChannel(channel, this);
-                }
-
-            }else{
-                //channel=IAirManager.INSTANCE.getChannel(local);
-                ThinkSpeak.insertInChannel(channel, this);
+            if(loc!=null){
+                double longitude = loc.getLongitude();
+                double latitude = loc.getLatitude();
+                LatLng latLng = new LatLng(latitude, longitude);
+                getVicinity(latLng,4000);
             }
+
+
+
+
 
 
         } else if (id == R.id.menu_gps) {
@@ -200,6 +190,34 @@ public class MySensorsActivity extends GPSActivity {
 
                      location = new LatLng(latitude, longitude);
                     locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
+
+                    CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+                    pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(IAirManager.INSTANCE.getTemperature(),
+                            IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity(), locationName,String.valueOf(location.latitude)
+                            ,String.valueOf(location.longitude));
+
+
+                    if (city == null) {
+
+                        ThinkSpeak.createNewChannel(locationName, String.valueOf(location.latitude),String.valueOf(location.longitude),getApplicationContext());
+                        System.out.println("LOCAL :" + locationName);
+                        city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+                        System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+                        if (city != null){
+
+                            //ThinkSpeak.insertInChannel(channel,this);
+
+                            //channel=IAirManager.INSTANCE.getChannel(local);
+                            ThinkSpeak.insertInChannel(channel, getApplicationContext());
+                        }
+
+                    }else{
+                        //channel=IAirManager.INSTANCE.getChannel(local);
+                        ThinkSpeak.insertInChannel(channel, getApplicationContext());
+                    }
+
 
 
                 }

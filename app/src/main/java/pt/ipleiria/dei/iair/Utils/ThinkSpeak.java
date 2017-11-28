@@ -28,7 +28,9 @@ import pt.ipleiria.dei.iair.view.DashboardActivity;
  * Created by kxtreme on 08-11-2017.
  */
 
-public class ThinkSpeak {
+public enum ThinkSpeak {
+    INSTANCE;
+
     private final static String API_KEY_CREATE_CHANNEL = "6T4V93KT9K3ZVOWV";
     private final static String API_KEY_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
    // private final static String CHANNEL_NUMBER_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
@@ -63,7 +65,7 @@ public class ThinkSpeak {
             return false;
         }
 
-          location = GPSUtils.getLocationDetails(context,latitude, longitude).getLocality();
+          location = GPSUtils.getLocationDetails(context,latitude, longitude).get(0).getLocality();
         System.out.println(location);
         HttpUtils.Get(new HttpCallBack() {
             @Override
@@ -175,7 +177,7 @@ public class ThinkSpeak {
         return true;
     }
     public static void getData( HttpCallBack callback,Context context, double latitude, double longitude) {
-        getData(callback, context, GPSUtils.getLocationDetails(context, latitude,longitude).getLocality());
+        getData(callback, context, GPSUtils.getLocationDetails(context, latitude,longitude).get(0).getLocality());
     }
 
     public static void getData(HttpCallBack callback, Context context, String location) {
@@ -266,6 +268,7 @@ public class ThinkSpeak {
 
                 CityAssociation city=new CityAssociation(key,"",name,id,"",latitude,longitude);
 
+                IAirManager.INSTANCE.addCityAssociation(city);
                 createNewAlert(city,context);
 
 

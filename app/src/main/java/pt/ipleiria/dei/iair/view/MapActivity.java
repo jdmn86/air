@@ -234,10 +234,13 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
 
         if(IAirManager.INSTANCE.getAllChannels().size()!=0 && IAirManager.INSTANCE.getAllAlerts().size()!=0){
 
-
             for (Channel channel:IAirManager.INSTANCE.getAllChannels()) {
 
-                googleMap.addMarker(new MarkerOptions().position(location).title(channel.getName()));
+                location=new LatLng(Double.parseDouble(channel.getLatitude()),Double.parseDouble(channel.getLongitude()));
+                if(location!=IAirManager.INSTANCE.getFavoriteLocationLatLng()){
+                    markers.add(googleMap.addMarker(new MarkerOptions().position(location).title(channel.getName())));
+                }
+
             }
 
 
