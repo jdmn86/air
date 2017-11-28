@@ -41,24 +41,23 @@ import pt.ipleiria.dei.iair.model.CityAssociation;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static junit.framework.Assert.fail;
-import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.getThingDataAlertsLast;
+
 
 public class DashboardActivity extends GetVinicityActivity{
 
-    private String txtUsername = "Username: ";
+
     private TextView favouriteLocationTXT;
     private static TextView temperatureFavLocationValue;
     private static TextView pressureFavLocationValue;
     private static TextView humidityFavLocationValue;
-    private TextView userNameTXT;
+    private TextView textViewUserName;
     private TextView txtView;
 
     private ServiceConnection connection;
 
     static final int PICK_LOCATION_REQUEST = 1;  // The request code
 
-    private static ListView lista;// lista de quê?
+    private static ListView lista;
     private static ArrayAdapter<String> adapter;
 
     private ArrayList permissionsToRequest;
@@ -109,7 +108,7 @@ public class DashboardActivity extends GetVinicityActivity{
         temperatureFavLocationValue = findViewById(R.id.textViewValueTemperature);
         pressureFavLocationValue =  findViewById(R.id.textViewValuePressure);
         humidityFavLocationValue = findViewById(R.id.textViewValueHumidity);
-        userNameTXT = findViewById(R.id.textViewUserName);
+        textViewUserName = findViewById(R.id.textViewUsernamedescription);
         txtView = this.findViewById(R.id.textViewFavoriteLocation);
         lista= this.findViewById(R.id.listViewInformativeMessage);
 
@@ -207,14 +206,16 @@ public class DashboardActivity extends GetVinicityActivity{
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
                 IAirManager.INSTANCE.saveUsername(input.getText().toString());
-                userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
+                textViewUserName.setText(IAirManager.INSTANCE.getUsername());
+
                 Toast.makeText(DashboardActivity.this, "Username Saved", Toast.LENGTH_LONG).show();
             }
         });
         alertDialogBuilder.setNegativeButton("CANCEL",new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(DashboardActivity.this,"Your username isn't choose",Toast.LENGTH_LONG).show();
+                dialogUsername();
+                Toast.makeText(DashboardActivity.this,"Your username isn't choosen",Toast.LENGTH_LONG).show();
             }
         });
 
@@ -265,7 +266,7 @@ public class DashboardActivity extends GetVinicityActivity{
 
                 pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
                 //channel=IAirManager.INSTANCE.getChannel(local);
-                ThinkSpeak.insertInChannel(channel, this);
+                ThinkSpeak.INSTANCE.insertInChannel(channel, this);
 
                 putDataOnDashboard(this);
             }
@@ -424,21 +425,18 @@ public class DashboardActivity extends GetVinicityActivity{
             dialogUsername();
         }
 
-        userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
+        textViewUserName.setText(IAirManager.INSTANCE.getUsername());
 
         pt.ipleiria.dei.iair.model.Channel channel=null;
 
         //carrega dados
-        ThinkSpeak.getThingDataAssociations(this);
+        ThinkSpeak.INSTANCE.getThingDataAssociations(this);
 
     }
 
 
     public static void putDataOnDashboard(Context context) {
         Channel channel = null;
-        CityAssociation city=null;
-
-        city=IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
 
         if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
 
@@ -477,7 +475,7 @@ public class DashboardActivity extends GetVinicityActivity{
     protected void onResume() {
         super.onResume();
         txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
-        userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
+        textViewUserName.setText(IAirManager.INSTANCE.getUsername());
 
         putDataOnDashboard(this);
     }

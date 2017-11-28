@@ -200,7 +200,7 @@ public class MySensorsActivity extends GPSActivity {
 
                     if (city == null) {
 
-                        ThinkSpeak.createNewChannel(locationName, String.valueOf(location.latitude),String.valueOf(location.longitude),getApplicationContext());
+                        ThinkSpeak.INSTANCE.createNewChannel(locationName, String.valueOf(location.latitude),String.valueOf(location.longitude),getApplicationContext());
                         System.out.println("LOCAL :" + locationName);
                         city = IAirManager.INSTANCE.getCityAssociation(locationName);
 
@@ -210,12 +210,12 @@ public class MySensorsActivity extends GPSActivity {
                             //ThinkSpeak.insertInChannel(channel,this);
 
                             //channel=IAirManager.INSTANCE.getChannel(local);
-                            ThinkSpeak.insertInChannel(channel, getApplicationContext());
+                            ThinkSpeak.INSTANCE.insertInChannel(channel, getApplicationContext());
                         }
 
                     }else{
                         //channel=IAirManager.INSTANCE.getChannel(local);
-                        ThinkSpeak.insertInChannel(channel, getApplicationContext());
+                        ThinkSpeak.INSTANCE.insertInChannel(channel, getApplicationContext());
                     }
 
 

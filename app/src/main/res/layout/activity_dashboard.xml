@@ -16,12 +16,28 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/textViewUserName"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/activity_dashboard_username" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textViewUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/activity_dashboard_username"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textViewUsernamedescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="null" />
+            </LinearLayout>
 
             <Space
                 android:id="@+id/space1"
@@ -33,7 +49,7 @@
                 android:id="@+id/layouy2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/textViewName"

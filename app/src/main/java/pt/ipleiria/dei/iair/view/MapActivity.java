@@ -38,8 +38,10 @@ import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
+import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.Channel;
+import pt.ipleiria.dei.iair.model.CityAssociation;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -187,8 +189,30 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         } else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
 
-        } else if (id == R.id.menu_gps) {
-            enableGPS();
+        } else if (id == R.id.menu_send_data) {
+        //Location location = GPSUtils.getLocation();
+        //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+        //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+
+        CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName().toString());
+
+        String temp = IAirManager.INSTANCE.getTemperature();
+        String press = IAirManager.INSTANCE.getPresure();
+        String hum = IAirManager.INSTANCE.getHumity();
+
+        System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+
+        if (city != null) {
+
+            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
+            //channel=IAirManager.INSTANCE.getChannel(local);
+            ThinkSpeak.INSTANCE.insertInChannel(channel, this);
+
+        }
+
+
+    } else if (id == R.id.menu_gps) {
+
 
         }
         if (intent != null) {

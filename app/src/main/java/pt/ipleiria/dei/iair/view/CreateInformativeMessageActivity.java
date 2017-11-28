@@ -119,7 +119,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                 }
                 if(flag) {
                     Alerts alert=new Alerts(spinner.getSelectedItem().toString(),spinner1.getSelectedItem().toString(),editTextDescription.getText().toString(),editTextTimestampCreateInformativeMessage.getText().toString());
-                    ThinkSpeak.insertInAlerts(alert,getApplicationContext());
+                    ThinkSpeak.INSTANCE.insertInAlerts(alert,getApplicationContext());
 
                     Toast.makeText(CreateInformativeMessageActivity.this, "THE alert was send", Toast.LENGTH_LONG).show();
                     finish();
@@ -185,7 +185,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                         for (int position = 0; position < adapter.getCount(); position++) {
                             if (adapter.getItem(position).equalsIgnoreCase(currentLocation.getLocationName())) {
 
-                                ThinkSpeak.createNewChannel(currentLocation.getLocationName(),currentLocation.getLatitude().toString(),currentLocation.getLongitude().toString(), getApplicationContext());
+                                ThinkSpeak.INSTANCE.createNewChannel(currentLocation.getLocationName(),currentLocation.getLatitude().toString(),currentLocation.getLongitude().toString(), getApplicationContext());
                                 spinner.setSelection(position);
 
                                 return;
@@ -234,7 +234,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                     for (int position = 0; position < adapter.getCount(); position++) {
                         if(adapter.getItem(position).equalsIgnoreCase( locationName)) {
                             spinner.setSelection(position);
-                            ThinkSpeak.createNewChannel(locationName,currentLocation.getLatitude().toString(),currentLocation.getLongitude().toString(),this);
+                            ThinkSpeak.INSTANCE.createNewChannel(locationName,currentLocation.getLatitude().toString(),currentLocation.getLongitude().toString(),this);
                             return;
                         }
                     }
@@ -364,7 +364,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         this.currentLocation = currentLocation;
         String locationName = currentLocation.getLocationName();
         if(IAirManager.INSTANCE.getCityAssociation(locationName) == null){
-            ThinkSpeak.createNewChannel(locationName,currentLocation.getLatitude().toString(),currentLocation.getLongitude().toString(),this);
+            ThinkSpeak.INSTANCE.createNewChannel(locationName,currentLocation.getLatitude().toString(),currentLocation.getLongitude().toString(),this);
             adapter.add(locationName);
             for (int position = 0; position < adapter.getCount(); position++) {
                 if(adapter.getItem(position).equalsIgnoreCase( locationName)) {

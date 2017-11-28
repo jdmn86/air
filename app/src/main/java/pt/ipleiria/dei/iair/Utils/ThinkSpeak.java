@@ -34,24 +34,24 @@ public enum ThinkSpeak {
     private final static String API_KEY_CREATE_CHANNEL = "6T4V93KT9K3ZVOWV";
     private final static String API_KEY_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
    // private final static String CHANNEL_NUMBER_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
-    public static String location;
-    public static String temperature;
-    public static String pressure;
-    public static String humity;
-    public static double latitude;
-    public static double longitude;
-    public static Context context;
-    private static HttpCallBack callback;
+    public String location;
+    public String temperature;
+    public String pressure;
+    public String humity;
+    public double latitude;
+    public double longitude;
+    public Context context;
+    private HttpCallBack callback;
 
 
-    public static boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
+    public boolean sendData(Context context, double latitude, double longitude, String temperature, String pressure, String humity) {
 
-        ThinkSpeak.humity = humity;
-        ThinkSpeak.pressure = pressure;
-        ThinkSpeak.temperature = temperature;
-        ThinkSpeak.latitude = latitude;
-        ThinkSpeak.longitude = longitude;
-        ThinkSpeak.context = context;
+        this.humity = humity;
+        this.pressure = pressure;
+        this.temperature = temperature;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.context = context;
 
         LocationManager manager = (LocationManager) context.getSystemService( Context.LOCATION_SERVICE );
         if(temperature == null && pressure == null && humity == null) {
@@ -81,11 +81,11 @@ public enum ThinkSpeak {
                             ArrayList<Pair<String, String>> data = new ArrayList<>();
                             data.add(new Pair<>("api_key", elem.getString("field1")));
                             data.add(new Pair<>("name", location));
-                            data.add(new Pair<>("field1", ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature));
-                            data.add(new Pair<>("field2", ThinkSpeak.pressure == null? "N/A": ThinkSpeak.pressure));
-                            data.add(new Pair<>("field3", ThinkSpeak.humity == null? "N/A": ThinkSpeak.humity));
+                            data.add(new Pair<>("field1", ThinkSpeak.INSTANCE.getTemperature() == null? "N/A": ThinkSpeak.INSTANCE.getTemperature()));
+                            data.add(new Pair<>("field2", ThinkSpeak.INSTANCE.getPressure() == null? "N/A": ThinkSpeak.INSTANCE.getPressure()));
+                            data.add(new Pair<>("field3", ThinkSpeak.INSTANCE.getHumity() == null? "N/A": ThinkSpeak.INSTANCE.getHumity()));
 
-                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("field1") + "&field1=" + (ThinkSpeak.temperature == null ? "N/A" : ThinkSpeak.temperature), data, ThinkSpeak.context);
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + elem.getString("field1") + "&field1=" + (ThinkSpeak.INSTANCE.getTemperature() == null ? "N/A" : ThinkSpeak.INSTANCE.getTemperature()), data,ThinkSpeak.INSTANCE.getContext());
                         return;
                         }
 
@@ -97,14 +97,14 @@ public enum ThinkSpeak {
                             ArrayList<Pair<String, String>> data = new ArrayList<>();
                             data.add(new Pair<>("api_key", messages[0]));
                             data.add(new Pair<>("name", messages[1]));
-                            data.add(new Pair<>("field1", ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature));
-                            data.add(new Pair<>("field2", ThinkSpeak.pressure == null? "N/A": ThinkSpeak.pressure));
-                            data.add(new Pair<>("field3", ThinkSpeak.humity == null? "N/A": ThinkSpeak.humity));
+                            data.add(new Pair<>("field1", ThinkSpeak.INSTANCE.getTemperature() == null? "N/A": ThinkSpeak.INSTANCE.getTemperature()));
+                            data.add(new Pair<>("field2", ThinkSpeak.INSTANCE.getPressure()== null? "N/A": ThinkSpeak.INSTANCE.getPressure()));
+                            data.add(new Pair<>("field3", ThinkSpeak.INSTANCE.getHumity()== null? "N/A": ThinkSpeak.INSTANCE.getHumity()));
 
-                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + messages[0] + "&field1=" + (ThinkSpeak.temperature == null? "N/A": ThinkSpeak.temperature), data, ThinkSpeak.context);
+                            HttpUtils.Post(null, "https://api.thingspeak.com/update.json?api_key=" + messages[0] + "&field1=" + (ThinkSpeak.INSTANCE.getTemperature() == null? "N/A": ThinkSpeak.INSTANCE.getTemperature()), data, ThinkSpeak.INSTANCE.getContext());
                         }
 
-                    }, ThinkSpeak.context,location, ThinkSpeak.latitude, ThinkSpeak.longitude,true, "temperature", "pressure", "humity");
+                    }, ThinkSpeak.INSTANCE.getContext(),location, ThinkSpeak.INSTANCE.getLatitude(), ThinkSpeak.INSTANCE.getLongitude(),true, "temperature", "pressure", "humity");
 
             }
 
@@ -116,11 +116,11 @@ public enum ThinkSpeak {
         return true;
     }
 
-    public static boolean createNewChannel(final CallBack callBack, final Context context, final String channelName, double latitude, double longitude, boolean status, String... fields) {
+    public boolean createNewChannel(final CallBack callBack, final Context context, final String channelName, double latitude, double longitude, boolean status, String... fields) {
         try {
             ArrayList<Pair<String, String>> data = new ArrayList<>();
             data.add(new Pair<>("api_key", API_KEY_CREATE_CHANNEL));
-            data.add(new Pair<>("name", ThinkSpeak.location));
+            data.add(new Pair<>("name", ThinkSpeak.INSTANCE.getLocation()));
             data.add(new Pair<>("latitude", String.valueOf(latitude)));
             data.add(new Pair<>("longitude", String.valueOf(longitude)));
 
@@ -176,14 +176,14 @@ public enum ThinkSpeak {
 
         return true;
     }
-    public static void getData( HttpCallBack callback,Context context, double latitude, double longitude) {
+    public void getData( HttpCallBack callback,Context context, double latitude, double longitude) {
         getData(callback, context, GPSUtils.getLocationDetails(context, latitude,longitude).get(0).getLocality());
     }
 
-    public static void getData(HttpCallBack callback, Context context, String location) {
-        ThinkSpeak.location = location;
-        ThinkSpeak.context = context;
-        ThinkSpeak.callback = callback;
+    public void getData(HttpCallBack callback, Context context, String location) {
+        this.location = location;
+        this.context = context;
+        this.callback = callback;
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
@@ -193,8 +193,8 @@ public enum ThinkSpeak {
 
                     for (int i = 0; i < feeds.length(); i++) {
                         JSONObject elem = new JSONObject( feeds.get(i).toString());
-                        if (elem.get("field2").equals(ThinkSpeak.location)) {
-                            HttpUtils.Get(ThinkSpeak.callback,"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.context);
+                        if (elem.get("field2").equals(ThinkSpeak.INSTANCE.getLocation())) {
+                            HttpUtils.Get(ThinkSpeak.INSTANCE.getCallback(),"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.INSTANCE.getContext());
 
                         }
                     }
@@ -208,11 +208,11 @@ public enum ThinkSpeak {
         }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
     }
 
-    public static void getAllCitysAssociation(HttpCallBack callback, Context context, String location){
+    public void getAllCitysAssociation(HttpCallBack callback, Context context, String location){
 
-            ThinkSpeak.location = location;
-            ThinkSpeak.context = context;
-            ThinkSpeak.callback = callback;
+        this.location = location;
+        this.context = context;
+        this.callback = callback;
             HttpUtils.Get(new HttpCallBack() {
                 @Override
                 public void onResult(JSONObject response) throws JSONException {
@@ -222,8 +222,8 @@ public enum ThinkSpeak {
 
                         for (int i = 0; i < feeds.length(); i++) {
                             JSONObject elem = new JSONObject( feeds.get(i).toString());
-                            if (elem.get("field2").equals(ThinkSpeak.location)) {
-                                HttpUtils.Get(ThinkSpeak.callback,"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.context);
+                            if (elem.get("field2").equals(ThinkSpeak.INSTANCE.getLocation())) {
+                                HttpUtils.Get(ThinkSpeak.INSTANCE.getCallback(),"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.INSTANCE.getContext());
 
                             }
                         }
@@ -240,7 +240,7 @@ public enum ThinkSpeak {
 
 
 
-    public static void createNewChannel(final String name, final String latitude, final String longitude , final Context context) {
+    public void createNewChannel(final String name, final String latitude, final String longitude , final Context context) {
 
         CityAssociation city=IAirManager.INSTANCE.getCityAssociation(name);
         if(city!=null){
@@ -285,7 +285,7 @@ public enum ThinkSpeak {
     }
 
 
-    public static void createNewAlert(final CityAssociation city, final Context context) {
+    public void createNewAlert(final CityAssociation city, final Context context) {
 
         ArrayList<Pair<String, String>> data = new ArrayList<>();
         //data.add(new Pair<>("API_KEY_CHANNEL", API_KEY_CREATE_ASSOCIATION));
@@ -320,7 +320,7 @@ public enum ThinkSpeak {
 
     }
 
-    public static void insertInAssociation(CityAssociation city, Context context) {
+    public void insertInAssociation(CityAssociation city, Context context) {
 
            // IAirManager.INSTANCE.addCityAssociation(city);
 
@@ -351,7 +351,7 @@ public enum ThinkSpeak {
 
 
 
-    public static void insertInAlerts(Alerts alert, Context context) {
+    public void insertInAlerts(Alerts alert, Context context) {
 
         //get api key for alert to add
 
@@ -384,7 +384,7 @@ public enum ThinkSpeak {
 
     }
 
-    public static void insertInChannel(Channel channel, Context context) {
+    public void insertInChannel(Channel channel, Context context) {
 
         //get api key for alert to add
 
@@ -420,7 +420,7 @@ public enum ThinkSpeak {
 
     }
 
-    public static void getThingDataAssociations(final Context context) {
+    public void getThingDataAssociations(final Context context) {
 
         HttpUtils.Get(new HttpCallBack() {
             @Override
@@ -458,7 +458,7 @@ public enum ThinkSpeak {
         }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key="+API_KEY_CREATE_ASSOCIATION, context);
     }
 
-    private static void verificaLocationFavourite(Context context) {
+    private void verificaLocationFavourite(Context context) {
         CityAssociation city=IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
 
         if(city!=null){
@@ -468,7 +468,7 @@ public enum ThinkSpeak {
 
         }else{
             System.out.println("TESTE:" +IAirManager.INSTANCE.getCurrentLocationName());
-            ThinkSpeak.createNewChannel(IAirManager.INSTANCE.getCurrentLocationName().toString(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude), context);
+            ThinkSpeak.INSTANCE.createNewChannel(IAirManager.INSTANCE.getCurrentLocationName().toString(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude), context);
 
             System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
             if (city != null){
@@ -476,14 +476,14 @@ public enum ThinkSpeak {
                 //ThinkSpeak.insertInChannel(channel,this);
                 pt.ipleiria.dei.iair.model.Channel channel2 = new pt.ipleiria.dei.iair.model.Channel(IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity(), city.getREGION_NAME(),city.getLatitude().toString(),city.getLongitude().toString());
                 //channel=IAirManager.INSTANCE.getChannel(local);
-                ThinkSpeak.insertInChannel(channel2, context);
+                ThinkSpeak.INSTANCE.insertInChannel(channel2, context);
             }
 
         }
 
     }
 
-    public static void getThingDataAlerts(LinkedList<CityAssociation> listaCitys, Context context) {
+    public void getThingDataAlerts(LinkedList<CityAssociation> listaCitys, Context context) {
         for (CityAssociation city:listaCitys) {
 
             //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
@@ -519,7 +519,7 @@ public enum ThinkSpeak {
         }
     }
 
-    public static void getThingDataChannels(LinkedList<CityAssociation> listaCitys, Context context) {
+    public void getThingDataChannels(LinkedList<CityAssociation> listaCitys, Context context) {
         for (CityAssociation city:listaCitys) {
 
             //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
@@ -558,7 +558,7 @@ public enum ThinkSpeak {
         }
     }
 
-    public static void getThingDataChannelLastData(CityAssociation city) {
+    public void getThingDataChannelLastData(CityAssociation city) {
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
@@ -589,7 +589,7 @@ public enum ThinkSpeak {
     }
 
 
-    public static void getThingDataAlertsLast(CityAssociation city, Context context) {
+    public void getThingDataAlertsLast(CityAssociation city, Context context) {
 
             //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
 
@@ -622,7 +622,39 @@ public enum ThinkSpeak {
                 }
             }, "https://api.thingspeak.com/channels/"+city.getALERTS_ID()+"/feeds.json?api_key="+city.getAPI_KEY_ALERTS().toString(), context);
         }
+
+    public String getLocation() {
+        return location;
     }
+
+    public String getTemperature() {
+        return temperature;
+    }
+
+    public String getPressure() {
+        return pressure;
+    }
+
+    public String getHumity() {
+        return humity;
+    }
+
+    public HttpCallBack getCallback() {
+        return callback;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+}
 
 
 
