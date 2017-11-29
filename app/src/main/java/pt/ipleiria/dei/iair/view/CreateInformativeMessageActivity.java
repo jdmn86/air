@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -55,6 +57,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
     private Spinner spinnerLocations;
     private TextView textViewLocation;
     private TextView textViewTimestamp;
+    private TextView textViewcharacterCount;
     private Button buttonCancel;
     private ImageView imageGetMyLocation;
     private Location currentLocation;
@@ -83,7 +86,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         final TextView textViewDescription = findViewById(R.id.textViewDescription);
         spinnerLocations = findViewById(R.id.spinnerLocations);
         imageGetMyLocation = findViewById(R.id.imageGetMyLocationCreateInformativeMessage);
-
+        textViewcharacterCount  = (TextView) findViewById(R.id.textViewCreateInformativeMessageCharacterCount);
 
         if(!getMyLocation()){
             Toast.makeText(this,"Error Getting Actual Location", Toast.LENGTH_SHORT);
@@ -134,6 +137,26 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                 //pickLocation.setType(Phone.CONTENT_TYPE); // Show user only contacts w/ phone numbers
                 pickLocation.putExtra("SEND_LOCATION_REQUEST", 2);
                 startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
+            }
+        });
+        editTextDescription.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textViewcharacterCount.setText(count + " Characters");
+                if(count<20 || count >160)
+                    textViewcharacterCount.setTextColor(Color.RED);
+                else
+                    textViewcharacterCount.setTextColor(Color.GREEN);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 
@@ -282,6 +305,43 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
+        }else if (id == R.id.menu_send_data) {
+            GPSUtils gpsUtils = new GPSUtils(this);
+            android.location.Location location = gpsUtils.getLocation();
+            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            /*
+
+
+
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+
+            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temperatureSensorValue.toString(), pressureSensorValue.toString(), humiditySensorValue.toString(), locationName);
+
+            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+
+            if (city == null) {
+                ThinkSpeak.INSTANCE.createNewChannel(locationName, this);
+                System.out.println("LOCAL :" + locationName);
+
+                city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+                System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+                if (city != null){
+
+                    //ThinkSpeak.insertInChannel(channel,this);
+
+                    //channel=IAirManager.INSTANCE.getChannel(local);
+                    ThinkSpeak.insertInChannel(channel, this);
+                }
+
+            }else{
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.insertInChannel(channel, this);
+            }
+
+            */
         }
 
         if (intent != null) {

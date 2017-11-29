@@ -1,5 +1,8 @@
 package pt.ipleiria.dei.iair.controller;
 
+import android.app.Service;
+import android.bluetooth.BluetoothClass;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -42,6 +45,12 @@ public enum IAirManager {
     private LatLng favoriteLocationLatLng;
     private String favoriteLocationName;
     private String username;
+
+    public void setService(IairService service) {
+        this.service = service;
+    }
+
+    private IairService service;
 
     private LinkedList<CityAssociation> listCityAssotiation=new LinkedList<>();
 
@@ -114,11 +123,13 @@ public enum IAirManager {
 
     public void changeTemperatureValue(float[] eventValues) {
         mySensorsActivity.setTemperatureValue(eventValues[0]);
+        //service.setTemperatureValue(eventValues[0]);
         temperature = String.valueOf(eventValues[0]);
     }
 
     public void changeHumidityValue(float[] eventValues) {
         mySensorsActivity.setHumidityValue(eventValues[0]);
+        //service.setHumidityValue(eventValues[0]);
         humity = String.valueOf(eventValues[0]);
     }
 
@@ -130,6 +141,9 @@ public enum IAirManager {
 
     public void setMySensorsActivity(MySensorsActivity mySensorsActivity) {
         this.mySensorsActivity = mySensorsActivity;
+
+    }    public void setMySensorsActivity(IairService mySensorsActivity) {
+        this.service = mySensorsActivity;
     }
     public void setCreateInformativeMessageActivity(CreateInformativeMessageActivity createInformativeMessageActivity) {
         this.createInformativeMessageActivity = createInformativeMessageActivity;
@@ -223,6 +237,11 @@ public enum IAirManager {
 
     public void setCityIdLast(int cityIdList) {
         this.cityIdList = cityIdList;
+    }
+
+
+    public void CityAssociation(LinkedList<CityAssociation> cityAssociations) {
+        this.listCityAssotiation = cityAssociations;
     }
 
     public void addToListStrings(String str){

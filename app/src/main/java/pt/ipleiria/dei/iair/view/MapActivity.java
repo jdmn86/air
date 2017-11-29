@@ -4,17 +4,16 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.support.v4.app.ActivityCompat;
 import android.view.MenuItem;
 import android.widget.Toast;
+
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -28,11 +27,14 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
@@ -163,12 +165,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         });
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -214,7 +210,44 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
     } else if (id == R.id.menu_gps) {
 
 
-        }
+        } else if (id == R.id.menu_send_data) {
+        GPSUtils gpsUtils = new GPSUtils(this);
+        Location location = gpsUtils.getLocation();
+        //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+        ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            /*
+
+
+
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+
+            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temperatureSensorValue.toString(), pressureSensorValue.toString(), humiditySensorValue.toString(), locationName);
+
+            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+
+            if (city == null) {
+                ThinkSpeak.INSTANCE.createNewChannel(locationName, this);
+                System.out.println("LOCAL :" + locationName);
+
+                city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+                System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+                if (city != null){
+
+                    //ThinkSpeak.insertInChannel(channel,this);
+
+                    //channel=IAirManager.INSTANCE.getChannel(local);
+                    ThinkSpeak.insertInChannel(channel, this);
+                }
+
+            }else{
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.insertInChannel(channel, this);
+            }
+
+            */
+    }
         if (intent != null) {
             startActivity(intent);
 

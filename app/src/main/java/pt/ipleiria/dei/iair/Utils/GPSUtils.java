@@ -34,7 +34,7 @@ public class GPSUtils extends Service implements LocationListener {
 
     boolean checkNetwork = false;
 
-    private boolean canGetLocation=false;
+    private boolean canGetLocation = false;
 
     Location loc;
     double latitude;
@@ -205,11 +205,8 @@ public class GPSUtils extends Service implements LocationListener {
     }
 
 
-
-
-
-    public static List<Address> getLocationDetails(Context context, double latitude, double longitude) {
-        Log.d("APPSENSORS","LONGITUDE" + longitude);
+    public List<Address> getLocationDetails(Context context, double latitude, double longitude) {
+        Log.d("APPSENSORS", "LONGITUDE" + longitude);
         //latitude = 39.753396;
         //longitude = -8.807000;
         Geocoder geocoder;
@@ -249,6 +246,24 @@ public class GPSUtils extends Service implements LocationListener {
 
     @Override
     public void onProviderDisabled(String s) {
+
+    }
+
+    public String getLocationName(double latitude, double longitude) {
+        List<Address> addresses = getLocationDetails(mContext, latitude, longitude);
+        if (addresses.isEmpty())
+            return "Other";
+        Address address = addresses.get(0);
+        if (address.getLocality() != null)
+            return address.getLocality();
+        else {
+
+            String[] localitionLine = address.getAddressLine(address.getMaxAddressLineIndex()==0 ? 0 : 1).split(" ");
+            if (localitionLine.length == 1)
+                return localitionLine[0];
+            else
+                return localitionLine[1];
+        }
 
     }
 }

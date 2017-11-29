@@ -10,6 +10,8 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
@@ -31,6 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
@@ -43,7 +46,10 @@ import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 
-public class DashboardActivity extends GetVinicityActivity{
+public class DashboardActivity extends GetVinicityActivity implements LocationListener{
+    public static final String SHARED_PREFERENCES = "Shared";
+    SharedPreferences preferencesRead;
+    SharedPreferences.Editor preferencesWrite;
 
 
     private TextView favouriteLocationTXT;
@@ -66,8 +72,11 @@ public class DashboardActivity extends GetVinicityActivity{
 
     private final static int ALL_PERMISSIONS_RESULT = 101;
 
+    LocationManager mLocationManager;
 
 
+
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -94,10 +103,21 @@ public class DashboardActivity extends GetVinicityActivity{
                 requestPermissions((String[]) permissionsToRequest.toArray(new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
             }else{
                 enableGPS();
+                mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
+                Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if(location != null && location.getTime() > Calendar.getInstance().getTimeInMillis() - 2 * 60 * 1000) {
+                    // Do something with the recent location fix
+                    //  if it is less than two minutes old,
+                    //  otherwise wait for the update below
+                }
 
                 setCurrentLocation();
 
             }
+
+
         }
 
     }
@@ -224,11 +244,6 @@ public class DashboardActivity extends GetVinicityActivity{
     }
 
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -481,4 +496,27 @@ public class DashboardActivity extends GetVinicityActivity{
     }
 
 
+    @Override
+    public void onLocationChanged(Location location) {
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        IAirManager.INSTANCE.setCurrentLocation(latLng);
+        GPSUtils gpsUtils = new GPSUtils(this);
+        IAirManager.INSTANCE.setCurrentLocationName(gpsUtils.getLocationName(location.getLatitude(), location.getLongitude()));
+        getVicinity(latLng,4000);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }

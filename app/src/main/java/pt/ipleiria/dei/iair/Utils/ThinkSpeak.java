@@ -64,8 +64,9 @@ public enum ThinkSpeak {
             Toast.makeText(context, R.string.No_gps_message, Toast.LENGTH_SHORT).show();
             return false;
         }
+        GPSUtils gpsUtils = new GPSUtils(context);
 
-          location = GPSUtils.getLocationDetails(context,latitude, longitude).get(0).getLocality();
+          location = gpsUtils.getLocationName(latitude, longitude);
         System.out.println(location);
         HttpUtils.Get(new HttpCallBack() {
             @Override
@@ -177,7 +178,8 @@ public enum ThinkSpeak {
         return true;
     }
     public void getData( HttpCallBack callback,Context context, double latitude, double longitude) {
-        getData(callback, context, GPSUtils.getLocationDetails(context, latitude,longitude).get(0).getLocality());
+        GPSUtils gpsUtils = new GPSUtils(context);
+        getData(callback, context, gpsUtils.getLocationName(latitude,longitude));
     }
 
     public void getData(HttpCallBack callback, Context context, String location) {

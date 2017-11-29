@@ -6,10 +6,7 @@ import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Location;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -17,8 +14,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.lang.reflect.Array;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.CallBack;
@@ -90,12 +85,6 @@ public class MySensorsActivity extends GPSActivity {
         humiditySensorValue = (TextView) findViewById(R.id.textViewHumiditySensorValue);
     }
 
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -120,6 +109,13 @@ public class MySensorsActivity extends GPSActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         }else if (id == R.id.menu_send_data) {
+            GPSUtils gpsUtils = new GPSUtils(this);
+            Location location = gpsUtils.getLocation();
+            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            /*
+
+
 
             GPSUtils locationTrack = new GPSUtils(this);
 
@@ -137,7 +133,7 @@ public class MySensorsActivity extends GPSActivity {
 
 
 
-
+            */
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
