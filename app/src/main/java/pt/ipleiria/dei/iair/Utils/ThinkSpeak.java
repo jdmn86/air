@@ -587,34 +587,41 @@ public enum ThinkSpeak {
             }
         }, "https://api.thingspeak.com/channels/"+city.getCHANNEL_ID()+"/feeds/last.json?api_key="+city.getAPI_KEY_CHANNEL().toString()+"&last", context);
     }
+    public static void getThingDataAlertsLast( CityAssociation city, Context context)
+    {
+        getThingDataAlertsLast(null, city, context);
+    }
 
-
-    public void getThingDataAlertsLast(CityAssociation city, Context context) {
+    public List<Alerts> alerts;
+    public static void getThingDataAlertsLast(final AlertCallBack callBack, CityAssociation city, Context context) {
 
             //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
 
-            HttpUtils.Get(new HttpCallBack() {
-                @Override
-                public void onResult(JSONObject response) throws JSONException {
-                    JSONArray feeds = response.getJSONArray("channel");
-                    System.out.println(feeds.length());
-                    if (feeds.length() != 0) {
 
-                        for (int i = 0; i < feeds.length(); i++) {
-                            String name=feeds.getJSONObject(i).getString("name");
-                            String type=feeds.getJSONObject(i).getString("field2");
-                            String message=feeds.getJSONObject(i).getString("field3");
-                            String timestamp=feeds.getJSONObject(i).getString("field4");
+        HttpUtils.Get(new HttpCallBack() {
+            @Override
+            public void onResult(JSONObject response) throws JSONException {
+                ThinkSpeak.INSTANCE.alerts = new LinkedList<>();
+                JSONArray feeds = response.getJSONArray("feeds");
+                System.out.println(feeds.length());
+                if (feeds.length() != 0) {
+                        String name= response.getJSONObject("channel").getString("name");
+                        String type=feeds.getJSONObject(feeds.length() - 1).getString("field1");
+                        String message=feeds.getJSONObject(feeds.length() - 1).getString("field2");
+                        String timestamp=feeds.getJSONObject(feeds.length() - 1).getString("field3");
 
-                            Alerts alert = new Alerts(name,type,message,timestamp);
-                            IAirManager.INSTANCE.addAlert(alert);
-                        }
-                    }
+                        Alerts alert = new Alerts(name,type,message,timestamp);
+                        IAirManager.INSTANCE.addAlert(alert);
+                        ThinkSpeak.INSTANCE.alerts.add(alert);
 
-                    for (Alerts alert:IAirManager.INSTANCE.getAllAlerts()) {
-                        System.out.println("alert : "+alert.toString());
-                    }
                 }
+
+                for (Alerts alert:IAirManager.INSTANCE.getAllAlerts()) {
+                    System.out.println("alert : "+alert.toString());
+                }
+                if(callBack != null)
+                    callBack.onResult(ThinkSpeak.INSTANCE.alerts);
+            }
 
                 @Override
                 public void onResult(String response) {
@@ -655,7 +662,6 @@ public enum ThinkSpeak {
         return longitude;
     }
 }
-
 
 
 

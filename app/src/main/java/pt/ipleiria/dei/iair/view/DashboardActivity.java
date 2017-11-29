@@ -1,5 +1,6 @@
 package pt.ipleiria.dei.iair.view;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -13,17 +14,16 @@ import android.location.Location;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.Utils.HttpUtils;
-import pt.ipleiria.dei.iair.controller.IAirManager;
-import android.widget.EditText;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -31,14 +31,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.Utils.AlertCallBack;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
 
+import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.getThingDataAlertsLast;
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -66,6 +72,8 @@ public class DashboardActivity extends GetVinicityActivity{
 
     private final static int ALL_PERMISSIONS_RESULT = 101;
 
+    private static final String[] permissions = {Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WAKE_LOCK, Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.CHANGE_NETWORK_STATE};
 
 
     @Override
@@ -73,6 +81,8 @@ public class DashboardActivity extends GetVinicityActivity{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+        context = this;
+        requestPermission(permissions);
 
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -102,6 +112,47 @@ public class DashboardActivity extends GetVinicityActivity{
 
     }
 
+
+        System.out.println("favorito"+IAirManager.INSTANCE.getFavoriteLocationName());
+
+        CityAssociation city=IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
+
+        if(city!=null){
+            getThingDataAlertsLast(new AlertCallBack() {
+
+                @Override
+                public void onResult(List<Alerts> response) {
+                    System.out.println("number of alertas"+IAirManager.INSTANCE.getAllAlerts().size());
+                    if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
+                        // Convert ArrayList to array
+
+
+                        ArrayList<String> strings = new ArrayList<>();
+
+                        adapter = new ArrayAdapter<String>(DashboardActivity.context,
+                                android.R.layout.simple_list_item_1, strings);
+
+
+                        for (Alerts alert :response) {
+                            //strings.add(alert.toString());
+                            adapter.add(alert.toString());
+                        }
+
+
+
+                        lista.setAdapter(adapter);
+                        // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
+
+                    }
+                }
+            }, city,this);
+
+
+        }
+
+
+
+    }
 
     private void bindTextViews() {
         favouriteLocationTXT = findViewById(R.id.textViewFavoriteLocation);
