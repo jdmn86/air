@@ -13,6 +13,7 @@ public class CityAssociation {
     private String ALERTS_ID;
     private String latitude;
     private String longitude;
+    private int id;
 
     public CityAssociation(String API_KEY_CHANNEL, String API_KEY_ALERTS, String REGION_NAME, String CHANNEL_ID, String ALERTS_ID, String latitude, String longitude) {
         this.API_KEY_CHANNEL = API_KEY_CHANNEL;
@@ -22,6 +23,7 @@ public class CityAssociation {
         this.ALERTS_ID = ALERTS_ID;
         this.latitude = latitude;
         this.longitude = longitude;
+
 
     }
 
@@ -80,6 +82,14 @@ public class CityAssociation {
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
+    }
+
+    public int getChannel() {
+        return id;
+    }
+
+    public void setChannel(int id) {
+        this.id = id;
     }
 
     @Override

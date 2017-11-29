@@ -41,6 +41,7 @@ public enum IAirManager {
 
     private LatLng favoriteLocationLatLng;
     private String favoriteLocationName;
+
     private String username;
 
     private LinkedList<CityAssociation> listCityAssotiation=new LinkedList<>();

@@ -1,0 +1,7 @@
+<resources>
+    <declare-styleable name="markericon">
+        <attr name="temp" format="string" />
+        <attr name="press" format="string"></attr>
+        <attr name="hum" format="string"></attr>
+    </declare-styleable>
+</resources>

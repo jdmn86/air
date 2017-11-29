@@ -5,6 +5,7 @@ import android.content.Context;
 import android.location.LocationManager;
 import android.util.Pair;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -520,7 +521,7 @@ public enum ThinkSpeak {
     }
 
     public void getThingDataChannels(LinkedList<CityAssociation> listaCitys, Context context) {
-        for (CityAssociation city:listaCitys) {
+        for (final CityAssociation city:listaCitys) {
 
             //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
 
@@ -542,6 +543,8 @@ public enum ThinkSpeak {
 
                             Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,latitude,longitude);
                             IAirManager.INSTANCE.addChannel(channel);
+                            System.out.println("add channel to citi last"+temperature);
+                            city.setChannel( IAirManager.INSTANCE.getAllChannels().size()-1);
                         }
                     }
 
@@ -579,6 +582,8 @@ public enum ThinkSpeak {
                 Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,latitude,longitude);
                 IAirManager.INSTANCE.addChannel(channel);
                 IAirManager.INSTANCE.setCityIdLast(IAirManager.INSTANCE.getAllChannels().lastIndexOf(channel));
+
+
             }
 
             @Override

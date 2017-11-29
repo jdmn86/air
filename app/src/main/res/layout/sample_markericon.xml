@@ -1,0 +1,46 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/framelayout"
+android:layout_height="210dp"
+android:layout_width="120dp">
+
+    <ImageView
+        android:id="@+id/ImageView01"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/sensorsimg" />
+
+    <TextView
+        android:id="@+id/textViewtemp"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="53dp"
+        android:layout_marginRight="1dp"
+        android:layout_marginTop="32dp"
+        android:text="N.D."
+        android:maxLength="40"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/textViewhum"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="11dp"
+        android:layout_marginTop="100dp"
+        android:text="N.D."
+        android:maxLength="25"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/textViewpress"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="54dp"
+        android:layout_marginTop="100dp"
+        android:text="N.D."
+        android:maxLength="25"
+        android:textStyle="bold"/>
+
+
+
+</FrameLayout>

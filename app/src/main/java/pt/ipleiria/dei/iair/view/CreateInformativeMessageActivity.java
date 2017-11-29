@@ -57,12 +57,12 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
     private TextView textViewTimestamp;
     private Button buttonCancel;
     private ImageView imageGetMyLocation;
-    private Location currentLocation;
     private ArrayAdapter<String> adapter;
     private Spinner spinner;
     private Spinner spinner1;
     private ArrayAdapter<String> adapter1;
     private EditText editTextDescriptionCreateInformativeMessage;
+    private Location auxLocation;
 
 
     @Override
@@ -141,8 +141,12 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
 
         spinner = (Spinner) findViewById(R.id.spinnerLocations) ;
         java.util.ArrayList<String> strings = new java.util.ArrayList<>();
+
+        System.out.println("tamanho:" +IAirManager.INSTANCE.getAllCityAssociations().size());
+
         for (CityAssociation city: IAirManager.INSTANCE.getAllCityAssociations()) {
             strings.add(city.getREGION_NAME());
+
         }
          adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, strings);
@@ -179,13 +183,13 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                     Toast.makeText(getApplicationContext(), "Error Getting Actual Location", Toast.LENGTH_SHORT);
                 } else {
 
-                    if (IAirManager.INSTANCE.getCityAssociation(currentLocation.getLocationName()) == null) {
+                    if (IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName()) == null) {
 
-                        adapter.add(currentLocation.getLocationName());
+                        adapter.add(IAirManager.INSTANCE.getCurrentLocationName());
                         for (int position = 0; position < adapter.getCount(); position++) {
-                            if (adapter.getItem(position).equalsIgnoreCase(currentLocation.getLocationName())) {
+                            if (adapter.getItem(position).equalsIgnoreCase(IAirManager.INSTANCE.getCurrentLocationName())) {
 
-                                ThinkSpeak.INSTANCE.createNewChannel(currentLocation.getLocationName(),currentLocation.getLatitude().toString(),currentLocation.getLongitude().toString(), getApplicationContext());
+                                ThinkSpeak.INSTANCE.createNewChannel(IAirManager.INSTANCE.getCurrentLocationName(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude), getApplicationContext());
                                 spinner.setSelection(position);
 
                                 return;
@@ -193,7 +197,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                         }
                     } else {
                         for (int position = 0; position < adapter.getCount(); position++) {
-                            if (adapter.getItem(position).equalsIgnoreCase(currentLocation.getLocationName())) {
+                            if (adapter.getItem(position).equalsIgnoreCase(IAirManager.INSTANCE.getCurrentLocationName())) {
                                 spinner.setSelection(position);
 
                                 return;
@@ -219,34 +223,39 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         if (requestCode == PICK_LOCATION_REQUEST) {
             if (resultCode == RESULT_OK) { // Activity.RESULT_OK
 
-                currentLocation.setLatitude(data.getDoubleExtra("latitude",0.0));
-                currentLocation.setLongitude(data.getDoubleExtra("longitude",0.0));
-                currentLocation.setLocationName(data.getStringExtra("locationName"));
-                String location=data.getStringExtra("location");
+                auxLocation= new Location();
+
+                auxLocation.setLatitude(data.getDoubleExtra("latitude",0.0));
+                auxLocation.setLongitude(data.getDoubleExtra("longitude",0.0));
+                auxLocation.setLocationName(data.getStringExtra("locationName"));
+
+                //String location=data.getStringExtra("location");
                 String locationName=data.getStringExtra("locationName");
 
-                System.out.println("location"+location);
+               // System.out.println("location"+location);
                 System.out.println("locationName"+locationName);
 
                 if(IAirManager.INSTANCE.getCityAssociation(locationName)==null){
+
+                    ThinkSpeak.INSTANCE.createNewChannel(locationName,auxLocation.getLatitude().toString(),auxLocation.getLongitude().toString(),this);
 
                     adapter.add(locationName);
                     for (int position = 0; position < adapter.getCount(); position++) {
                         if(adapter.getItem(position).equalsIgnoreCase( locationName)) {
                             spinner.setSelection(position);
-                            ThinkSpeak.INSTANCE.createNewChannel(locationName,currentLocation.getLatitude().toString(),currentLocation.getLongitude().toString(),this);
+
                             return;
                         }
                     }
                 } else {
-                for (int position = 0; position < adapter.getCount(); position++) {
-                    if (adapter.getItem(position).equalsIgnoreCase(currentLocation.getLocationName())) {
-                        spinner.setSelection(position);
+                    for (int position = 0; position < adapter.getCount(); position++) {
+                        if (adapter.getItem(position).equalsIgnoreCase(auxLocation.getLocationName())) {
+                            spinner.setSelection(position);
 
-                        return;
+                            return;
+                        }
+
                     }
-
-                }
             }
 
             }
@@ -360,18 +369,4 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
         return false;
     }
 
-    public void setCurrentLocation(Location currentLocation) {
-        this.currentLocation = currentLocation;
-        String locationName = currentLocation.getLocationName();
-        if(IAirManager.INSTANCE.getCityAssociation(locationName) == null){
-            ThinkSpeak.INSTANCE.createNewChannel(locationName,currentLocation.getLatitude().toString(),currentLocation.getLongitude().toString(),this);
-            adapter.add(locationName);
-            for (int position = 0; position < adapter.getCount(); position++) {
-                if(adapter.getItem(position).equalsIgnoreCase( locationName)) {
-                    spinner.setSelection(position);
-                    return;
-                }
-            }
-        }
-    }
 }

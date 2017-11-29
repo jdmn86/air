@@ -438,20 +438,8 @@ public class DashboardActivity extends GetVinicityActivity{
     public static void putDataOnDashboard(Context context) {
         Channel channel = null;
 
-        if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
 
-            channel = IAirManager.INSTANCE.getAllChannels().get(IAirManager.INSTANCE.getCityIdLast());
-            System.out.println("canal:"+channel.toString());
-        }
 
-        if (channel != null) {
-            if (!channel.getTemperature().contains("N/A"))
-                temperatureFavLocationValue.setText(channel.getTemperature());
-            if (!channel.getPressure().contains("N/A"))
-                pressureFavLocationValue.setText(channel.getPressure());
-            if (!channel.getHumity().contains("N/A"))
-                humidityFavLocationValue.setText(channel.getHumity());
-        }
 
         if (IAirManager.INSTANCE.getAllAlerts().size() != 0) {
             // Convert ArrayList to array
