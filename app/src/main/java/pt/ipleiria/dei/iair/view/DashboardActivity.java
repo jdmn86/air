@@ -71,10 +71,7 @@ public class DashboardActivity extends GetVinicityActivity{
     private ArrayList permissions = new ArrayList();
 
     private final static int ALL_PERMISSIONS_RESULT = 101;
-
-    private static final String[] permissions = {Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WAKE_LOCK, Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.CHANGE_NETWORK_STATE};
-
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +79,7 @@ public class DashboardActivity extends GetVinicityActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
         context = this;
-        requestPermission(permissions);
+
 
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -109,47 +106,7 @@ public class DashboardActivity extends GetVinicityActivity{
 
             }
         }
-
-    }
-
-
-        System.out.println("favorito"+IAirManager.INSTANCE.getFavoriteLocationName());
-
-        CityAssociation city=IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
-
-        if(city!=null){
-            getThingDataAlertsLast(new AlertCallBack() {
-
-                @Override
-                public void onResult(List<Alerts> response) {
-                    System.out.println("number of alertas"+IAirManager.INSTANCE.getAllAlerts().size());
-                    if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
-                        // Convert ArrayList to array
-
-
-                        ArrayList<String> strings = new ArrayList<>();
-
-                        adapter = new ArrayAdapter<String>(DashboardActivity.context,
-                                android.R.layout.simple_list_item_1, strings);
-
-
-                        for (Alerts alert :response) {
-                            //strings.add(alert.toString());
-                            adapter.add(alert.toString());
-                        }
-
-
-
-                        lista.setAdapter(adapter);
-                        // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
-
-                    }
-                }
-            }, city,this);
-
-
-        }
-
+        //putDataOnDashboard(this);
 
 
     }
@@ -383,7 +340,6 @@ public class DashboardActivity extends GetVinicityActivity{
       //  if (
             Location loc =locationTrack.getLocation();
             if(loc!=null){
-                System.out.println("AKI");
                 double longitude = loc.getLongitude();
                 double latitude = loc.getLatitude();
                 LatLng latLng = new LatLng(latitude, longitude);
@@ -469,7 +425,6 @@ public class DashboardActivity extends GetVinicityActivity{
 
     public void populate(){
 
-        System.out.println("in populate");
 
         if (IAirManager.INSTANCE.getUsername()==null || IAirManager.INSTANCE.getUsername()=="null") {
 
@@ -486,13 +441,13 @@ public class DashboardActivity extends GetVinicityActivity{
     }
 
 
-    public static void putDataOnDashboard(Context context) {
+    public static void putDataOnDashboard(final Context context) {
         Channel channel = null;
 
         if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
 
             channel = IAirManager.INSTANCE.getAllChannels().get(IAirManager.INSTANCE.getCityIdLast());
-            System.out.println("canal:"+channel.toString());
+
         }
 
         if (channel != null) {
@@ -504,22 +459,47 @@ public class DashboardActivity extends GetVinicityActivity{
                 humidityFavLocationValue.setText(channel.getHumity());
         }
 
-        if (IAirManager.INSTANCE.getAllAlerts().size() != 0) {
-            // Convert ArrayList to array
+        System.out.println("favorito"+IAirManager.INSTANCE.getFavoriteLocationName());
 
-            ArrayList<String> strings = new ArrayList<>();
+        CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
 
-            adapter = new ArrayAdapter<String>(context,
-                    android.R.layout.simple_list_item_1, strings);
+        if(city!=null){
+            getThingDataAlertsLast(new AlertCallBack() {
 
-            for (Alerts alert : IAirManager.INSTANCE.getAllAlerts()) {
-                //strings.add(alert.toString());
-                adapter.add(alert.toString());
-            }
+                @Override
+                public void onResult(List<Alerts> response) {
+                    System.out.println("number of alertas"+IAirManager.INSTANCE.getAllAlerts().size());
+                    if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
+                        // Convert ArrayList to array
 
-            lista.setAdapter(adapter);
-            // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
+
+                        ArrayList<String> strings = new ArrayList<>();
+
+                        adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, strings);
+
+
+                        for (Alerts alert :response) {
+                            adapter.clear();
+                            adapter.add(alert.toString());
+                        }
+
+
+
+                        lista.setAdapter(adapter);
+                        // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
+
+                    }
+                    else{
+                        adapter.clear();
+                        adapter.add("No alerts available!");
+                        lista.setAdapter(adapter);
+                    }
+                }
+            }, city,context);
+
+
         }
+
     }
 
     @Override

@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.controller.IAirManager;
@@ -459,6 +460,7 @@ public enum ThinkSpeak {
     }
 
     private void verificaLocationFavourite(Context context) {
+
         CityAssociation city=IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
 
         if(city!=null){
@@ -593,6 +595,7 @@ public enum ThinkSpeak {
     }
 
     public List<Alerts> alerts;
+
     public static void getThingDataAlertsLast(final AlertCallBack callBack, CityAssociation city, Context context) {
 
             //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
