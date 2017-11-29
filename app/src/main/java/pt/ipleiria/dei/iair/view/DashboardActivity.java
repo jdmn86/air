@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.Utils.AlertCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import android.widget.EditText;
@@ -31,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
@@ -41,10 +43,10 @@ import pt.ipleiria.dei.iair.model.CityAssociation;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.getThingDataAlertsLast;
 
 
 public class DashboardActivity extends GetVinicityActivity{
-
 
     private TextView favouriteLocationTXT;
     private static TextView temperatureFavLocationValue;
@@ -65,7 +67,7 @@ public class DashboardActivity extends GetVinicityActivity{
     private ArrayList permissions = new ArrayList();
 
     private final static int ALL_PERMISSIONS_RESULT = 101;
-
+    private DashboardActivity context;
 
 
     @Override
@@ -73,6 +75,8 @@ public class DashboardActivity extends GetVinicityActivity{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+
+        context = this;
 
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -435,7 +439,7 @@ public class DashboardActivity extends GetVinicityActivity{
     }
 
 
-    public static void putDataOnDashboard(Context context) {
+    public static void putDataOnDashboard(final Context context) {
         Channel channel = null;
 
         if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
