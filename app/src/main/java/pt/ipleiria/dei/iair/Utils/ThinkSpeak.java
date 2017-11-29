@@ -177,6 +177,35 @@ public enum ThinkSpeak {
 
         return true;
     }
+
+    public void getGraphURL(HttpCallBack callBack, Context context, String location) {
+        this.location = location;
+        this.context = context;
+        this.callback = callback;
+        HttpUtils.Get(new HttpCallBack() {
+            @Override
+            public void onResult(JSONObject response) throws JSONException {
+                JSONArray feeds = response.getJSONArray("feeds");
+                System.out.println(feeds.length());
+                if (feeds.length() != 0) {
+
+                    for (int i = 0; i < feeds.length(); i++) {
+                        JSONObject elem = new JSONObject( feeds.get(i).toString());
+                        if (elem.get("field2").equals(ThinkSpeak.INSTANCE.getLocation())) {
+                            getCallback().onResult("https://api.thingspeak.com/channels/" + elem.get("field3") + "/charts/<key>?api_key=" + elem.get("field1") + "&results=2");
+
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onResult(String response) {
+
+            }
+        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H", context);
+
+    }
     public void getData( HttpCallBack callback,Context context, double latitude, double longitude) {
         GPSUtils gpsUtils = new GPSUtils(context);
         getData(callback, context, gpsUtils.getLocationName(latitude,longitude));
@@ -196,7 +225,7 @@ public enum ThinkSpeak {
                     for (int i = 0; i < feeds.length(); i++) {
                         JSONObject elem = new JSONObject( feeds.get(i).toString());
                         if (elem.get("field2").equals(ThinkSpeak.INSTANCE.getLocation())) {
-                            HttpUtils.Get(ThinkSpeak.INSTANCE.getCallback(),"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.INSTANCE.getContext());
+                            HttpUtils.Get(ThinkSpeak.INSTANCE.getCallback(),"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1"), ThinkSpeak.INSTANCE.getContext());
 
                         }
                     }
@@ -207,7 +236,7 @@ public enum ThinkSpeak {
             public void onResult(String response) {
 
             }
-        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
+        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H", context);
     }
 
     public void getAllCitysAssociation(HttpCallBack callback, Context context, String location){
@@ -225,7 +254,7 @@ public enum ThinkSpeak {
                         for (int i = 0; i < feeds.length(); i++) {
                             JSONObject elem = new JSONObject( feeds.get(i).toString());
                             if (elem.get("field2").equals(ThinkSpeak.INSTANCE.getLocation())) {
-                                HttpUtils.Get(ThinkSpeak.INSTANCE.getCallback(),"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1") + "&results=2" , ThinkSpeak.INSTANCE.getContext());
+                                HttpUtils.Get(ThinkSpeak.INSTANCE.getCallback(),"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1"), ThinkSpeak.INSTANCE.getContext());
 
                             }
                         }
@@ -236,7 +265,7 @@ public enum ThinkSpeak {
                 public void onResult(String response) {
 
                 }
-            }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
+            }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H", context);
 
     }
 
@@ -656,6 +685,8 @@ public enum ThinkSpeak {
     public double getLongitude() {
         return longitude;
     }
+
+
 }
 
 

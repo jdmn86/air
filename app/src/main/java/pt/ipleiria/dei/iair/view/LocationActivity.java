@@ -71,9 +71,10 @@ public class LocationActivity extends GPSActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                showLoading(true);
-                ThinkSpeak.INSTANCE.getData(new HttpCallBack() {
+                ThinkSpeak.INSTANCE.getGraphURL(new HttpCallBack() {
                    @Override
                    public void onResult(JSONObject response) throws JSONException {
+                       /*
                        //data incoming
                        System.out.println(response.toString());
                        JSONArray feeds = response.getJSONArray("feeds");
@@ -110,7 +111,7 @@ public class LocationActivity extends GPSActivity {
                            graph.addSeries(seriesPressure);
                            graph.addSeries(seriesHumity);
 
-                       }
+                       }*/
 
                        showLoading(false);
                    }
