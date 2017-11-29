@@ -114,6 +114,11 @@ public class MySensorsActivity extends GPSActivity {
             //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
             ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
             /*
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> origin/feature/US5
 
 
 
@@ -132,7 +137,10 @@ public class MySensorsActivity extends GPSActivity {
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/feature/US5
             */
         } else if (id == R.id.menu_gps) {
             enableGPS();

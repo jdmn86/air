@@ -6,14 +6,8 @@ import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import pt.ipleiria.dei.iair.Utils.AlertCallback;
-import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
-import pt.ipleiria.dei.iair.model.Alerts;
-import pt.ipleiria.dei.iair.model.CityAssociation;
 
 public class IairService extends Service {
     private final SensorManager sensorManager;
@@ -26,25 +20,33 @@ public class IairService extends Service {
 
     }
 
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
     private void setSensorManager() {
         try {
             SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             IAirManager.INSTANCE.setSensorManager(sensorManager);
-            setSensors(sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
+            setSensors(sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE), sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
                     sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY));
-        }catch (Exception e){
+        } catch (Exception e) {
             return;
         }
 
 
     }
+
     public void setSensors(Sensor temperatureSensor, Sensor pressureSensor, Sensor humiditySensor) {
 
-            IAirManager.INSTANCE.setSensor(temperatureSensor);
-            IAirManager.INSTANCE.setSensor(pressureSensor);
-            IAirManager.INSTANCE.setSensor(humiditySensor);
+        IAirManager.INSTANCE.setSensor(temperatureSensor);
+        IAirManager.INSTANCE.setSensor(pressureSensor);
+        IAirManager.INSTANCE.setSensor(humiditySensor);
 
     }
+}
 
 
     /*
@@ -66,12 +68,3 @@ public class IairService extends Service {
             }
         }, this);
     }*/
-
-
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-}
