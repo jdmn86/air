@@ -438,24 +438,60 @@ public class DashboardActivity extends GetVinicityActivity{
     public static void putDataOnDashboard(Context context) {
         Channel channel = null;
 
+        if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
+
+            channel = IAirManager.INSTANCE.getAllChannels().get(IAirManager.INSTANCE.getCityIdLast());
+            System.out.println("canal:"+channel.toString());
+        }
+
+        if (channel != null) {
+            if (!channel.getTemperature().contains("N/A"))
+                temperatureFavLocationValue.setText(channel.getTemperature());
+            if (!channel.getPressure().contains("N/A"))
+                pressureFavLocationValue.setText(channel.getPressure());
+            if (!channel.getHumity().contains("N/A"))
+                humidityFavLocationValue.setText(channel.getHumity());
+        }
+
+        System.out.println("favorito"+IAirManager.INSTANCE.getFavoriteLocationName());
+
+        CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
+
+        if(city!=null){
+            getThingDataAlertsLast(new AlertCallBack() {
+
+                @Override
+                public void onResult(List<Alerts> response) {
+                    System.out.println("number of alertas"+IAirManager.INSTANCE.getAllAlerts().size());
+                    if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
+                        // Convert ArrayList to array
+
+
+                        ArrayList<String> strings = new ArrayList<>();
+
+                        adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, strings);
+
+
+                        for (Alerts alert :response) {
+                            adapter.clear();
+                            adapter.add(alert.toString());
+                        }
 
 
 
-        if (IAirManager.INSTANCE.getAllAlerts().size() != 0) {
-            // Convert ArrayList to array
+                        lista.setAdapter(adapter);
+                        // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
 
-            ArrayList<String> strings = new ArrayList<>();
+                    }
+                    else{
+                        adapter.clear();
+                        adapter.add("No alerts available!");
+                        lista.setAdapter(adapter);
+                    }
+                }
+            }, city,context);
 
-            adapter = new ArrayAdapter<String>(context,
-                    android.R.layout.simple_list_item_1, strings);
 
-            for (Alerts alert : IAirManager.INSTANCE.getAllAlerts()) {
-                //strings.add(alert.toString());
-                adapter.add(alert.toString());
-            }
-
-            lista.setAdapter(adapter);
-            // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
         }
     }
 
