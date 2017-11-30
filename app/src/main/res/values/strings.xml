@@ -16,9 +16,9 @@
     <string name="No_internet_message">No internet Available</string>
     <string name="No_gps_message">No GPS Available</string>
     <string name="No_data_message">No Data Available</string>
-    <string name="txt_view_favorite_location">Favorite Location</string>
+    <string name="txt_view_favorite_location">Favorite Location:</string>
     <string name="txt_dashboard_data">Data</string>
-    <string name="txtViewMsgInformative">Informative Message</string>
+    <string name="txtViewMsgInformative">Informative Message:</string>
     <string name="activity_dashboard_username">Username:</string>
     <string name="set_as_favorite_location">Set As Favorite Location</string>
     <string name="back">Back</string>
@@ -32,7 +32,7 @@
     <string name="buttonMapCreateInformativeMessage">Map</string>
     <string name="buttonCancelCreateInformativeMessage">Cancel</string>
     <string name="buttonSaveCreateInformativeMessage">Save</string>
-    <string name="buttonSelectDateTimeCreateInformativeMessage">Select Tmestamp</string> set_as_choose_this_location
+    <string name="buttonSelectDateTimeCreateInformativeMessage">Select Timestamp</string> set_as_choose_this_location
     <string name="set_as_choose_this_location">Set As Location</string>
 
 </resources>

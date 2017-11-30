@@ -68,7 +68,6 @@ public enum ThinkSpeak {
         }
 
           location = GPSUtils.getLocationDetails(context,latitude, longitude).get(0).getLocality();
-        System.out.println(location);
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
@@ -190,7 +189,6 @@ public enum ThinkSpeak {
             @Override
             public void onResult(JSONObject response) throws JSONException {
                 JSONArray feeds = response.getJSONArray("feeds");
-                System.out.println(feeds.length());
                 if (feeds.length() != 0) {
 
                     for (int i = 0; i < feeds.length(); i++) {
@@ -246,10 +244,8 @@ public enum ThinkSpeak {
 
         CityAssociation city=IAirManager.INSTANCE.getCityAssociation(name);
         if(city!=null){
-            System.out.println("RETURN in create channel");
             return;
         }
-        System.out.println("CREATE in create channel");
 
         ArrayList<Pair<String, String>> data = new ArrayList<>();
         //data.add(new Pair<>("API_KEY_CHANNEL", API_KEY_CREATE_ASSOCIATION));
@@ -265,7 +261,7 @@ public enum ThinkSpeak {
 
                 String key =response.getJSONArray("api_keys").getJSONObject(0).get("api_key").toString();
                 String id = response.get("id").toString();
-               String latitude = response.get("latitude").toString();
+                String latitude = response.get("latitude").toString();
                 String longitude = response.get("longitude").toString();
 
                 CityAssociation city=new CityAssociation(key,"",name,id,"",latitude,longitude);
@@ -361,8 +357,6 @@ public enum ThinkSpeak {
 
         IAirManager.INSTANCE.addAlert(alert);
 
-        System.out.println("HEREEEEE alert"+city.toString());
-
         ArrayList<Pair<String, String>> data = new ArrayList<>();
         data.add(new Pair<>("field1", alert.getType() ));
         data.add(new Pair<>("field2",alert.getMessage() ));
@@ -391,11 +385,7 @@ public enum ThinkSpeak {
         //get api key for alert to add
 
         CityAssociation city=IAirManager.INSTANCE.getCityAssociation(channel.getName());
-        System.out.println("tamanho:"+IAirManager.INSTANCE.getAllCityAssociations());
         IAirManager.INSTANCE.addChannel(channel);
-
-        System.out.println("HEREEEEE city"+city.toString());
-
         ArrayList<Pair<String, String>> data = new ArrayList<>();
         data.add(new Pair<>("field1", channel.getTemperature() == null? "N/A":channel.getTemperature() ));
         data.add(new Pair<>("field2",channel.getPressure() == null? "N/A": channel.getPressure()));
@@ -403,7 +393,6 @@ public enum ThinkSpeak {
         data.add(new Pair<>("latitude",city.getLatitude()));
         data.add(new Pair<>("longitude", city.getLongitude()));
 
-        System.out.println("getAPI_KEY "+city.getAPI_KEY_CHANNEL().toString());
 
         HttpUtils.Post(new HttpCallBack() {
             @Override
@@ -470,10 +459,8 @@ public enum ThinkSpeak {
 
 
         }else{
-            System.out.println("TESTE:" +IAirManager.INSTANCE.getCurrentLocationName());
-            ThinkSpeak.INSTANCE.createNewChannel(IAirManager.INSTANCE.getCurrentLocationName().toString(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude), context);
 
-            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+            ThinkSpeak.INSTANCE.createNewChannel(IAirManager.INSTANCE.getCurrentLocationName().toString(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude), context);
             if (city != null){
 
                 //ThinkSpeak.insertInChannel(channel,this);
@@ -510,7 +497,6 @@ public enum ThinkSpeak {
                 }
 
                 for (Alerts alert:IAirManager.INSTANCE.getAllAlerts()) {
-                    System.out.println("alert : "+alert.toString());
                 }
             }
 
@@ -545,13 +531,11 @@ public enum ThinkSpeak {
 
                             Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,latitude,longitude);
                             IAirManager.INSTANCE.addChannel(channel);
-                            System.out.println("add channel to citi last"+temperature);
                             city.setChannel( IAirManager.INSTANCE.getAllChannels().size()-1);
                         }
                     }
 
                     for (Channel channel:IAirManager.INSTANCE.getAllChannels()) {
-                        System.out.println("channel : "+channel.toString());
                     }
                 }
 
@@ -578,7 +562,6 @@ public enum ThinkSpeak {
 
                // Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,id,location);
                 //IAirManager.INSTANCE.addChannel(channel);
-                System.out.println("Last channel : "+name + temperature + "etc" );
                 LatLng latLng= new LatLng(Double.parseDouble(latitude),Double.parseDouble(longitude));
 
                 Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,latitude,longitude);
@@ -624,9 +607,6 @@ public enum ThinkSpeak {
 
                 }
 
-                for (Alerts alert:IAirManager.INSTANCE.getAllAlerts()) {
-                    System.out.println("alert : "+alert.toString());
-                }
                 if(callBack != null)
                     callBack.onResult(ThinkSpeak.INSTANCE.alerts);
             }

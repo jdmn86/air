@@ -52,11 +52,10 @@ public class Alerts {
 
     @Override
     public String toString() {
-        return "Alerts{" +
-                "name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", message='" + message + '\'' +
-                ", timeStamp='" + timeStamp + '\'' +
-                '}';
+        return
+                "Channel Name: " + name + '\n' +
+                "Message Type: " + type + '\n' +
+                "Description: " + message + '\n' +
+                "When: " + timeStamp;
     }
 }

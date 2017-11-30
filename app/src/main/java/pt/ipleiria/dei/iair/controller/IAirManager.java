@@ -57,7 +57,6 @@ public enum IAirManager {
             if(city.getREGION_NAME().equalsIgnoreCase(LocationName)){
                 return city;
             }
-            System.out.println("qq:"+city.getREGION_NAME());
         }
         return null;
     }

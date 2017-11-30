@@ -264,8 +264,6 @@ public class DashboardActivity extends GetVinicityActivity{
             String press = IAirManager.INSTANCE.getPresure();
             String hum = IAirManager.INSTANCE.getHumity();
 
-            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
-
             if (city != null) {
 
                 pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
@@ -306,12 +304,10 @@ public class DashboardActivity extends GetVinicityActivity{
                     IAirManager.INSTANCE.setCurrentLocationName(response.getJSONArray("results").getJSONObject(0).get("vicinity").toString());
 
                     //IAirManager.INSTANCE.saveFavoriteLocation(location,locationName);
-                    System.out.println("getvinicity: "+response.getJSONArray("results").getJSONObject(0).get("vicinity").toString());
                     //favouriteLocationTXT.setText(locationName);
 
                     if (IAirManager.INSTANCE.getFavoriteLocationName()== "null") {
 
-                        System.out.println("CurrentLocation:"+IAirManager.INSTANCE.getCurrentLocationName());
                         dialogFavoriteLocation();
                     }
 
@@ -336,7 +332,6 @@ public class DashboardActivity extends GetVinicityActivity{
       //  if (
             Location loc =locationTrack.getLocation();
             if(loc!=null){
-                System.out.println("AKI");
                 double longitude = loc.getLongitude();
                 double latitude = loc.getLatitude();
                 LatLng latLng = new LatLng(latitude, longitude);
@@ -422,7 +417,6 @@ public class DashboardActivity extends GetVinicityActivity{
 
     public void populate(){
 
-        System.out.println("in populate");
 
         if (IAirManager.INSTANCE.getUsername()==null || IAirManager.INSTANCE.getUsername()=="null") {
 
@@ -445,7 +439,7 @@ public class DashboardActivity extends GetVinicityActivity{
         if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
 
             channel = IAirManager.INSTANCE.getAllChannels().get(IAirManager.INSTANCE.getCityIdLast());
-            System.out.println("canal:"+channel.toString());
+            System.out.println(">>>>>>>>>>>>>>>>>" + channel.getTemperature());
         }
 
         if (channel != null) {
@@ -457,8 +451,6 @@ public class DashboardActivity extends GetVinicityActivity{
                 humidityFavLocationValue.setText(channel.getHumity());
         }
 
-        System.out.println("favorito"+IAirManager.INSTANCE.getFavoriteLocationName());
-
         CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
 
         if(city!=null){
@@ -466,7 +458,6 @@ public class DashboardActivity extends GetVinicityActivity{
 
                 @Override
                 public void onResult(List<Alerts> response) {
-                    System.out.println("number of alertas"+IAirManager.INSTANCE.getAllAlerts().size());
                     if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
                         // Convert ArrayList to array
 
