@@ -35,27 +35,27 @@ public class AlarmsDataAdapter extends ArrayAdapter<Alerts> {
         if (v == null) {
             LayoutInflater vi;
             vi = LayoutInflater.from(getContext());
-            v = vi.inflate(R.layout.list_item_sensors_data, null);
+            v = vi.inflate(R.layout.list_item_alerts_data, null);
         }
 
         Alerts p = getItem(position);
 
         if (p != null) {
             ImageView tt1 = (ImageView) v.findViewById(R.id.imageView_alarm_type);
-            TextView tt2 = (TextView) v.findViewById(R.id.textView_alarmsData_Date);
-            TextView tt3 = (TextView) v.findViewById(R.id.textView_alarms_description_data);
+            TextView tt3 = (TextView) v.findViewById(R.id.textView_alarmsData_Date);
+            TextView tt2 = (TextView) v.findViewById(R.id.textView_alarms_description_data);
 
             if (tt1 != null) {
                 if(p.getType().equals("fire"))
-                tt1.setImageDrawable(Drawable.createFromPath("fire_icon"));
+                tt1.setImageDrawable(Drawable.createFromPath("@drawable/fire_icon"));
                 else if(p.getType().equals("rain"))
-                    tt1.setImageDrawable(Drawable.createFromPath("rain_icon"));
+                    tt1.setImageDrawable(Drawable.createFromPath("@drawable/rain_icon"));
                 else if(p.getType().equals("wind"))
-                    tt1.setImageDrawable(Drawable.createFromPath("wind_icon"));
+                    tt1.setImageDrawable(Drawable.createFromPath("@drawable/wind_icon"));
                 else if(p.getType().equals("gas_leak"))
-                    tt1.setImageDrawable(Drawable.createFromPath("gas_leak_icon"));
+                    tt1.setImageDrawable(Drawable.createFromPath("@drawable/gas_leak_icon"));
                 else if(p.getType().equals("other"))
-                    tt1.setImageDrawable(Drawable.createFromPath("other_icon"));
+                    tt1.setImageDrawable(Drawable.createFromPath("@drawable/other_icon"));
             }
 
             if (tt2 != null) {

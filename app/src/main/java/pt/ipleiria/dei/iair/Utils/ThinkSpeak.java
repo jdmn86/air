@@ -516,6 +516,38 @@ public enum ThinkSpeak {
         }
 
     }
+    public void getThingDataAlerts(final AlertCallback alertCallback, Context context, CityAssociation city) {
+
+                    //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
+
+            HttpUtils.Get(new HttpCallBack() {
+                @Override
+                public void onResult(JSONObject response) throws JSONException {
+                    JSONArray feeds = response.getJSONArray("feeds");
+                    List<Alerts> alerts = new LinkedList();
+                    System.out.println(feeds.length());
+                    if (feeds.length() != 0) {
+
+                        for (int i = 0; i < feeds.length(); i++) {
+                            String name=response.getJSONObject("channel").getString("name");
+                            String type=feeds.getJSONObject(i).getString("field1");
+                            String message=feeds.getJSONObject(i).getString("field2");
+                            String timestamp=feeds.getJSONObject(i).getString("field3");
+
+                            Alerts alert = new Alerts(name,type,message,timestamp);
+                            alerts.add(alert);
+                        }
+                        alertCallback.onResult(alerts);
+                    }
+                }
+
+                @Override
+                public void onResult(String response) {
+
+                }
+            }, "https://api.thingspeak.com/channels/"+city.getALERTS_ID()+"/feeds.json?api_key="+city.getAPI_KEY_ALERTS().toString(), context);
+
+    }
 
     public void getThingDataAlerts(LinkedList<CityAssociation> listaCitys, Context context) {
         for (CityAssociation city:listaCitys) {
@@ -700,6 +732,7 @@ public enum ThinkSpeak {
     public double getLongitude() {
         return longitude;
     }
+
 
 
 }

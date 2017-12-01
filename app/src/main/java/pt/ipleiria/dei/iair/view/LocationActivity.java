@@ -32,12 +32,15 @@ import java.util.List;
 import java.util.Locale;
 
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.Utils.AlarmsDataAdapter;
+import pt.ipleiria.dei.iair.Utils.AlertCallback;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.SensorDataAdapter;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
 
@@ -53,6 +56,7 @@ public class LocationActivity extends GPSActivity {
     private ListView listViewData;
     public List<String> cityNames;
     public Context context;
+    private ListView listViewAlarms;
 
 
     @Override
@@ -141,6 +145,21 @@ public class LocationActivity extends GPSActivity {
 
                     }
                 }, context, cityNames.get(position));
+
+                CityAssociation cityAssociation = IAirManager.INSTANCE.getCityAssociationsByName(cityNames.get(position));
+                ThinkSpeak.INSTANCE.getThingDataAlerts(new AlertCallback() {
+                    @Override
+                    public void onResult(List<Alerts> alert) {
+                        AlarmsDataAdapter customAdapter = new AlarmsDataAdapter(context, R.layout.list_item_alerts_data);
+
+                        listViewAlarms.setAdapter(customAdapter);
+                    }
+
+                    @Override
+                    public void onResult(LinkedList<CityAssociation> cityAssociations) {
+
+                    }
+                }, context, cityAssociation);
             }
 
             @Override
@@ -193,8 +212,10 @@ public class LocationActivity extends GPSActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabLayoutLocationActivity);
         linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityGraphical));
         linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityList));
+        linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityAlerts));
         locationsSpinner = (Spinner) findViewById(R.id.spinnerLocationList);
         listViewData = (ListView) findViewById(R.id.listViewData);
+        listViewAlarms = (ListView) findViewById(R.id.listViewAlerts);
         loadingScreen = (LinearLayout) findViewById(R.id.linearLayoutLoadingLocationActivity);
 
 

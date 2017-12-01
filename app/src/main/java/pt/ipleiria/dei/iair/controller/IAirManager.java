@@ -1,12 +1,8 @@
 package pt.ipleiria.dei.iair.controller;
 
-import android.app.Service;
-import android.bluetooth.BluetoothClass;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
@@ -17,7 +13,6 @@ import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
 import pt.ipleiria.dei.iair.model.IAirSensorListener;
-import pt.ipleiria.dei.iair.model.Location;
 import pt.ipleiria.dei.iair.view.CreateInformativeMessageActivity;
 import pt.ipleiria.dei.iair.view.MySensorsActivity;
 
@@ -275,5 +270,15 @@ public enum IAirManager {
 
     public void setCityAssociation(LinkedList<CityAssociation> cityAssociation) {
         this.listCityAssotiation = cityAssociation;
+    }
+
+    public CityAssociation getCityAssociationsByName(String s) {
+        for (CityAssociation city: listCityAssotiation) {
+            if(s.equals(city.getREGION_NAME()))
+                return city;
+
+
+        }
+        return  null;
     }
 }
