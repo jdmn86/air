@@ -4,7 +4,6 @@ package pt.ipleiria.dei.iair.Utils;
 import android.content.Context;
 import android.location.LocationManager;
 import android.util.Pair;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -13,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -178,7 +176,7 @@ public enum ThinkSpeak {
         return true;
     }
 
-    public void getGraphURL(HttpCallBack callBack, Context context, String location) {
+    public void getGraphURL(final HttpCallBack callBack, Context context, String location) {
         this.location = location;
         this.context = context;
         this.callback = callback;
@@ -191,8 +189,9 @@ public enum ThinkSpeak {
 
                     for (int i = 0; i < feeds.length(); i++) {
                         JSONObject elem = new JSONObject( feeds.get(i).toString());
-                        if (elem.get("field2").equals(ThinkSpeak.INSTANCE.getLocation())) {
-                            getCallback().onResult("https://api.thingspeak.com/channels/" + elem.get("field3") + "/charts/<key>?api_key=" + elem.get("field1") + "&results=2");
+                        if (elem.get("field1").equals(ThinkSpeak.INSTANCE.getLocation())) {
+                            callBack.onResult("https://api.thingspeak.com/channels/" + elem.get("field3") + "/charts/<key>?api_key=" + elem.get("field2"));
+                            continue;
 
                         }
                     }

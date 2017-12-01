@@ -13,19 +13,14 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.Utils.HttpUtils;
-import pt.ipleiria.dei.iair.controller.IAirManager;
-import android.widget.EditText;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -35,9 +30,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
@@ -73,7 +71,7 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
     private final static int ALL_PERMISSIONS_RESULT = 101;
 
     LocationManager mLocationManager;
-
+    private long lastTimestamp;
 
 
     @SuppressLint("MissingPermission")
@@ -89,6 +87,8 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
         IAirManager.INSTANCE.setSharedPreferences(sharedPref);
 
         bindTextViews();
+
+        lastTimestamp =  0;
 
         permissions.add(ACCESS_FINE_LOCATION);
         permissions.add(ACCESS_COARSE_LOCATION);
@@ -498,11 +498,15 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
 
     @Override
     public void onLocationChanged(Location location) {
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        IAirManager.INSTANCE.setCurrentLocation(latLng);
-        GPSUtils gpsUtils = new GPSUtils(this);
-        IAirManager.INSTANCE.setCurrentLocationName(gpsUtils.getLocationName(location.getLatitude(), location.getLongitude()));
-        getVicinity(latLng,4000);
+        if(System.currentTimeMillis()> lastTimestamp +(1000*20)) {
+            lastTimestamp = System.currentTimeMillis();
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            IAirManager.INSTANCE.setCurrentLocation(latLng);
+            GPSUtils gpsUtils = new GPSUtils(this);
+            IAirManager.INSTANCE.setCurrentLocationName(gpsUtils.getLocationName(location.getLatitude(), location.getLongitude()));
+            getVicinity(latLng,4000);
+        }
+
     }
 
     @Override
