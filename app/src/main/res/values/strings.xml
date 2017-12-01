@@ -32,7 +32,7 @@
     <string name="buttonMapCreateInformativeMessage">Map</string>
     <string name="buttonCancelCreateInformativeMessage">Cancel</string>
     <string name="buttonSaveCreateInformativeMessage">Save</string>
-    <string name="buttonSelectDateTimeCreateInformativeMessage">Select Timestamp</string> set_as_choose_this_location
+    <string name="buttonSelectDateTimeCreateInformativeMessage">Select Timestamp</string>
     <string name="set_as_choose_this_location">Set As Location</string>
     <string name="choose_location">Choose Location</string>
 

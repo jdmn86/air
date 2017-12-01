@@ -93,7 +93,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                     textViewDescription.setText("Description: Please insert a description (at least 20 characters)");
                     flag = false;
                 }
-                if (spinnerLocations.getSelectedItem().toString().length() == 0) {
+                if (spinnerLocations.getAdapter().getCount() == 0) {
                     textViewLocation.setTextColor(Color.RED);
                     textViewLocation.setText("Location: Please Insert A Valid Location");
                     flag = false;

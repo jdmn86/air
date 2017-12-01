@@ -34,7 +34,7 @@ public enum ThinkSpeak {
     INSTANCE;
 
     private final static String API_KEY_CREATE_CHANNEL = "6T4V93KT9K3ZVOWV";
-    private final static String API_KEY_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
+    private final static String API_KEY_CREATE_ASSOCIATION = "BL46QWGYVARFOVGM";
    // private final static String CHANNEL_NUMBER_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
     public String location;
     public String temperature;
@@ -446,7 +446,7 @@ public enum ThinkSpeak {
             public void onResult(String response) {
 
             }
-        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key="+API_KEY_CREATE_ASSOCIATION, context);
+        }, "https://api.thingspeak.com/channels/376979/feeds.json?api_key="+API_KEY_CREATE_ASSOCIATION, context);
     }
 
     private void verificaLocationFavourite(Context context) {

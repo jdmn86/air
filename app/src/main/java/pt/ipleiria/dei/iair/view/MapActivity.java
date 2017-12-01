@@ -287,18 +287,19 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                 if (location.longitude != IAirManager.INSTANCE.getFavoriteLocationLatLng().longitude
                         || location.latitude != IAirManager.INSTANCE.getFavoriteLocationLatLng().latitude) {
 
-                    Channel channel = IAirManager.INSTANCE.getAllChannels().get(city.getChannel());
-                    System.out.println("CHANNEL" + channel.toString());
-                    markericon m = new markericon(this, channel.getTemperature().toString(), channel.getPressure().toString(), channel.getHumity().toString());
-                    m.setDrawingCacheEnabled(true);
-                    m.buildDrawingCache();
-                    Bitmap bm = m.getDrawingCache();
+                    Channel channel = IAirManager.INSTANCE.getChannel(city.getREGION_NAME());
+                    if(channel!=null) {
+                        markericon m = new markericon(this, channel.getTemperature().toString(), channel.getPressure().toString(), channel.getHumity().toString());
+                        m.setDrawingCacheEnabled(true);
+                        m.buildDrawingCache();
+                        Bitmap bm = m.getDrawingCache();
 
-                    googleMap.addMarker(new MarkerOptions()
-                            .position(location)
-                            .title(city.getREGION_NAME())
-                            .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, m)))
-                    );
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(location)
+                                .title(city.getREGION_NAME())
+                                .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, m)))
+                        );
+                    }
                 }
             }
         }
