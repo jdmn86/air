@@ -338,7 +338,7 @@ public class DashboardActivity extends GetVinicityActivity{
             public void onResult(String response) {
 
             }
-        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
+        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyDw9LzBVitGvG3jPApKgFCwvwoFuUpyet8&location="+latLng.latitude+","+latLng.longitude, this);
 
     }
 
