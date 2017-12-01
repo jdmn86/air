@@ -31,8 +31,8 @@ public enum ThinkSpeak {
     INSTANCE;
 
     private final static String API_KEY_CREATE_CHANNEL = "6T4V93KT9K3ZVOWV";
-    private final static String API_KEY_CREATE_ASSOCIATION = "4UPGLRLDJD20KXET";
-    private final static String API_KEY_GET_ASSOCIATION = "BL46QWGYVARFOVGM";
+    private final static String API_KEY_CREATE_ASSOCIATION = "BL46QWGYVARFOVGM";
+    private final static String API_KEY_GET_ASSOCIATION = "4UPGLRLDJD20KXET";
     private static final String CHANNEL_ASSOCIATION = "376979";
     // private final static String CHANNEL_NUMBER_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
     public String location;
