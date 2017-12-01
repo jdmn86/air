@@ -6,8 +6,6 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -17,35 +15,24 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-
 import com.google.android.gms.maps.model.LatLng;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.Utils.GPSActivity;
+import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.CityAssociation;
-import pt.ipleiria.dei.iair.Utils.GPSUtils;
-import pt.ipleiria.dei.iair.Utils.HttpCallBack;
-import pt.ipleiria.dei.iair.Utils.HttpUtils;
-import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.InformativeMessageType;
 import pt.ipleiria.dei.iair.model.Location;
 
@@ -227,6 +214,9 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                 }
             }
         });
+        Intent intent = getIntent();
+        spinnerLocations.setSelection(intent.getIntExtra("listPosition", 0));
+
 
     }
 

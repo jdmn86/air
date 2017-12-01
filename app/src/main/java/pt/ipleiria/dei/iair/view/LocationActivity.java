@@ -61,6 +61,7 @@ public class LocationActivity extends GPSActivity {
     private Spinner locationsSpinner;
     private ListView listViewData;
     private ImageView imageSetLocationWithFavorite;
+    private ImageView imageSendInformativeMessage;
     public List<String> cityNames;
     public Context context;
     private ListView listViewAlarms;
@@ -80,33 +81,6 @@ public class LocationActivity extends GPSActivity {
         bindLayoutElements();
         populateList();
         setListeners();
-
-
-        imageSetLocationWithFavorite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Double latitudeLocationSpinner = 0.0;
-                Double longitudeLocationSpinner = 0.0;
-
-                LatLng latLng = new LatLng(latitudeLocationSpinner, longitudeLocationSpinner);
-
-                for (CityAssociation cityAssociation: IAirManager.INSTANCE.getAllCityAssociations())
-                {
-                    if(locationsSpinner.getSelectedItem().toString().equals(cityAssociation.getREGION_NAME())){
-                        latitudeLocationSpinner = Double.valueOf(cityAssociation.getLatitude());
-                        longitudeLocationSpinner= Double.valueOf(cityAssociation.getLongitude());
-                        latLng = new LatLng(latitudeLocationSpinner, longitudeLocationSpinner);
-                    }
-                }
-                IAirManager.INSTANCE.saveFavoriteLocation(latLng, locationsSpinner.getSelectedItem().toString());
-
-                Log.d("testeImg", locationsSpinner.getSelectedItem().toString() + " =>> " + latitudeLocationSpinner+";"+longitudeLocationSpinner);
-                imageSetLocationWithFavorite.setVisibility(View.INVISIBLE);
-                Toast.makeText(context, "Location Favourite Updated to: " + IAirManager.INSTANCE.getFavoriteLocationName(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
     }
 
     private void setListeners() {
@@ -242,7 +216,37 @@ public class LocationActivity extends GPSActivity {
 
             }
         });
+        imageSetLocationWithFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Double latitudeLocationSpinner = 0.0;
+                Double longitudeLocationSpinner = 0.0;
 
+                LatLng latLng = new LatLng(latitudeLocationSpinner, longitudeLocationSpinner);
+
+                for (CityAssociation cityAssociation: IAirManager.INSTANCE.getAllCityAssociations())
+                {
+                    if(locationsSpinner.getSelectedItem().toString().equals(cityAssociation.getREGION_NAME())){
+                        latitudeLocationSpinner = Double.valueOf(cityAssociation.getLatitude());
+                        longitudeLocationSpinner= Double.valueOf(cityAssociation.getLongitude());
+                        latLng = new LatLng(latitudeLocationSpinner, longitudeLocationSpinner);
+                    }
+                }
+                IAirManager.INSTANCE.saveFavoriteLocation(latLng, locationsSpinner.getSelectedItem().toString());
+
+                Log.d("testeImg", locationsSpinner.getSelectedItem().toString() + " =>> " + latitudeLocationSpinner+";"+longitudeLocationSpinner);
+                imageSetLocationWithFavorite.setVisibility(View.INVISIBLE);
+                Toast.makeText(context, "Location Favourite Updated to: " + IAirManager.INSTANCE.getFavoriteLocationName(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        imageSendInformativeMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, CreateInformativeMessageActivity.class);
+                intent.putExtra("listPosition", locationsSpinner.getSelectedItemPosition());
+                context.startActivity(intent);
+            }
+        });
     }
 
     private Date parseDate(String created_at) {
@@ -277,6 +281,7 @@ public class LocationActivity extends GPSActivity {
         listViewAlarms = (ListView) findViewById(R.id.listViewAlerts_location);
         loadingScreen = (LinearLayout) findViewById(R.id.linearLayoutLoadingLocationActivity);
         imageSetLocationWithFavorite = findViewById(R.id.imageSetLocationWithFavoriteLocation);
+        imageSendInformativeMessage = (ImageView) findViewById(R.id.imageView_send_alert_for_location);
     }
 
     private void populateList() {
