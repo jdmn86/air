@@ -36,7 +36,6 @@ import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
-import pt.ipleiria.dei.iair.controller.IairService;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
@@ -498,7 +497,7 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
 
     @Override
     public void onLocationChanged(Location location) {
-        if(System.currentTimeMillis()> lastTimestamp +(1000*20)) {
+        if(System.currentTimeMillis()> lastTimestamp +(1000*60*20)) {
             lastTimestamp = System.currentTimeMillis();
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             IAirManager.INSTANCE.setCurrentLocation(latLng);
