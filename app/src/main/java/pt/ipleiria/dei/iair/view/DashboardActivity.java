@@ -9,42 +9,49 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.AlertCallBack;
-import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import android.widget.EditText;
+
 import com.google.android.gms.maps.model.LatLng;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
+
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.getThingDataAlertsLast;
 
 
-public class DashboardActivity extends GPSActivity{
+public class DashboardActivity extends GetVinicityActivity{
 
     private TextView favouriteLocationTXT;
     private static TextView temperatureFavLocationValue;
@@ -92,16 +99,16 @@ public class DashboardActivity extends GPSActivity{
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            if (permissionsToRequest.size() > 0){
+            if (permissionsToRequest.size() > 0) {
                 requestPermissions((String[]) permissionsToRequest.toArray(new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
-            }else{
+            } else {
                 enableGPS();
+
                 setCurrentLocation();
+
             }
         }
-
     }
-
     private void setSensorManager() {
         try {
             SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -109,7 +116,6 @@ public class DashboardActivity extends GPSActivity{
         }catch (Exception e){
             return;
         }
-
 
     }
 
@@ -268,19 +274,19 @@ public class DashboardActivity extends GPSActivity{
             //Location location = GPSUtils.getLocation();
             //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
             //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName());
+
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName().toString());
+
             String temp = IAirManager.INSTANCE.getTemperature();
             String press = IAirManager.INSTANCE.getPresure();
             String hum = IAirManager.INSTANCE.getHumity();
-            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
 
             if (city != null) {
 
-                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),
-                        String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),
-                        String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
+                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
                 //channel=IAirManager.INSTANCE.getChannel(local);
                 ThinkSpeak.INSTANCE.insertInChannel(channel, this);
+
                 putDataOnDashboard(this);
             }
 
@@ -346,7 +352,7 @@ public class DashboardActivity extends GPSActivity{
                 double longitude = loc.getLongitude();
                 double latitude = loc.getLatitude();
                 LatLng latLng = new LatLng(latitude, longitude);
-                getVicinity(latLng,10000);
+                getVicinity(latLng,4000);
             }
 
     }

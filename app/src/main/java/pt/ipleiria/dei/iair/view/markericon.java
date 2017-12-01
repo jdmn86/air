@@ -1,4 +1,4 @@
-package pt.ipleiria.dei.iair;
+package pt.ipleiria.dei.iair.view;
 
 
 import android.content.Context;
@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.view.MapActivity;
 
 /**

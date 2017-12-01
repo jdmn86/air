@@ -10,8 +10,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -32,10 +33,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
@@ -43,7 +47,6 @@ import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
-import pt.ipleiria.dei.iair.markericon;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
 
@@ -52,7 +55,10 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
 
     private List<Marker> markers;
     GPSUtils locationTrack;
+
     private GoogleMap googleMap;
+
+
     private LatLng location;
     private String locationName = null;
     private int sendLocation;
@@ -72,6 +78,8 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         }
 
         markers = new ArrayList<>();
+
+
         locationTrack = new GPSUtils(this);
 
         if (locationTrack.getLocation() != null) {
@@ -89,6 +97,8 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
@@ -186,6 +196,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                     dialog.show();
                 }
             }
+
             @Override
             public void onError(Status status) {
                 // TODO: Solucionar o erro.
@@ -226,9 +237,11 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
 
             CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName());
+
             String temp = IAirManager.INSTANCE.getTemperature();
             String press = IAirManager.INSTANCE.getPresure();
             String hum = IAirManager.INSTANCE.getHumity();
+
             System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
 
             if (city != null) {
@@ -236,12 +249,17 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                 pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(), String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude), String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
                 //channel=IAirManager.INSTANCE.getChannel(local);
                 ThinkSpeak.INSTANCE.insertInChannel(channel, this);
+
             }
+
+
         } else if (id == R.id.menu_gps) {
+
 
         }
         if (intent != null) {
             startActivity(intent);
+
             return true;
         }
 
@@ -274,8 +292,10 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             Marker marker = googleMap.addMarker(new MarkerOptions().position(IAirManager.INSTANCE.getFavoriteLocationLatLng())
                     .title(IAirManager.INSTANCE.getFavoriteLocationName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
             markers.add(marker);
+
             this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(IAirManager.INSTANCE.getFavoriteLocationLatLng()));
             this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(6));
+
         }
 
         if (IAirManager.INSTANCE.getAllCityAssociations().size() != 0) {
@@ -284,27 +304,29 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
 
                 location = new LatLng(Double.parseDouble(city.getLatitude()), Double.parseDouble(city.getLongitude()));
 
-                if (location.longitude != IAirManager.INSTANCE.getFavoriteLocationLatLng().longitude
-                        || location.latitude != IAirManager.INSTANCE.getFavoriteLocationLatLng().latitude) {
+                if (location != IAirManager.INSTANCE.getFavoriteLocationLatLng()) {
 
-                    Channel channel = IAirManager.INSTANCE.getChannel(city.getREGION_NAME());
-                    if(channel!=null) {
-                        markericon m = new markericon(this, channel.getTemperature().toString(), channel.getPressure().toString(), channel.getHumity().toString());
-                        m.setDrawingCacheEnabled(true);
-                        m.buildDrawingCache();
-                        Bitmap bm = m.getDrawingCache();
+                    Channel channel = IAirManager.INSTANCE.getAllChannels().get(city.getChannel());
 
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(location)
-                                .title(city.getREGION_NAME())
-                                .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, m)))
-                        );
-                    }
+                    System.out.println("CHANNEL" + channel.toString());
+
+                    markericon m = new markericon(this, channel.getTemperature().toString(), channel.getPressure().toString(), channel.getHumity().toString());
+
+                    m.setDrawingCacheEnabled(true);
+                    m.buildDrawingCache();
+                    Bitmap bm = m.getDrawingCache();
+
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(location)
+                            .title(city.getREGION_NAME())
+                            .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, m)))
+
+                    );
                 }
+                //          }
             }
         }
     }
-
 
     public static Bitmap createDrawableFromView(Context context, View view) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -331,11 +353,15 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
     @Override
     public void onMapLongClick(final LatLng latLng) {
 
-        getVicinity(latLng, 10000, this);
 
-        if (location != null) {
-            Toast.makeText(this, location.toString(), Toast.LENGTH_LONG).show();
-        }
+            getVicinity( latLng,4500,this);
+
+            if(location!=null) {
+                Toast.makeText(this, location.toString(), Toast.LENGTH_LONG).show();
+
+            }
+
+
     }
 
     public void getVicinity(LatLng latLng, int radius, final MapActivity m) {

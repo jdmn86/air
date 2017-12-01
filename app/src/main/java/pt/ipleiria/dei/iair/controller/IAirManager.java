@@ -95,6 +95,10 @@ public enum IAirManager {
     }
 
 
+    public void setCityAssociation(LinkedList<CityAssociation> cityAssociation) {
+        this.listCityAssotiation = cityAssociation;
+    }
+
 
 
     public String getHumity() {

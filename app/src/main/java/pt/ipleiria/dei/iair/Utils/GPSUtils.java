@@ -250,4 +250,22 @@ public class GPSUtils extends Service implements LocationListener {
     public void onProviderDisabled(String s) {
 
     }
+
+    public String getLocationName(double latitude, double longitude) {
+        List<Address> addresses = getLocationDetails(mContext, latitude, longitude);
+        if (addresses.isEmpty())
+            return "Other";
+        Address address = addresses.get(0);
+        if (address.getLocality() != null)
+            return address.getLocality();
+        else {
+
+            String[] localitionLine = address.getAddressLine(address.getMaxAddressLineIndex()==0 ? 0 : 1).split(" ");
+            if (localitionLine.length == 1)
+                return localitionLine[0];
+            else
+                return localitionLine[1];
+        }
+
+    }
 }
