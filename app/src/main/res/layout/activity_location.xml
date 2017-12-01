@@ -34,7 +34,14 @@
             android:id="@+id/spinnerLocationList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0" />
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/imageSetLocationWithFavoriteLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            app:srcCompat="@android:drawable/btn_star_big_on" />
 
     </LinearLayout>
 
