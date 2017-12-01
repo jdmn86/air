@@ -167,7 +167,7 @@ public class LocationActivity extends GPSActivity {
     private void bindLayoutElements()
     {
 
-        graph = (GraphView) findViewById(R.id.graphAirQuality);
+        //graph = (GraphView) findViewById(R.id.graphAirQuality);
         tabLayout = (TabLayout) findViewById(R.id.tabLayoutLocationActivity);
         linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityGraphical));
         linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityList));
