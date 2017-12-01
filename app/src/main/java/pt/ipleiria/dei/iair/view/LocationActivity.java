@@ -126,7 +126,7 @@ public class LocationActivity extends GPSActivity {
                         if(feeds.length()!=0) {
                             for (int i = 0; i <feeds.length()-1;i++) {
                                 if(!(feeds.getJSONObject(i).getString("field1").equals("N/A") && feeds.getJSONObject(i).getString("field2").equals("N/A") && feeds.getJSONObject(i).getString("field3").equals("N/A"))) {
-                                    channels.add(new Channel(feeds.getJSONObject(i).getString("field1"), feeds.getJSONObject(i).getString("field2"), feeds.getJSONObject(i).getString("field3"), response.getString("name"), "", ""));
+                                    channels.add(new Channel(parseDate(feeds.getJSONObject(1).getString("created_at")),feeds.getJSONObject(i).getString("field1"), feeds.getJSONObject(i).getString("field2"), feeds.getJSONObject(i).getString("field3"), response.getJSONObject("channel").getString("name"), response.getJSONObject("channel").getString("latitude"), response.getJSONObject("channel").getString("longitude")));
                                 }
                             }
                                 customAdapter = new SensorDataAdapter(context, R.layout.list_item_sensors_data, channels);

@@ -42,6 +42,7 @@ public class SensorDataAdapter extends ArrayAdapter<Channel> {
             TextView tt1 = (TextView) v.findViewById(R.id.textView_temperature_sensors_data);
             TextView tt2 = (TextView) v.findViewById(R.id.textView_humidity_sensors_data);
             TextView tt3 = (TextView) v.findViewById(R.id.textView_pressure_sensors_data);
+            TextView tt4 = (TextView) v.findViewById(R.id.textView_sensorsData_Date);
 
             if (tt1 != null) {
                 tt1.setText(p.getTemperature());
@@ -53,6 +54,9 @@ public class SensorDataAdapter extends ArrayAdapter<Channel> {
 
             if (tt3 != null) {
                 tt3.setText(p.getPressure());
+            }
+            if (tt4 != null) {
+                tt4.setText(p.getDate().toString());
             }
         }
 
