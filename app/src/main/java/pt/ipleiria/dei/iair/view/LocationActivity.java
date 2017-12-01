@@ -64,6 +64,8 @@ public class LocationActivity extends GPSActivity {
     public List<String> cityNames;
     public Context context;
     private ListView listViewAlarms;
+    private AlarmsDataAdapter customAdapter;
+    private SensorDataAdapter sensorDataAdapter;
 
 
     @Override
@@ -167,20 +169,28 @@ public class LocationActivity extends GPSActivity {
                 ThinkSpeak.INSTANCE.getData(new HttpCallBack() {
                     @Override
                     public void onResult(JSONObject response) throws JSONException {
-                        SensorDataAdapter customAdapter = new SensorDataAdapter(context, R.layout.list_item_sensors_data);
+                        sensorDataAdapter = new SensorDataAdapter(context, R.layout.list_item_sensors_data);
                         List<Channel> channels = new LinkedList<>();
                         JSONArray feeds = response.getJSONArray("feeds");
                         if(feeds.length()!=0) {
-                            for (int i = 0; i <feeds.length()-1;i++) {
+                            for (int i = 0; i <feeds.length(); i++) {
                                 if(!(feeds.getJSONObject(i).getString("field1").equals("N/A") && feeds.getJSONObject(i).getString("field2").equals("N/A") && feeds.getJSONObject(i).getString("field3").equals("N/A"))) {
-                                    channels.add(new Channel(parseDate(feeds.getJSONObject(1).getString("created_at")),feeds.getJSONObject(i).getString("field1"), feeds.getJSONObject(i).getString("field2"), feeds.getJSONObject(i).getString("field3"), response.getJSONObject("channel").getString("name"), response.getJSONObject("channel").getString("latitude"), response.getJSONObject("channel").getString("longitude")));
+                                    channels.add(new Channel(parseDate(feeds.getJSONObject(0).getString("created_at")),feeds.getJSONObject(i).getString("field1"), feeds.getJSONObject(i).getString("field2"), feeds.getJSONObject(i).getString("field3"), response.getJSONObject("channel").getString("name"), response.getJSONObject("channel").getString("latitude"), response.getJSONObject("channel").getString("longitude")));
+                                System.out.println(channels.get(0));
                                 }
                             }
-                                customAdapter = new SensorDataAdapter(context, R.layout.list_item_sensors_data, channels);
+                        }
+                        if(sensorDataAdapter == null) {
+                            sensorDataAdapter = new SensorDataAdapter(context, R.layout.list_item_sensors_data, channels);
+                            listViewData.setAdapter(sensorDataAdapter);
+
+                        } else {
+                            sensorDataAdapter.clear();
+                            sensorDataAdapter.addAll(channels);
+                            sensorDataAdapter.notifyDataSetChanged();
                         }
 
 
-                        listViewData.setAdapter(customAdapter);
                     }
 
                     @Override
@@ -193,9 +203,15 @@ public class LocationActivity extends GPSActivity {
                 ThinkSpeak.INSTANCE.getThingDataAlerts(new AlertCallback() {
                     @Override
                     public void onResult(List<Alerts> alert) {
-                        AlarmsDataAdapter customAdapter = new AlarmsDataAdapter(context, R.layout.list_item_alerts_data);
+                        if(customAdapter == null) {
+                            customAdapter = new AlarmsDataAdapter(context, R.layout.list_item_alerts_data);
+                            listViewAlarms.setAdapter(customAdapter);
+                        } else {
+                            customAdapter.clear();
+                            customAdapter.addAll(alert);
+                            customAdapter.notifyDataSetChanged();
+                        }
 
-                        listViewAlarms.setAdapter(customAdapter);
                     }
 
                     @Override
@@ -258,8 +274,8 @@ public class LocationActivity extends GPSActivity {
         linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityList));
         linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityAlerts));
         locationsSpinner = (Spinner) findViewById(R.id.spinnerLocationList);
-        listViewData = (ListView) findViewById(R.id.listViewData);
-        listViewAlarms = (ListView) findViewById(R.id.listViewAlerts);
+        listViewData = (ListView) findViewById(R.id.listViewData_location);
+        listViewAlarms = (ListView) findViewById(R.id.listViewAlerts_location);
         loadingScreen = (LinearLayout) findViewById(R.id.linearLayoutLoadingLocationActivity);
         imageSetLocationWithFavorite = findViewById(R.id.imageSetLocationWithFavoriteLocation);
     }
