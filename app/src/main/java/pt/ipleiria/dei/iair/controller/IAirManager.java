@@ -271,4 +271,8 @@ public enum IAirManager {
     public void setCurrentLocationName(String currentLocationName) {
         this.currentLocationName = currentLocationName;
     }
+
+    public void setCityAssociation(LinkedList<CityAssociation> cityAssociation) {
+        this.listCityAssotiation = cityAssociation;
+    }
 }
