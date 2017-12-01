@@ -95,17 +95,17 @@
                     <WebView
                         android:id="@+id/graph_temperature"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp" />
+                        android:layout_height="275dp" />
 
                     <WebView
                         android:id="@+id/graph_pressure"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp" />
+                        android:layout_height="275dp" />
 
                     <WebView
                         android:id="@+id/graph_humity"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp" />
+                        android:layout_height="275dp" />
 
                 </LinearLayout>
             </ScrollView>
