@@ -455,7 +455,6 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
         Channel channel = null;
 
         if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
-
             channel = IAirManager.INSTANCE.getAllChannels().get(IAirManager.INSTANCE.getCityIdLast());
             System.out.println("canal:"+channel.toString());
         }

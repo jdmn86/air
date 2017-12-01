@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.controller.IAirManager;
@@ -458,6 +459,7 @@ public enum ThinkSpeak {
                 JSONArray feeds = response.getJSONArray("feeds");
                 System.out.println(feeds.length());
                 if (feeds.length() != 0) {
+                    IAirManager.INSTANCE.setCityAssociation(new LinkedList<CityAssociation>());
 
                     for (int i = 0; i < feeds.length(); i++) {
                         //int id=feeds.getJSONObject(i).getInt("entry_id");
@@ -516,7 +518,7 @@ public enum ThinkSpeak {
     public void getThingDataAlerts(LinkedList<CityAssociation> listaCitys, Context context) {
         for (CityAssociation city:listaCitys) {
 
-            //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
+        //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
 
         HttpUtils.Get(new HttpCallBack() {
             @Override
@@ -561,7 +563,7 @@ public enum ThinkSpeak {
                     System.out.println(feeds.length());
                     if (feeds.length() != 0) {
 
-                        for (int i = 0; i < feeds.length(); i++) {
+                        for (int i =  feeds.length()-1; i >=0; i--) {
                             //int id=response.getJSONArray("channel").getJSONObject(i).getInt("entry_id");
                             String name=response.getJSONObject("channel").getString("name");
                             String temperature=feeds.getJSONObject(i).getString("field1");
@@ -615,17 +617,24 @@ public enum ThinkSpeak {
             public void onResult(String response) {
 
             }
+
+
         }, "https://api.thingspeak.com/channels/"+city.getCHANNEL_ID()+"/feeds/last.json?api_key="+city.getAPI_KEY_CHANNEL().toString()+"&last", context);
     }
 
-
     public void getThingDataAlertsLast(CityAssociation city, Context context) {
+        getThingDataAlertsLast(null, city, context);
+    }
+
+    public List<Alerts> alerts;
+    public void getThingDataAlertsLast(final AlertCallback callback, CityAssociation city, Context context) {
 
             //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
 
             HttpUtils.Get(new HttpCallBack() {
                 @Override
                 public void onResult(JSONObject response) throws JSONException {
+                    ThinkSpeak.INSTANCE.alerts = new LinkedList<>();
                     JSONArray feeds = response.getJSONArray("channel");
                     System.out.println(feeds.length());
                     if (feeds.length() != 0) {
@@ -638,11 +647,15 @@ public enum ThinkSpeak {
 
                             Alerts alert = new Alerts(name,type,message,timestamp);
                             IAirManager.INSTANCE.addAlert(alert);
+                            ThinkSpeak.INSTANCE.alerts.add(alert);
                         }
                     }
 
                     for (Alerts alert:IAirManager.INSTANCE.getAllAlerts()) {
                         System.out.println("alert : "+alert.toString());
+                    }
+                    if(callback != null) {
+                        callback.onResult(ThinkSpeak.INSTANCE.alerts);
                     }
                 }
 
@@ -650,6 +663,7 @@ public enum ThinkSpeak {
                 public void onResult(String response) {
 
                 }
+
             }, "https://api.thingspeak.com/channels/"+city.getALERTS_ID()+"/feeds.json?api_key="+city.getAPI_KEY_ALERTS().toString(), context);
         }
 
