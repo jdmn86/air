@@ -57,36 +57,12 @@ public class US5_AT4 extends MasterTest{
 
     @Test
     public void uS5_AT4() {
-        /*ViewInteraction editText = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.custom),
-                                childAtPosition(
-                                        withId(R.id.customPanel),
-                                        0)),
-                        0),
-                        isDisplayed()));
-        editText.perform(click());
-
-        ViewInteraction editText2 = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.custom),
-                                childAtPosition(
-                                        withId(R.id.customPanel),
-                                        0)),
-                        0),
-                        isDisplayed()));
-        editText2.perform(replaceText("z"), closeSoftKeyboard());
-
-        ViewInteraction appCompatButton = onView(
-                allOf(withId(android.R.id.button2), withText("My Current Location"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                2)));
-        appCompatButton.perform(scrollTo(), click());*/
-
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+
+        List<String> cityNames = new ArrayList<>();
+        for (CityAssociation cityAssociation: IAirManager.INSTANCE.getAllCityAssociations()) {
+            cityNames.add(cityAssociation.getREGION_NAME());
+        }
 
         ViewInteraction appCompatTextView = onView(
                 allOf(withId(R.id.title), withText("Location list"),
@@ -98,27 +74,13 @@ public class US5_AT4 extends MasterTest{
                         isDisplayed()));
         appCompatTextView.perform(click());
 
-        ViewInteraction appCompatSpinner = onView(
-                allOf(withId(R.id.spinnerLocationList),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                1),
-                        isDisplayed()));
-        //appCompatSpinner.perform(click());
-        List<String> cityNames;
-        cityNames = new ArrayList<String>();
-        for (CityAssociation cityAssociation: IAirManager.INSTANCE.getAllCityAssociations())
-        {
-            cityNames.add(cityAssociation.getREGION_NAME());
-        }
 
         onView(withId(R.id.spinnerLocationList)).perform(click());
-        for(int i= 0; i< cityNames.size()-1;i++){
+        for(int i= 0; i < cityNames.size()-1;i++){
             Log.d("debj",cityNames.get(i)+ " :TESTE AT4 US5");
-            onData(hasToString(cityNames.get(i))).perform(click());//IAirManager.INSTANCE.getCurrentLocationName())).perform(click());
-            onView(withId(R.id.spinnerLocationList)).check(matches(withSpinnerText(containsString(cityNames.get(i)))));
+            Log.d("debj1",cityNames.size()+ " :TESTE AT4 US5");
+            onData(hasToString(cityNames.get(i)));
+            onView(withText(R.id.spinnerLocationList)).check(matches(withText(containsString(cityNames.get(i)))));
         }
     }
 

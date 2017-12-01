@@ -112,7 +112,7 @@ public enum ThinkSpeak {
             public void onResult(String response) {
 
             }
-        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
+        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H", context);
         return true;
     }
 
