@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -19,7 +21,6 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import pt.ipleiria.dei.iair.MasterTest;
 import pt.ipleiria.dei.iair.R;
@@ -32,9 +33,11 @@ import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.replaceText;
+import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
@@ -42,6 +45,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.StringContains.containsString;
 
 @LargeTest
@@ -53,42 +57,12 @@ public class US5_AT4 extends MasterTest{
 
     @Test
     public void uS5_AT4() {
-        /*ViewInteraction editText = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.custom),
-                                childAtPosition(
-                                        withId(R.id.customPanel),
-                                        0)),
-                        0),
-                        isDisplayed()));
-        editText.perform(click());
-
-        ViewInteraction editText2 = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.custom),
-                                childAtPosition(
-                                        withId(R.id.customPanel),
-                                        0)),
-                        0),
-                        isDisplayed()));
-        editText2.perform(replaceText("z"), closeSoftKeyboard());
-
-        ViewInteraction appCompatButton = onView(
-                allOf(withId(android.R.id.button2), withText("My Current Location"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                2)));
-        appCompatButton.perform(scrollTo(), click());*/
-        try {
-            onView(isRoot()).perform(waitId(R.id.menu_dashboard, TimeUnit.SECONDS.toMillis(10)));
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            //fail(e.toString());
-        }
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+
+        List<String> cityNames = new ArrayList<>();
+        for (CityAssociation cityAssociation: IAirManager.INSTANCE.getAllCityAssociations()) {
+            cityNames.add(cityAssociation.getREGION_NAME());
+        }
 
         ViewInteraction appCompatTextView = onView(
                 allOf(withId(R.id.title), withText("Location list"),
@@ -99,26 +73,14 @@ public class US5_AT4 extends MasterTest{
                                 0),
                         isDisplayed()));
         appCompatTextView.perform(click());
-        try {
-            onView(isRoot()).perform(waitId(R.id.menu_dashboard, TimeUnit.SECONDS.toMillis(10)));
 
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            //fail(e.toString());
-        }
-
-        List<String> cityNames;
-        cityNames = new ArrayList<String>();
-        for (CityAssociation cityAssociation: IAirManager.INSTANCE.getAllCityAssociations())
-        {
-            cityNames.add(cityAssociation.getREGION_NAME());
-        }
 
         onView(withId(R.id.spinnerLocationList)).perform(click());
-        for(int i= 0; i< cityNames.size()-1;i++){
+        for(int i= 0; i < cityNames.size()-1;i++){
             Log.d("debj",cityNames.get(i)+ " :TESTE AT4 US5");
-            onData(hasToString(cityNames.get(i))).perform(click());//IAirManager.INSTANCE.getCurrentLocationName())).perform(click());
-            onView(withId(R.id.spinnerLocationList)).check(matches(withSpinnerText(containsString(cityNames.get(i)))));
+            Log.d("debj1",cityNames.size()+ " :TESTE AT4 US5");
+            onData(hasToString(cityNames.get(i)));
+            onView(withText(R.id.spinnerLocationList)).check(matches(withText(containsString(cityNames.get(i)))));
         }
     }
 
