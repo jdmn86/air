@@ -31,8 +31,10 @@ public enum ThinkSpeak {
     INSTANCE;
 
     private final static String API_KEY_CREATE_CHANNEL = "6T4V93KT9K3ZVOWV";
-    private final static String API_KEY_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
-   // private final static String CHANNEL_NUMBER_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
+    private final static String API_KEY_CREATE_ASSOCIATION = "4UPGLRLDJD20KXET";
+    private final static String API_KEY_GET_ASSOCIATION = "BL46QWGYVARFOVGM";
+    private static final String CHANNEL_ASSOCIATION = "376979";
+    // private final static String CHANNEL_NUMBER_CREATE_ASSOCIATION = "BAFPV9ZE40IW6C6G";
     public String location;
     public String temperature;
     public String pressure;
@@ -112,7 +114,7 @@ public enum ThinkSpeak {
             public void onResult(String response) {
 
             }
-        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H&results=2", context);
+        }, "https://api.thingspeak.com/channels/"+CHANNEL_ASSOCIATION +"/feeds.json?api_key="+ API_KEY_GET_ASSOCIATION +"", context);
         return true;
     }
 
@@ -131,7 +133,7 @@ public enum ThinkSpeak {
                 i += 1;
             }
 
-            //MQTTHandler mqtt = new MQTTHandler(context, "channels/361937/subscribe/json/" + API_KEY_CREATE_ASSOCIATION, "pl12taes217", "0DT1756US8QLAZUK".toCharArray());
+            //MQTTHandler mqtt = new MQTTHandler(context, "channels/"CHANNEL_ASSOCIATION +"/subscribe/json/" + API_KEY_CREATE_ASSOCIATION, "pl12taes217", "0DT1756US8QLAZUK".toCharArray());
             //mqtt.connect();
             //mqtt.addActionListener(new MQTTThinkSpeakHandler() {
 
@@ -203,7 +205,7 @@ public enum ThinkSpeak {
             public void onResult(String response) {
 
             }
-        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H", context);
+        }, "https://api.thingspeak.com/channels/"+CHANNEL_ASSOCIATION +"/feeds.json?api_key="+ API_KEY_GET_ASSOCIATION +"", context);
 
     }
     public void getData( HttpCallBack callback,Context context, double latitude, double longitude) {
@@ -224,8 +226,8 @@ public enum ThinkSpeak {
 
                     for (int i = 0; i < feeds.length(); i++) {
                         JSONObject elem = new JSONObject( feeds.get(i).toString());
-                        if (elem.get("field2").equals(ThinkSpeak.INSTANCE.getLocation())) {
-                            HttpUtils.Get(ThinkSpeak.INSTANCE.getCallback(),"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1"), ThinkSpeak.INSTANCE.getContext());
+                        if (elem.get("field1").equals(ThinkSpeak.INSTANCE.getLocation())) {
+                            HttpUtils.Get(ThinkSpeak.INSTANCE.getCallback(),"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field2"), ThinkSpeak.INSTANCE.getContext());
 
                         }
                     }
@@ -236,7 +238,7 @@ public enum ThinkSpeak {
             public void onResult(String response) {
 
             }
-        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H", context);
+        }, "https://api.thingspeak.com/channels/"+CHANNEL_ASSOCIATION +"/feeds.json?api_key="+ API_KEY_GET_ASSOCIATION +"", context);
     }
 
     public void getAllCitysAssociation(HttpCallBack callback, Context context, String location){
@@ -265,7 +267,7 @@ public enum ThinkSpeak {
                 public void onResult(String response) {
 
                 }
-            }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key=XI56ZFE2HQM85U8H", context);
+            }, "https://api.thingspeak.com/channels/"+CHANNEL_ASSOCIATION +"/feeds.json?api_key="+ API_KEY_GET_ASSOCIATION +"", context);
 
     }
 
@@ -487,7 +489,7 @@ public enum ThinkSpeak {
             public void onResult(String response) {
 
             }
-        }, "https://api.thingspeak.com/channels/361937/feeds.json?api_key="+API_KEY_CREATE_ASSOCIATION, context);
+        }, "https://api.thingspeak.com/channels/"+CHANNEL_ASSOCIATION +"/feeds.json?api_key="+API_KEY_CREATE_ASSOCIATION, context);
     }
 
     private void verificaLocationFavourite(Context context) {

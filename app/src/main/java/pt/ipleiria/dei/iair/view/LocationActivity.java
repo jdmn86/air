@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,8 +35,10 @@ import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
+import pt.ipleiria.dei.iair.Utils.SensorDataAdapter;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
 
 public class LocationActivity extends GPSActivity {
@@ -116,7 +120,20 @@ public class LocationActivity extends GPSActivity {
                 ThinkSpeak.INSTANCE.getData(new HttpCallBack() {
                     @Override
                     public void onResult(JSONObject response) throws JSONException {
+                        SensorDataAdapter customAdapter = new SensorDataAdapter(context, R.layout.list_item_sensors_data);
+                        List<Channel> channels = new LinkedList<>();
+                        JSONArray feeds = response.getJSONArray("feeds");
+                        if(feeds.length()!=0) {
+                            for (int i = 0; i <feeds.length()-1;i++) {
+                                if(!(feeds.getJSONObject(i).getString("field1").equals("N/A") && feeds.getJSONObject(i).getString("field2").equals("N/A") && feeds.getJSONObject(i).getString("field3").equals("N/A"))) {
+                                    channels.add(new Channel(feeds.getJSONObject(i).getString("field1"), feeds.getJSONObject(i).getString("field2"), feeds.getJSONObject(i).getString("field3"), response.getString("name"), "", ""));
+                                }
+                            }
+                                customAdapter = new SensorDataAdapter(context, R.layout.list_item_sensors_data, channels);
+                        }
 
+
+                        listViewData.setAdapter(customAdapter);
                     }
 
                     @Override

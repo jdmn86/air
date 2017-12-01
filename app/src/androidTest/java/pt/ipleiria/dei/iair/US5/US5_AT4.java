@@ -9,8 +9,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -21,6 +19,7 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import pt.ipleiria.dei.iair.MasterTest;
 import pt.ipleiria.dei.iair.R;
@@ -33,11 +32,9 @@ import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static android.support.test.espresso.action.ViewActions.replaceText;
-import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
@@ -45,7 +42,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.StringContains.containsString;
 
 @LargeTest
@@ -85,7 +81,13 @@ public class US5_AT4 extends MasterTest{
                                         0),
                                 2)));
         appCompatButton.perform(scrollTo(), click());*/
+        try {
+            onView(isRoot()).perform(waitId(R.id.menu_dashboard, TimeUnit.SECONDS.toMillis(10)));
 
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            //fail(e.toString());
+        }
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction appCompatTextView = onView(
@@ -97,16 +99,14 @@ public class US5_AT4 extends MasterTest{
                                 0),
                         isDisplayed()));
         appCompatTextView.perform(click());
+        try {
+            onView(isRoot()).perform(waitId(R.id.menu_dashboard, TimeUnit.SECONDS.toMillis(10)));
 
-        ViewInteraction appCompatSpinner = onView(
-                allOf(withId(R.id.spinnerLocationList),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                1),
-                        isDisplayed()));
-        //appCompatSpinner.perform(click());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            //fail(e.toString());
+        }
+
         List<String> cityNames;
         cityNames = new ArrayList<String>();
         for (CityAssociation cityAssociation: IAirManager.INSTANCE.getAllCityAssociations())
