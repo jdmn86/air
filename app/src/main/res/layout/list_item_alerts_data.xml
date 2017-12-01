@@ -27,12 +27,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
-                android:contentDescription="desc for alarm" />
+                android:contentDescription="desc for alarm"
+                app:srcCompat="@drawable/common_full_open_on_phone" />
 
             <TextView
                 android:id="@+id/textView_alarms_description_data"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1" />
 
         </LinearLayout>

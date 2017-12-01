@@ -63,7 +63,7 @@ public class AlarmsDataAdapter extends ArrayAdapter<Alerts> {
             }
 
             if (tt3 != null) {
-                tt3.setText(p.getDate().toString());
+                tt3.setText(p.getTimeStamp());
             }
         }
 
