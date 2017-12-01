@@ -13,9 +13,6 @@ public class IairService extends Service {
     private SensorManager sensorManager;
 
     public IairService() {
-
-
-
     }
 
 
@@ -45,8 +42,6 @@ public class IairService extends Service {
         } catch (Exception e) {
             return;
         }
-
-
     }
 
     public void setSensors(Sensor temperatureSensor, Sensor pressureSensor, Sensor humiditySensor) {

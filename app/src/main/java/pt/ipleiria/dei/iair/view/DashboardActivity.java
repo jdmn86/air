@@ -117,7 +117,7 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
                 setCurrentLocation();
 
             }
-            startService(new Intent(this, IairService.class));
+            //startService(new Intent(this, IairService.class));
 
         }
 
