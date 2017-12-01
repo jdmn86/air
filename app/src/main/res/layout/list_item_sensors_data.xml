@@ -53,11 +53,11 @@
 
             <ImageView
                 android:id="@+id/imageView_pressure"
-                android:layout_width="wrap_content"
+                android:layout_width="20dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="0"
                 android:contentDescription="desc for pressure"
-                app:srcCompat="@drawable/pressure_icon" />
+                app:srcCompat="@drawable/pressure" />
 
             <TextView
                 android:id="@+id/textView_pressure_sensors_data"
