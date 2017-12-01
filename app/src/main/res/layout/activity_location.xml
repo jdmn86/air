@@ -17,7 +17,6 @@
             android:id="@+id/linearLayoutLoadingLocationActivity"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="0"
             android:orientation="horizontal"
             android:textAlignment="inherit"
             android:visibility="invisible">
@@ -91,7 +90,7 @@
         <LinearLayout
             android:id="@+id/linearLayoutlocationActivityAlerts"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <ListView

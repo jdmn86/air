@@ -64,8 +64,8 @@ public class LocationActivity extends GPSActivity {
     public List<String> cityNames;
     public Context context;
     private ListView listViewAlarms;
-    private AlarmsDataAdapter customAdapter;
-    private SensorDataAdapter sensorDataAdapter;
+    public AlarmsDataAdapter customAdapter;
+    public SensorDataAdapter sensorDataAdapter;
 
 
     @Override
@@ -169,13 +169,12 @@ public class LocationActivity extends GPSActivity {
                 ThinkSpeak.INSTANCE.getData(new HttpCallBack() {
                     @Override
                     public void onResult(JSONObject response) throws JSONException {
-                        sensorDataAdapter = new SensorDataAdapter(context, R.layout.list_item_sensors_data);
                         List<Channel> channels = new LinkedList<>();
                         JSONArray feeds = response.getJSONArray("feeds");
                         if(feeds.length()!=0) {
                             for (int i = 0; i <feeds.length(); i++) {
                                 if(!(feeds.getJSONObject(i).getString("field1").equals("N/A") && feeds.getJSONObject(i).getString("field2").equals("N/A") && feeds.getJSONObject(i).getString("field3").equals("N/A"))) {
-                                    channels.add(new Channel(parseDate(feeds.getJSONObject(0).getString("created_at")),feeds.getJSONObject(i).getString("field1"), feeds.getJSONObject(i).getString("field2"), feeds.getJSONObject(i).getString("field3"), response.getJSONObject("channel").getString("name"), response.getJSONObject("channel").getString("latitude"), response.getJSONObject("channel").getString("longitude")));
+                                    channels.add(new Channel(parseDate(feeds.getJSONObject(i).getString("created_at")),feeds.getJSONObject(i).getString("field1"), feeds.getJSONObject(i).getString("field2"), feeds.getJSONObject(i).getString("field3"), response.getJSONObject("channel").getString("name"), response.getJSONObject("channel").getString("latitude"), response.getJSONObject("channel").getString("longitude")));
                                 System.out.println(channels.get(0));
                                 }
                             }
@@ -183,12 +182,10 @@ public class LocationActivity extends GPSActivity {
                         if(sensorDataAdapter == null) {
                             sensorDataAdapter = new SensorDataAdapter(context, R.layout.list_item_sensors_data, channels);
                             listViewData.setAdapter(sensorDataAdapter);
-
-                        } else {
-                            sensorDataAdapter.clear();
+                        }
+                        sensorDataAdapter.clear();
                             sensorDataAdapter.addAll(channels);
                             sensorDataAdapter.notifyDataSetChanged();
-                        }
 
 
                     }
@@ -203,14 +200,14 @@ public class LocationActivity extends GPSActivity {
                 ThinkSpeak.INSTANCE.getThingDataAlerts(new AlertCallback() {
                     @Override
                     public void onResult(List<Alerts> alert) {
+
                         if(customAdapter == null) {
                             customAdapter = new AlarmsDataAdapter(context, R.layout.list_item_alerts_data);
                             listViewAlarms.setAdapter(customAdapter);
-                        } else {
+                        }
                             customAdapter.clear();
                             customAdapter.addAll(alert);
                             customAdapter.notifyDataSetChanged();
-                        }
 
                     }
 
@@ -230,11 +227,13 @@ public class LocationActivity extends GPSActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 linearLayouts.get(tab.getPosition()).setVisibility(View.VISIBLE);
+                System.out.println(tab.getPosition() + "IN");
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
                 linearLayouts.get(tab.getPosition()).setVisibility(View.INVISIBLE);
+                System.out.println(tab.getPosition() + "OUT");
 
             }
 

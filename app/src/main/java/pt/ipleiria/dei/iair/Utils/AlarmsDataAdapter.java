@@ -1,7 +1,6 @@
 package pt.ipleiria.dei.iair.Utils;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,15 +46,16 @@ public class AlarmsDataAdapter extends ArrayAdapter<Alerts> {
 
             if (tt1 != null) {
                 if(p.getType().equals("fire"))
-                tt1.setImageDrawable(Drawable.createFromPath("@drawable/fire_icon"));
+                tt1.setImageDrawable(getContext().getResources().getDrawable(R.drawable.fire_icon));
                 else if(p.getType().equals("rain"))
-                    tt1.setImageDrawable(Drawable.createFromPath("@drawable/rain_icon"));
+                    tt1.setImageDrawable(getContext().getResources().getDrawable(R.drawable.rain_icon));
                 else if(p.getType().equals("wind"))
-                    tt1.setImageDrawable(Drawable.createFromPath("@drawable/wind_icon"));
+                    tt1.setImageDrawable(getContext().getResources().getDrawable(R.drawable.wind_icon));
                 else if(p.getType().equals("gas_leak"))
-                    tt1.setImageDrawable(Drawable.createFromPath("@drawable/gas_leak_icon"));
+                    tt1.setImageDrawable(getContext().getResources().getDrawable(R.drawable.gas_leak_icon));
                 else if(p.getType().equals("other"))
-                    tt1.setImageDrawable(Drawable.createFromPath("@drawable/other_icon"));
+                    tt1.setImageDrawable(getContext().getResources().getDrawable(R.drawable.others_icon));
+
             }
 
             if (tt2 != null) {

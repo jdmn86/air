@@ -46,6 +46,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class DashboardActivity extends GetVinicityActivity implements LocationListener{
     public static final String SHARED_PREFERENCES = "Shared";
+    public static final String GOOGLE_API_KEY = "AIzaSyDw9LzBVitGvG3jPApKgFCwvwoFuUpyet8";
     SharedPreferences preferencesRead;
     SharedPreferences.Editor preferencesWrite;
 
@@ -336,7 +337,7 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
             public void onResult(String response) {
 
             }
-        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
+        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+ "&sensor=false&type=locality&key=" + GOOGLE_API_KEY + "&location=" +latLng.latitude+","+latLng.longitude, this);
 
     }
 
