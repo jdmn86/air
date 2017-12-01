@@ -5,9 +5,12 @@ import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -16,9 +19,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import pt.ipleiria.dei.iair.MasterTest;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.CityAssociation;
 import pt.ipleiria.dei.iair.view.DashboardActivity;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
@@ -91,15 +98,6 @@ public class US5_AT4 extends MasterTest{
                         isDisplayed()));
         appCompatTextView.perform(click());
 
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        /*try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
         ViewInteraction appCompatSpinner = onView(
                 allOf(withId(R.id.spinnerLocationList),
                         childAtPosition(
@@ -109,11 +107,19 @@ public class US5_AT4 extends MasterTest{
                                 1),
                         isDisplayed()));
         //appCompatSpinner.perform(click());
-        onView(withId(R.id.spinnerLocationList)).perform(click());
-        System.out.println(IAirManager.INSTANCE.getCurrentLocationName()+ " :TESTE AT4 US5");
-        onData(hasToString(IAirManager.INSTANCE.getCurrentLocationName())).perform(click());
-        onView(withId(R.id.spinnerLocationList)).check(matches(withSpinnerText(containsString(IAirManager.INSTANCE.getCurrentLocationName().toString()))));
+        List<String> cityNames;
+        cityNames = new ArrayList<String>();
+        for (CityAssociation cityAssociation: IAirManager.INSTANCE.getAllCityAssociations())
+        {
+            cityNames.add(cityAssociation.getREGION_NAME());
+        }
 
+        onView(withId(R.id.spinnerLocationList)).perform(click());
+        for(int i= 0; i< cityNames.size()-1;i++){
+            Log.d("debj",cityNames.get(i)+ " :TESTE AT4 US5");
+            onData(hasToString(cityNames.get(i))).perform(click());//IAirManager.INSTANCE.getCurrentLocationName())).perform(click());
+            onView(withId(R.id.spinnerLocationList)).check(matches(withSpinnerText(containsString(cityNames.get(i)))));
+        }
     }
 
     private static Matcher<View> childAtPosition(
