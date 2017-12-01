@@ -36,6 +36,7 @@ import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.controller.IairService;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
@@ -116,7 +117,7 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
                 setCurrentLocation();
 
             }
-
+            startService(new Intent(this, IairService.class));
 
         }
 

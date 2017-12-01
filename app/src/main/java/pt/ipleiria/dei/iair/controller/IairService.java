@@ -10,14 +10,24 @@ import android.support.annotation.Nullable;
 
 
 public class IairService extends Service {
-    private final SensorManager sensorManager;
+    private SensorManager sensorManager;
 
     public IairService() {
+
+
+
+    }
+
+
+    @Override
+    public void onStart(Intent intent, int startId) {
+        // TODO Auto-generated method stub
+
+        super.onStart(intent, startId);
         IAirManager.INSTANCE.setMySensorsActivity(this);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         setSensorManager();
-
-
+        this.stopSelf();
     }
 
     @Nullable
