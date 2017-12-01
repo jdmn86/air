@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -128,6 +129,7 @@ public class MySensorsActivity extends GPSActivity {
                 ThinkSpeak.INSTANCE.insertInChannel(channel, this);
 
             }
+            Toast.makeText(MySensorsActivity.this, "THE sensors data was send", Toast.LENGTH_LONG).show();
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
