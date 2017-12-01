@@ -531,7 +531,7 @@ public enum ThinkSpeak {
 
                             Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,latitude,longitude);
                             IAirManager.INSTANCE.addChannel(channel);
-                            city.setChannel( IAirManager.INSTANCE.getAllChannels().size()-1);
+                            city.setChannel( IAirManager.INSTANCE.getAllChannels().size());
                         }
                     }
 

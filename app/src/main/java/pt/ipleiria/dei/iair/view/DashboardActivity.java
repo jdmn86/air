@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
@@ -22,31 +24,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.AlertCallBack;
+import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import android.widget.EditText;
-
 import com.google.android.gms.maps.model.LatLng;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
-
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.getThingDataAlertsLast;
 
 
-public class DashboardActivity extends GetVinicityActivity{
+public class DashboardActivity extends GPSActivity{
 
     private TextView favouriteLocationTXT;
     private static TextView temperatureFavLocationValue;
@@ -75,7 +73,7 @@ public class DashboardActivity extends GetVinicityActivity{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-
+        setSensorManager();
         context = this;
 
         SharedPreferences sharedPref = this.getSharedPreferences(
@@ -98,11 +96,20 @@ public class DashboardActivity extends GetVinicityActivity{
                 requestPermissions((String[]) permissionsToRequest.toArray(new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
             }else{
                 enableGPS();
-
                 setCurrentLocation();
-
             }
         }
+
+    }
+
+    private void setSensorManager() {
+        try {
+            SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            IAirManager.INSTANCE.setSensorManager(sensorManager);
+        }catch (Exception e){
+            return;
+        }
+
 
     }
 
@@ -121,7 +128,11 @@ public class DashboardActivity extends GetVinicityActivity{
         pressureFavLocationValue.setText("N/A");
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
 
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -157,10 +168,10 @@ public class DashboardActivity extends GetVinicityActivity{
         alertDialogBuilder.setTitle("Alert");
         alertDialogBuilder.setMessage("Your current favorite location isn't set, please choose one option.");
 
-        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("Map", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                Intent intent = null;
+                Intent intent;
                 intent = new Intent(getApplicationContext(), MapActivity.class);
                 if (intent != null) {
                     Intent pickLocation = new Intent( getApplicationContext() , MapActivity.class );
@@ -257,19 +268,19 @@ public class DashboardActivity extends GetVinicityActivity{
             //Location location = GPSUtils.getLocation();
             //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
             //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-
-            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName().toString());
-
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName());
             String temp = IAirManager.INSTANCE.getTemperature();
             String press = IAirManager.INSTANCE.getPresure();
             String hum = IAirManager.INSTANCE.getHumity();
+            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
 
             if (city != null) {
 
-                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
+                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),
+                        String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),
+                        String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
                 //channel=IAirManager.INSTANCE.getChannel(local);
                 ThinkSpeak.INSTANCE.insertInChannel(channel, this);
-
                 putDataOnDashboard(this);
             }
 
@@ -335,7 +346,7 @@ public class DashboardActivity extends GetVinicityActivity{
                 double longitude = loc.getLongitude();
                 double latitude = loc.getLatitude();
                 LatLng latLng = new LatLng(latitude, longitude);
-                getVicinity(latLng,4000);
+                getVicinity(latLng,10000);
             }
 
     }
@@ -438,16 +449,15 @@ public class DashboardActivity extends GetVinicityActivity{
 
         if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
 
-            channel = IAirManager.INSTANCE.getAllChannels().get(IAirManager.INSTANCE.getCityIdLast());
-            System.out.println(">>>>>>>>>>>>>>>>>" + channel.getTemperature());
+            channel = IAirManager.INSTANCE.getChannel(IAirManager.INSTANCE.getFavoriteLocationName());
         }
 
         if (channel != null) {
-            if (!channel.getTemperature().contains("N/A"))
+            if (channel.getTemperature()!=null&&!channel.getTemperature().contains("N/A"))
                 temperatureFavLocationValue.setText(channel.getTemperature());
-            if (!channel.getPressure().contains("N/A"))
+            if (channel.getPressure()!=null&&!channel.getPressure().contains("N/A"))
                 pressureFavLocationValue.setText(channel.getPressure());
-            if (!channel.getHumity().contains("N/A"))
+            if (channel.getHumity()!=null&&!channel.getHumity().contains("N/A"))
                 humidityFavLocationValue.setText(channel.getHumity());
         }
 
@@ -458,14 +468,13 @@ public class DashboardActivity extends GetVinicityActivity{
 
                 @Override
                 public void onResult(List<Alerts> response) {
+
+                    ArrayList<String> strings = new ArrayList<>();
+
+                    adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, strings);
+
                     if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
                         // Convert ArrayList to array
-
-
-                        ArrayList<String> strings = new ArrayList<>();
-
-                        adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, strings);
-
 
                         for (Alerts alert :response) {
                             adapter.clear();

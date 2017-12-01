@@ -63,6 +63,7 @@ public enum IAirManager {
 
     public void addCityAssociation(CityAssociation city){
         listCityAssotiation.add(city);
+        System.out.println("City:" + city.getChannel());
     }
 
     public Alerts getAlerts(String alertName){
@@ -110,20 +111,27 @@ public enum IAirManager {
 
     public void setSensorManager(SensorManager sensorManager) {
         this.sensorManager = sensorManager;
+        setSensor(sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE));
+        setSensor(sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE));
+        setSensor(sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY));
     }
 
     public void changeTemperatureValue(float[] eventValues) {
-        mySensorsActivity.setTemperatureValue(eventValues[0]);
+        if(mySensorsActivity!=null)
+            mySensorsActivity.setTemperatureValue(eventValues[0]);
         temperature = String.valueOf(eventValues[0]);
+        System.out.println("TEmperature:" + String.valueOf(eventValues[0]));
     }
 
     public void changeHumidityValue(float[] eventValues) {
-        mySensorsActivity.setHumidityValue(eventValues[0]);
+        if(mySensorsActivity!=null)
+            mySensorsActivity.setHumidityValue(eventValues[0]);
         humity = String.valueOf(eventValues[0]);
     }
 
     public void changePressureValue(float[] eventValues) {
-        mySensorsActivity.setPressureValue(eventValues[0]);
+        if(mySensorsActivity!=null)
+            mySensorsActivity.setPressureValue(eventValues[0]);
         presure = String.valueOf(eventValues[0]);
 
     }
@@ -136,7 +144,6 @@ public enum IAirManager {
     }
 
     public void setSensor(Sensor sensor) {
-
         sensorManager.registerListener(new IAirSensorListener(),sensor,SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -215,6 +222,16 @@ public enum IAirManager {
 
     public LinkedList<Channel> getAllChannels() {
         return listChannel;
+    }
+
+    public int getCityIdFavoriteLocation(){
+        if(listCityAssotiation.size()!=0) {
+            for (int i = 0; i < listCityAssotiation.size(); i++) {
+                if (listCityAssotiation.get(i).getREGION_NAME() == currentLocationName)
+                    return i;
+            }
+        }
+        return -1;
     }
 
     public int getCityIdLast() {

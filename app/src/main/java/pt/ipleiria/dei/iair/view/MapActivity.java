@@ -2,7 +2,6 @@ package pt.ipleiria.dei.iair.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -37,7 +35,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
@@ -50,22 +47,15 @@ import pt.ipleiria.dei.iair.markericon;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
 
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-
-public class MapActivity extends GPSActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener{
+public class MapActivity extends GPSActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
 
     private List<Marker> markers;
     GPSUtils locationTrack;
-
     private GoogleMap googleMap;
-
-
     private LatLng location;
-    private String locationName=null;
+    private String locationName = null;
     private int sendLocation;
-
 
 
     @Override
@@ -75,18 +65,16 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-             sendLocation = extras.getInt("SEND_LOCATION_REQUEST");
+            sendLocation = extras.getInt("SEND_LOCATION_REQUEST");
             //The key argument here must match that used in the other activity
-        }else{
-            sendLocation=1;
+        } else {
+            sendLocation = 1;
         }
 
         markers = new ArrayList<>();
-
-
         locationTrack = new GPSUtils(this);
 
-        if (locationTrack.getLocation()!=null) {
+        if (locationTrack.getLocation() != null) {
 
             double longitude = locationTrack.getLongitude();
             double latitude = locationTrack.getLatitude();
@@ -101,8 +89,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
@@ -115,53 +101,91 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             public void onPlaceSelected(final Place place) {
                 // TODO: obter informações sobre o local selecionado.
                 //Log.i(TAG, "Place: " + place.getName());
-                LatLng chosenLocation = place.getLatLng();
-                Marker marker = googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
-                markers.add(marker);
+                if (sendLocation == 1) {
+                    LatLng chosenLocation = place.getLatLng();
+                    Marker marker = googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
+                    markers.add(marker);
+                    googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                        @Override
+                        public void onMapLongClick(LatLng latLng) {
+                            for (Marker marker : markers) {
+                                if (Math.abs(marker.getPosition().latitude - latLng.latitude) < 0.05 && Math.abs(marker.getPosition().longitude - latLng.longitude) < 0.05) {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                                    // Add the buttons
+                                    builder.setPositiveButton(R.string.set_as_favorite_location, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            IAirManager.INSTANCE.saveFavoriteLocation(place);
+                                            googleMap.clear();
+                                            googleMap.addMarker(new MarkerOptions().position(place.getLatLng())
+                                                    .title(IAirManager.INSTANCE.getFavoriteLocationName() + " This Is Your Favorite Location")
+                                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
+                                            Toast.makeText(MapActivity.this, place.getName() + " is now your favorite location!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
 
+                                    builder.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            // User cancelled the dialog
+                                        }
+                                    });
+                                    // Set other dialog properties
+                                    builder.setTitle(place.getAddress());
+                                    builder.setMessage(place.getLatLng().toString());
 
-                googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-                    @Override
-                    public void onMapLongClick(LatLng latLng) {
-                        for(Marker marker : markers) {
-                            if(Math.abs(marker.getPosition().latitude - latLng.latitude) < 0.05 && Math.abs(marker.getPosition().longitude - latLng.longitude) < 0.05) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
-                                // Add the buttons
-                                builder.setPositiveButton(R.string.set_as_favorite_location, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        IAirManager.INSTANCE.saveFavoriteLocation(place);
-                                        googleMap.clear();
-                                        googleMap.addMarker(new MarkerOptions().position(place.getLatLng())
-                                                .title(IAirManager.INSTANCE.getFavoriteLocationName() + " This Is Your Favorite Location")
-                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
-                                        Toast.makeText(MapActivity.this,  place.getName() + " is now your favorite location!", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                    // Create the AlertDialog
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
 
-                                builder.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        // User cancelled the dialog
-                                    }
-                                });
-                                // Set other dialog properties
-                                builder.setTitle(place.getAddress());
-                                builder.setMessage(place.getLatLng().toString());
-
-                                // Create the AlertDialog
-                                AlertDialog dialog = builder.create();
-                                dialog.show();
-
-                                break;
+                                    break;
+                                }
                             }
                         }
-                    }
-                });
-                googleMap.clear();
-                googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
-                googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
-                googleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
-            }
+                    });
+                    googleMap.clear();
+                    googleMap.addMarker(new MarkerOptions().position(chosenLocation).title(place.getAddress().toString()));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(chosenLocation));
+                    googleMap.moveCamera(CameraUpdateFactory.zoomTo(10));
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                    // Add the buttons
+                    builder.setPositiveButton(R.string.choose_location, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            if (sendLocation != 2 && location != null && !locationName.isEmpty()) {
 
+                                IAirManager.INSTANCE.saveFavoriteLocation(location, locationName);
+                            }
+                            if (sendLocation == 2 && location != null && !locationName.isEmpty()) {
+
+                                Intent intent = new Intent();
+                                intent.putExtra("latitude", place.getLatLng().latitude);
+                                intent.putExtra("longitude", place.getLatLng().longitude);
+                                intent.putExtra("locationName", place.getName());
+                                setResult(RESULT_OK, intent);
+                                finish();
+                            }
+                            googleMap.clear();
+                            googleMap.addMarker(new MarkerOptions().position(location)
+                                    .title(IAirManager.INSTANCE.getFavoriteLocationName() + "\n This Is Yor Favorite Location")
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
+                            Toast.makeText(MapActivity.this, location.toString() + " is now your favorite location!", Toast.LENGTH_SHORT).show();
+                            //location=null;
+                            finish();
+                        }
+                    });
+
+                    builder.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    });
+                    // Set other dialog properties
+                    builder.setTitle(place.getName());
+                    builder.setMessage(place.getAddress());
+                    // Create the AlertDialog
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            }
             @Override
             public void onError(Status status) {
                 // TODO: Solucionar o erro.
@@ -197,34 +221,27 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             intent = new Intent(this, SettingsActivity.class);
 
         } else if (id == R.id.menu_send_data) {
-        //Location location = GPSUtils.getLocation();
-        //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-        //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            //Location location = GPSUtils.getLocation();
+            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
 
-        CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName());
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName());
+            String temp = IAirManager.INSTANCE.getTemperature();
+            String press = IAirManager.INSTANCE.getPresure();
+            String hum = IAirManager.INSTANCE.getHumity();
+            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
 
-        String temp = IAirManager.INSTANCE.getTemperature();
-        String press = IAirManager.INSTANCE.getPresure();
-        String hum = IAirManager.INSTANCE.getHumity();
+            if (city != null) {
 
-        System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
-
-        if (city != null) {
-
-            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
-            //channel=IAirManager.INSTANCE.getChannel(local);
-            ThinkSpeak.INSTANCE.insertInChannel(channel, this);
-
-        }
-
-
-    } else if (id == R.id.menu_gps) {
-
+                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(), String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude), String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.INSTANCE.insertInChannel(channel, this);
+            }
+        } else if (id == R.id.menu_gps) {
 
         }
         if (intent != null) {
             startActivity(intent);
-
             return true;
         }
 
@@ -252,46 +269,39 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         this.googleMap.setMyLocationEnabled(true);
         this.googleMap.setOnMapLongClickListener(this);
 
-        if(IAirManager.INSTANCE.getFavoriteLocationLatLng()!=null){
+        if (IAirManager.INSTANCE.getFavoriteLocationLatLng() != null) {
 
             Marker marker = googleMap.addMarker(new MarkerOptions().position(IAirManager.INSTANCE.getFavoriteLocationLatLng())
                     .title(IAirManager.INSTANCE.getFavoriteLocationName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
             markers.add(marker);
-
             this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(IAirManager.INSTANCE.getFavoriteLocationLatLng()));
             this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(6));
-
         }
 
-        if(IAirManager.INSTANCE.getAllCityAssociations().size()!=0 ){
+        if (IAirManager.INSTANCE.getAllCityAssociations().size() != 0) {
 
-            for (CityAssociation city: IAirManager.INSTANCE.getAllCityAssociations()) {
+            for (CityAssociation city : IAirManager.INSTANCE.getAllCityAssociations()) {
 
-                location=new LatLng(Double.parseDouble(city.getLatitude()),Double.parseDouble(city.getLongitude()));
+                location = new LatLng(Double.parseDouble(city.getLatitude()), Double.parseDouble(city.getLongitude()));
 
+                if (location.longitude != IAirManager.INSTANCE.getFavoriteLocationLatLng().longitude
+                        || location.latitude != IAirManager.INSTANCE.getFavoriteLocationLatLng().latitude) {
 
-                if(location!=IAirManager.INSTANCE.getFavoriteLocationLatLng()){
+                    Channel channel = IAirManager.INSTANCE.getAllChannels().get(city.getChannel());
+                    System.out.println("CHANNEL" + channel.toString());
+                    markericon m = new markericon(this, channel.getTemperature().toString(), channel.getPressure().toString(), channel.getHumity().toString());
+                    m.setDrawingCacheEnabled(true);
+                    m.buildDrawingCache();
+                    Bitmap bm = m.getDrawingCache();
 
-                        Channel channel=IAirManager.INSTANCE.getAllChannels().get(city.getChannel());
-
-                        System.out.println("CHANNEL"+channel.toString());
-
-                        markericon m = new markericon(this,channel.getTemperature().toString(),channel.getPressure().toString(),channel.getHumity().toString());
-
-                        m.setDrawingCacheEnabled(true);
-                        m.buildDrawingCache();
-                        Bitmap bm = m.getDrawingCache();
-
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(location)
-                                .title(city.getREGION_NAME())
-                                .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, m)))
-
-                        );
-                    }
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(location)
+                            .title(city.getREGION_NAME())
+                            .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, m)))
+                    );
                 }
             }
-
+        }
     }
 
 
@@ -309,6 +319,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
 
         return bitmap;
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -319,18 +330,14 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
     @Override
     public void onMapLongClick(final LatLng latLng) {
 
+        getVicinity(latLng, 10000, this);
 
-            getVicinity( latLng,4500,this);
-
-            if(location!=null) {
-                Toast.makeText(this, location.toString(), Toast.LENGTH_LONG).show();
-
-            }
-
-
+        if (location != null) {
+            Toast.makeText(this, location.toString(), Toast.LENGTH_LONG).show();
+        }
     }
 
-    public void getVicinity(LatLng latLng, int radius, final MapActivity m){
+    public void getVicinity(LatLng latLng, int radius, final MapActivity m) {
 
         HttpUtils.Get(new HttpCallBack() {
 
@@ -338,70 +345,92 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             @Override
             public void onResult(JSONObject response) throws JSONException {
 
-                if(response.getJSONArray("results").length()>0){
+                if (response.getJSONArray("results").length() > 0) {
 
-                    double latitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lat").toString());
-                    double longitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lng").toString());
-
-                    location = new LatLng(latitude,longitude);
+                    double latitude = Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lat").toString());
+                    double longitude = Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lng").toString());
+                    location = new LatLng(latitude, longitude);
                     locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
 
+                    if (sendLocation == 1) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                        // Add the buttons
+                        builder.setPositiveButton(R.string.set_as_favorite_location, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                if (sendLocation != 2 && location != null && !locationName.isEmpty()) {
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
-                    // Add the buttons
-                    builder.setPositiveButton(R.id.set_as_favorite_location, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            if(sendLocation!=2 &&location!=null && !locationName.isEmpty()){
+                                    IAirManager.INSTANCE.saveFavoriteLocation(location, locationName);
 
-                                IAirManager.INSTANCE.saveFavoriteLocation(location,locationName);
+                                }
+                                googleMap.addMarker(new MarkerOptions().position(location)
+                                        .title(IAirManager.INSTANCE.getFavoriteLocationName() + "\n This Is Yor Favorite Location")
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
+                                Toast.makeText(MapActivity.this, location.toString() + " is now your favorite location!", Toast.LENGTH_SHORT).show();
+                                //location=null;
+                                m.finish();
+                            }
+                        });
+
+                        builder.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
 
                             }
-                            if(sendLocation==2 &&location!=null && !locationName.isEmpty()){
+                        });
+                        // Set other dialog properties
+                        builder.setTitle(locationName.toString());
+                        builder.setMessage(location.toString());
 
-                                Intent intent = new Intent();
-                                intent.putExtra("latitude", location.latitude);
-                                intent.putExtra("longitude", location.longitude);
-                                intent.putExtra("locationName", locationName);
-                                setResult(RESULT_OK, intent);
-                                finish();
+                        // Create the AlertDialog
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                        // Add the buttons
+                        builder.setPositiveButton(R.string.choose_location, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                if (sendLocation == 2 && location != null && !locationName.isEmpty()) {
+
+                                    Intent intent = new Intent();
+                                    intent.putExtra("latitude", location.latitude);
+                                    intent.putExtra("longitude", location.longitude);
+                                    intent.putExtra("locationName", locationName);
+                                    setResult(RESULT_OK, intent);
+                                    finish();
+
+                                }
+                                googleMap.clear();
+                                googleMap.addMarker(new MarkerOptions().position(location)
+                                        .title(IAirManager.INSTANCE.getFavoriteLocationName() + "\n This Is Yor Favorite Location")
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
+                                Toast.makeText(MapActivity.this, location.toString() + " is now your favorite location!", Toast.LENGTH_SHORT).show();
+                                //location=null;
+                                m.finish();
+                            }
+                        });
+
+                        builder.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
 
                             }
-                            googleMap.clear();
-                            googleMap.addMarker(new MarkerOptions().position(location)
-                                    .title(IAirManager.INSTANCE.getFavoriteLocationName() + "\n This Is Yor Favorite Location")
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_name)));
-                            Toast.makeText(MapActivity.this,  location.toString() + " is now your favorite location!", Toast.LENGTH_SHORT).show();
-                            //location=null;
-                            m.finish();
-                        }
-                    });
+                        });
+                        // Set other dialog properties
+                        builder.setTitle(locationName.toString());
+                        builder.setMessage(location.toString());
 
-                    builder.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-                        }
-                    });
-                    // Set other dialog properties
-                    builder.setTitle(locationName.toString());
-                    builder.setMessage(location.toString());
-
-                    // Create the AlertDialog
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
+                        // Create the AlertDialog
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
 
                 }
 
-
             }
-
             @Override
             public void onResult(String response) {
 
             }
-        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
+        }, "https://maps.googleapis.com/maps/api/place/search/json?radius=" + String.valueOf(radius) + "&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location=" + latLng.latitude + "," + latLng.longitude, this);
 
     }
-
-
 }

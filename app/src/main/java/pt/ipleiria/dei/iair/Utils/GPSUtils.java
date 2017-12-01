@@ -46,7 +46,6 @@ public class GPSUtils extends Service implements LocationListener {
 
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
     protected LocationManager locationManager;
-    ;
 
     public GPSUtils(Context context) {
         this.mContext = context;
@@ -200,7 +199,7 @@ public class GPSUtils extends Service implements LocationListener {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            locationManager.removeUpdates(GPSUtils.this);
+            locationManager.removeUpdates(this);
         }
     }
 
