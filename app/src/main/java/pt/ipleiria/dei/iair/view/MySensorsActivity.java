@@ -16,7 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.Utils.CallBack;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
@@ -112,36 +111,23 @@ public class MySensorsActivity extends GPSActivity {
             GPSUtils gpsUtils = new GPSUtils(this);
             Location location = gpsUtils.getLocation();
             //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            /*
-<<<<<<< HEAD
-=======
+            //ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
 
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName().toString());
 
->>>>>>> origin/feature/US5
+            String temp = IAirManager.INSTANCE.getTemperature();
+            String press = IAirManager.INSTANCE.getPresure();
+            String hum = IAirManager.INSTANCE.getHumity();
 
+            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
 
+            if (city != null) {
 
-            GPSUtils locationTrack = new GPSUtils(this);
+                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.INSTANCE.insertInChannel(channel, this);
 
-            //  if (
-            Location loc =locationTrack.getLocation();
-
-            if(loc!=null){
-                double longitude = loc.getLongitude();
-                double latitude = loc.getLatitude();
-                LatLng latLng = new LatLng(latitude, longitude);
-                getVicinity(latLng,4000);
             }
-
-
-
-
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/feature/US5
-            */
         } else if (id == R.id.menu_gps) {
             enableGPS();
 

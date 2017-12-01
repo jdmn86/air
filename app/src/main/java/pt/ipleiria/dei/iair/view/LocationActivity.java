@@ -2,26 +2,22 @@ package pt.ipleiria.dei.iair.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.multidex.MultiDex;
+import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
@@ -42,7 +38,9 @@ import pt.ipleiria.dei.iair.model.CityAssociation;
 
 public class LocationActivity extends GPSActivity {
     private ListView listViewLocations;
-    private GraphView graph;
+    private WebView graphtemperature;
+    private WebView graphHumity;
+    private WebView graphPressure;
     private TabLayout tabLayout;
     private ArrayList<LinearLayout> linearLayouts = new ArrayList();
     private LinearLayout loadingScreen;
@@ -51,11 +49,7 @@ public class LocationActivity extends GPSActivity {
     public List<String> cityNames;
     public Context context;
 
-    @Override
-    protected void attachBaseContext(Context context) {
-        super.attachBaseContext(context);
-        MultiDex.install(this);
-    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +67,7 @@ public class LocationActivity extends GPSActivity {
                showLoading(true);
                 ThinkSpeak.INSTANCE.getGraphURL(new HttpCallBack() {
                    @Override
-                   public void onResult(JSONObject response) throws JSONException {
+                   public void onResult(JSONObject response) {
                        /*
                        //data incoming
                        System.out.println(response.toString());
@@ -113,11 +107,37 @@ public class LocationActivity extends GPSActivity {
 
                        }*/
 
-                       showLoading(false);
+
+
                    }
 
                    @Override
                    public void onResult(String response) {
+                       String[] URLparts = response.split("<key>");
+                       Display display = getWindowManager().getDefaultDisplay();
+                       Point size = new Point();
+                       display.getSize(size);
+                       //String html = URLparts[0] + "1" + URLparts[1];
+                       graphtemperature.clearView();
+                       graphHumity.clearView();
+                       graphPressure.clearView();
+                       graphtemperature.setWebChromeClient(new WebChromeClient());
+                       graphtemperature.setWebViewClient(new WebViewClient());
+                       graphtemperature.getSettings().setJavaScriptEnabled(true);
+                       graphtemperature.loadData("<iframe width=\""+ size.x + "\" height=\"260\" style=\"border: 1px solid #cccccc;\" src=\"" + URLparts[0] + "1" + URLparts[1] + "\" ></iframe>\"", "text/html", null);
+
+                       graphHumity.setWebChromeClient(new WebChromeClient());
+                       graphHumity.setWebViewClient(new WebViewClient());
+                       graphHumity.getSettings().setJavaScriptEnabled(true);
+                       graphHumity.loadData("<iframe width=\""+ size.x + "\" height=\"260\" style=\"border: 1px solid #cccccc;\" src=\"" + URLparts[0] + "2" + URLparts[1] + "\" ></iframe>\"", "text/html", null);
+
+                       graphPressure.setWebChromeClient(new WebChromeClient());
+                       graphPressure.setWebViewClient(new WebViewClient());
+                       graphPressure.getSettings().setJavaScriptEnabled(true);
+                       graphPressure.loadData("<iframe width=\""+ size.x + "\" height=\"260\" style=\"border: 1px solid #cccccc;\" src=\"" + URLparts[0] + "3" + URLparts[1] + "\" ></iframe>\"", "text/html", null);
+
+
+                       showLoading(false);
 
                    }
                }, context, cityNames.get(position));
@@ -167,13 +187,16 @@ public class LocationActivity extends GPSActivity {
     private void bindLayoutElements()
     {
 
-        //graph = (GraphView) findViewById(R.id.graphAirQuality);
+        graphtemperature = (WebView) findViewById(R.id.graph_temperature);
+        graphHumity = (WebView) findViewById(R.id.graph_humity);
+        graphPressure = (WebView) findViewById(R.id.graph_pressure);
         tabLayout = (TabLayout) findViewById(R.id.tabLayoutLocationActivity);
         linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityGraphical));
         linearLayouts.add((LinearLayout) findViewById(R.id.linearLayoutlocationActivityList));
         locationsSpinner = (Spinner) findViewById(R.id.spinnerLocationList);
         listViewData = (ListView) findViewById(R.id.listViewData);
         loadingScreen = (LinearLayout) findViewById(R.id.linearLayoutLoadingLocationActivity);
+
 
     }
 

@@ -62,6 +62,21 @@
         android:layout_weight="0">
 
         <LinearLayout
+            android:id="@+id/linearLayoutlocationActivityList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:orientation="vertical">
+
+            <ListView
+                android:id="@+id/listViewData"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </ListView>
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/linearLayoutlocationActivityGraphical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -95,21 +110,6 @@
                 </LinearLayout>
             </ScrollView>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayoutlocationActivityList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0"
-            android:orientation="vertical">
-
-            <ListView
-                android:id="@+id/listViewData"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </ListView>
         </LinearLayout>
 
     </FrameLayout>
