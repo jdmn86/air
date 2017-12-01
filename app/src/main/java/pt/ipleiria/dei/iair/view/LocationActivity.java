@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
@@ -68,47 +69,6 @@ public class LocationActivity extends GPSActivity {
                 ThinkSpeak.INSTANCE.getGraphURL(new HttpCallBack() {
                    @Override
                    public void onResult(JSONObject response) {
-                       /*
-                       //data incoming
-                       System.out.println(response.toString());
-                       JSONArray feeds = response.getJSONArray("feeds");
-                       LineGraphSeries<DataPoint> seriesTemperature = new LineGraphSeries<>(new DataPoint[]{});
-                       LineGraphSeries<DataPoint> seriesPressure = new LineGraphSeries<>(new DataPoint[]{});
-                       LineGraphSeries<DataPoint> seriesHumity = new LineGraphSeries<>(new DataPoint[]{});
-                       if(feeds.length() != 0) {
-                           Date startDate = parseDate(feeds.getJSONObject(0).getString("created_at"));
-                           Date endDate = parseDate(feeds.getJSONObject(feeds.length()-1).getString("created_at"));
-
-
-                           for (int i = 0; i < feeds.length(); i++) {
-                               JSONObject feed = feeds.getJSONObject(i);
-                               if (!feed.getString("field1").equals("N/A"))
-                                   seriesTemperature.appendData(new DataPoint(parseDate(feed.getString("created_at")), Double.parseDouble(feed.getString("field1"))), true, 3);
-                               if (!feed.getString("field2").equals("N/A"))
-                                   seriesPressure.appendData(new DataPoint(parseDate(feed.getString("created_at")), Double.parseDouble(feed.getString("field2"))), true, 3);
-                               if (!feed.getString("field3").equals("N/A"))
-                                   seriesHumity.appendData(new DataPoint(parseDate(feed.getString("created_at")), Double.parseDouble(feed.getString("field3"))), true, 3);
-                           }
-                           graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(context));
-                           graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
-                           graph.getViewport().setYAxisBoundsManual(true);
-                           graph.getViewport().setMinY(0);
-                           graph.getViewport().setMaxY(100);
-                           graph.getViewport().setXAxisBoundsManual(true);
-                           graph.getViewport().setMinX(startDate.getTime());
-                           graph.getViewport().setMaxX(endDate.getTime());
-                           graph.getGridLabelRenderer().setHumanRounding(true);
-                           seriesTemperature.setColor(Color.RED);
-                           seriesPressure.setColor(Color.GRAY);
-                           seriesHumity.setColor(Color.BLUE);
-                           graph.addSeries(seriesTemperature);
-                           graph.addSeries(seriesPressure);
-                           graph.addSeries(seriesHumity);
-
-                       }*/
-
-
-
                    }
 
                    @Override
@@ -118,29 +78,52 @@ public class LocationActivity extends GPSActivity {
                        Point size = new Point();
                        display.getSize(size);
                        //String html = URLparts[0] + "1" + URLparts[1];
-                       graphtemperature.clearView();
-                       graphHumity.clearView();
-                       graphPressure.clearView();
+                       graphtemperature.loadUrl("about:blank");
+                       graphHumity.loadUrl("about:blank");
+                       graphPressure.loadUrl("about:blank");
                        graphtemperature.setWebChromeClient(new WebChromeClient());
                        graphtemperature.setWebViewClient(new WebViewClient());
                        graphtemperature.getSettings().setJavaScriptEnabled(true);
-                       graphtemperature.loadData("<iframe width=\""+ size.x + "\" height=\"260\" style=\"border: 1px solid #cccccc;\" src=\"" + URLparts[0] + "1" + URLparts[1] + "\" ></iframe>\"", "text/html", null);
-
+                       graphtemperature.loadData("<iframe width=\"" + (size.x -200) + "\" height=\"250\" style=\"border: 1px solid #cccccc;\" src=\"" + URLparts[0] + "1" + URLparts[1] + "\" ></iframe>\"", "text/html", null);
+                       graphtemperature.setWebViewClient(new WebViewClient(){
+                           public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                               return true;
+                           }
+                       });
                        graphHumity.setWebChromeClient(new WebChromeClient());
                        graphHumity.setWebViewClient(new WebViewClient());
                        graphHumity.getSettings().setJavaScriptEnabled(true);
-                       graphHumity.loadData("<iframe width=\""+ size.x + "\" height=\"260\" style=\"border: 1px solid #cccccc;\" src=\"" + URLparts[0] + "2" + URLparts[1] + "\" ></iframe>\"", "text/html", null);
-
+                       graphHumity.loadData("<iframe width=\""+ (size.x -20) + "\" height=\"250\" style=\"border: 1px solid #cccccc;\" src=\"" + URLparts[0] + "2" + URLparts[1] + "\" ></iframe>\"", "text/html", null);
+                       graphHumity.setWebViewClient(new WebViewClient(){
+                           public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                               return true;
+                           }
+                       });
                        graphPressure.setWebChromeClient(new WebChromeClient());
                        graphPressure.setWebViewClient(new WebViewClient());
                        graphPressure.getSettings().setJavaScriptEnabled(true);
-                       graphPressure.loadData("<iframe width=\""+ size.x + "\" height=\"260\" style=\"border: 1px solid #cccccc;\" src=\"" + URLparts[0] + "3" + URLparts[1] + "\" ></iframe>\"", "text/html", null);
-
+                       graphPressure.loadData("<iframe width=\""+ (size.x -100) + "\" height=\"250\" style=\"border: 1px solid #cccccc;\" src=\"" + URLparts[0] + "3" + URLparts[1] + "\" ></iframe>\"", "text/html", null);
+                       graphPressure.setWebViewClient(new WebViewClient(){
+                           public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                               return true;
+                           }
+                       });
 
                        showLoading(false);
 
                    }
                }, context, cityNames.get(position));
+                ThinkSpeak.INSTANCE.getData(new HttpCallBack() {
+                    @Override
+                    public void onResult(JSONObject response) throws JSONException {
+
+                    }
+
+                    @Override
+                    public void onResult(String response) {
+
+                    }
+                }, context, cityNames.get(position));
             }
 
             @Override

@@ -57,24 +57,3 @@ public class IairService extends Service {
 
     }
 }
-
-
-    /*
-    public IairService() {
-        populateIairManager();
-    }
-
-    public void populateIairManager() {
-        LinkedList<CityAssociation> cityAssociations = new LinkedList<>();
-        ThinkSpeak.getThingDataAssociations(new AlertCallback() {
-            @Override
-            public void onResult(List<Alerts> alert) {
-
-            }
-
-            @Override
-            public void onResult(LinkedList<CityAssociation> cityAssociations) {
-                IAirManager.INSTANCE.CityAssociation(cityAssociations);
-            }
-        }, this);
-    }*/
