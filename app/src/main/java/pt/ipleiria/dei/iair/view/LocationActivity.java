@@ -157,9 +157,13 @@ public class LocationActivity extends GPSActivity {
                             sensorDataAdapter = new SensorDataAdapter(context, R.layout.list_item_sensors_data, channels);
                             listViewData.setAdapter(sensorDataAdapter);
                         }
-                        sensorDataAdapter.clear();
+                        else {
+                            sensorDataAdapter.clear();
                             sensorDataAdapter.addAll(channels);
                             sensorDataAdapter.notifyDataSetChanged();
+                        }
+                        if(locationsSpinner.getSelectedItemPosition() !=1)
+                            linearLayouts.get(1).setVisibility(View.INVISIBLE);
 
 
                     }
@@ -182,6 +186,8 @@ public class LocationActivity extends GPSActivity {
                             customAdapter.clear();
                             customAdapter.addAll(alert);
                             customAdapter.notifyDataSetChanged();
+                            if(locationsSpinner.getSelectedItemPosition() !=2)
+                                linearLayouts.get(2).setVisibility(View.INVISIBLE);
 
                     }
 
