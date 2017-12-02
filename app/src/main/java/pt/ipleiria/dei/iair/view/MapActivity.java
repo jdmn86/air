@@ -62,7 +62,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
 
 
     private LatLng location;
-    private String locationName = null;
+    private String locationName = "";
     private int sendLocation;
 
 
@@ -233,22 +233,19 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             finish();
 
         } else if (id == R.id.menu_send_data) {
-            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName());
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName().toString());
 
             String temp = IAirManager.INSTANCE.getTemperature();
             String press = IAirManager.INSTANCE.getPresure();
             String hum = IAirManager.INSTANCE.getHumity();
 
-            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
-
             if (city != null) {
 
-                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(), String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude), String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
+                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
                 //channel=IAirManager.INSTANCE.getChannel(local);
                 ThinkSpeak.INSTANCE.insertInChannel(channel, this);
-
+                Toast.makeText(this, "The sensors data was send", Toast.LENGTH_LONG).show();
             }
-
 
         } else if (id == R.id.menu_gps) {
 

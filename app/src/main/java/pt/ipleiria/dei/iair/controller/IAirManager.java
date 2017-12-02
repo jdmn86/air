@@ -93,13 +93,6 @@ public enum IAirManager {
         listChannel.add(channel);
     }
 
-
-    public void setCityAssociation(LinkedList<CityAssociation> cityAssociation) {
-        this.listCityAssotiation = cityAssociation;
-    }
-
-
-
     public String getHumity() {
         return humity;
     }

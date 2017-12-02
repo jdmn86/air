@@ -653,10 +653,7 @@ public enum ThinkSpeak {
     }
 
     public List<Alerts> alerts;
-    public static void getThingDataAlertsLast(final AlertCallBack callback, CityAssociation city, Context context) {
     public void getThingDataAlertsLast(final AlertCallback callback, CityAssociation city, Context context) {
-
-
 
         HttpUtils.Get(new HttpCallBack() {
             @Override

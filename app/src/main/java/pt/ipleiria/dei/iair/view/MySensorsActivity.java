@@ -109,27 +109,20 @@ public class MySensorsActivity extends GPSActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         }else if (id == R.id.menu_send_data) {
-            GPSUtils gpsUtils = new GPSUtils(this);
-            Location location = gpsUtils.getLocation();
-            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            //ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-
             CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName().toString());
 
             String temp = IAirManager.INSTANCE.getTemperature();
             String press = IAirManager.INSTANCE.getPresure();
             String hum = IAirManager.INSTANCE.getHumity();
 
-            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
-
             if (city != null) {
 
                 pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
                 //channel=IAirManager.INSTANCE.getChannel(local);
                 ThinkSpeak.INSTANCE.insertInChannel(channel, this);
-
+                Toast.makeText(MySensorsActivity.this, "The sensors data was send", Toast.LENGTH_LONG).show();
             }
-            Toast.makeText(MySensorsActivity.this, "THE sensors data was send", Toast.LENGTH_LONG).show();
+
         } else if (id == R.id.menu_gps) {
             enableGPS();
 

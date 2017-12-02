@@ -49,10 +49,6 @@
             android:value="@string/google_maps_key" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
-        <service
-            android:name=".controller.IairService"
-            android:enabled="true"
-            android:exported="true" />
 
     </application>
 

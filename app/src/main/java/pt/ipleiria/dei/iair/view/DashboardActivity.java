@@ -25,7 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.Utils.AlertCallBack;
+import pt.ipleiria.dei.iair.Utils.AlertCallback;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import android.widget.EditText;
@@ -34,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
@@ -124,11 +125,10 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
                 setCurrentLocation();
 
             }
-            //startService(new Intent(this, IairService.class));
 
             }
         }
-    }
+
     private void setSensorManager() {
         try {
             SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -281,10 +281,6 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
             intent = new Intent(this, SettingsActivity.class);
 
         } else if (id == R.id.menu_send_data) {
-            //Location location = GPSUtils.getLocation();
-            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-
             CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName().toString());
 
             String temp = IAirManager.INSTANCE.getTemperature();
@@ -296,7 +292,7 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
                 pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
                 //channel=IAirManager.INSTANCE.getChannel(local);
                 ThinkSpeak.INSTANCE.insertInChannel(channel, this);
-
+                Toast.makeText(this, "The sensors data was send", Toast.LENGTH_LONG).show();
                 putDataOnDashboard(this);
             }
 
@@ -455,7 +451,7 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
     }
 
 
-    public static void putDataOnDashboard(Context context) {
+    public static void putDataOnDashboard(final Context context) {
         Channel channel = null;
 
         if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
@@ -475,14 +471,15 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
         CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
 
         if(city!=null){
-            getThingDataAlertsLast(new AlertCallBack() {
+
+            ThinkSpeak.INSTANCE.getThingDataAlertsLast(new AlertCallback() {
 
                 @Override
                 public void onResult(List<Alerts> response) {
 
                     ArrayList<String> strings = new ArrayList<>();
 
-                    adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, strings);
+                    adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, strings);
 
                     if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
                         // Convert ArrayList to array
@@ -503,6 +500,11 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
                         adapter.add("No alerts available!");
                         lista.setAdapter(adapter);
                     }
+                }
+
+                @Override
+                public void onResult(LinkedList<CityAssociation> cityAssociations) {
+
                 }
             }, city,context);
 

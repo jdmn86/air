@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -16,6 +17,7 @@ import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.CityAssociation;
 
 import static pt.ipleiria.dei.iair.view.DashboardActivity.SHARED_PREFERENCES;
 
@@ -83,42 +85,19 @@ public class SettingsActivity extends GPSActivity {
             intent = new Intent(this, LocationActivity.class);
 
         } else if (id == R.id.menu_send_data) {
-            GPSUtils gpsUtils = new GPSUtils(this);
-            Location location = gpsUtils.getLocation();
-            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            /*
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName().toString());
 
+            String temp = IAirManager.INSTANCE.getTemperature();
+            String press = IAirManager.INSTANCE.getPresure();
+            String hum = IAirManager.INSTANCE.getHumity();
 
+            if (city != null) {
 
-            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
-
-
-            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temperatureSensorValue.toString(), pressureSensorValue.toString(), humiditySensorValue.toString(), locationName);
-
-            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
-
-            if (city == null) {
-                ThinkSpeak.INSTANCE.createNewChannel(locationName, this);
-                System.out.println("LOCAL :" + locationName);
-
-                city = IAirManager.INSTANCE.getCityAssociation(locationName);
-
-                System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
-                if (city != null){
-
-                    //ThinkSpeak.insertInChannel(channel,this);
-
-                    //channel=IAirManager.INSTANCE.getChannel(local);
-                    ThinkSpeak.insertInChannel(channel, this);
-                }
-
-            }else{
+                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
                 //channel=IAirManager.INSTANCE.getChannel(local);
-                ThinkSpeak.insertInChannel(channel, this);
+                ThinkSpeak.INSTANCE.insertInChannel(channel, this);
+                Toast.makeText(this, "The sensors data was send", Toast.LENGTH_LONG).show();
             }
-
-            */
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
