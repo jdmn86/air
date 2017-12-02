@@ -34,7 +34,7 @@ public class GPSUtils extends Service implements LocationListener {
 
     boolean checkNetwork = false;
 
-    private boolean canGetLocation=false;
+    private boolean canGetLocation = false;
 
     Location loc;
     double latitude;
@@ -204,11 +204,8 @@ public class GPSUtils extends Service implements LocationListener {
     }
 
 
-
-
-
-    public static List<Address> getLocationDetails(Context context, double latitude, double longitude) {
-        Log.d("APPSENSORS","LONGITUDE" + longitude);
+    public List<Address> getLocationDetails(Context context, double latitude, double longitude) {
+        Log.d("APPSENSORS", "LONGITUDE" + longitude);
         //latitude = 39.753396;
         //longitude = -8.807000;
         Geocoder geocoder;

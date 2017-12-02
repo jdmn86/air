@@ -11,10 +11,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,15 +29,12 @@ import pt.ipleiria.dei.iair.Utils.AlertCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import android.widget.EditText;
-
 import com.google.android.gms.maps.model.LatLng;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
@@ -48,10 +46,14 @@ import pt.ipleiria.dei.iair.model.CityAssociation;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static pt.ipleiria.dei.iair.Utils.ThinkSpeak.getThingDataAlertsLast;
 
 
-public class DashboardActivity extends GetVinicityActivity{
+public class DashboardActivity extends GetVinicityActivity implements LocationListener{
+    public static final String SHARED_PREFERENCES = "Shared";
+    public static final String GOOGLE_API_KEY = "AIzaSyDw9LzBVitGvG3jPApKgFCwvwoFuUpyet8";
+    SharedPreferences preferencesRead;
+    SharedPreferences.Editor preferencesWrite;
+
 
     private TextView favouriteLocationTXT;
     private static TextView temperatureFavLocationValue;
@@ -74,7 +76,11 @@ public class DashboardActivity extends GetVinicityActivity{
     private final static int ALL_PERMISSIONS_RESULT = 101;
     private DashboardActivity context;
 
+    LocationManager mLocationManager;
+    private long lastTimestamp;
 
+
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -90,6 +96,8 @@ public class DashboardActivity extends GetVinicityActivity{
 
         bindTextViews();
 
+        lastTimestamp =  0;
+
         permissions.add(ACCESS_FINE_LOCATION);
         permissions.add(ACCESS_COARSE_LOCATION);
 
@@ -103,8 +111,20 @@ public class DashboardActivity extends GetVinicityActivity{
                 requestPermissions((String[]) permissionsToRequest.toArray(new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
             } else {
                 enableGPS();
+                mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
+                Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if(location != null && location.getTime() > Calendar.getInstance().getTimeInMillis() - 2 * 60 * 1000) {
+                    // Do something with the recent location fix
+                    //  if it is less than two minutes old,
+                    //  otherwise wait for the update below
+                }
 
                 setCurrentLocation();
+
+            }
+            //startService(new Intent(this, IairService.class));
 
             }
         }
@@ -134,11 +154,6 @@ public class DashboardActivity extends GetVinicityActivity{
         pressureFavLocationValue.setText("N/A");
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -245,11 +260,6 @@ public class DashboardActivity extends GetVinicityActivity{
     }
 
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -320,15 +330,10 @@ public class DashboardActivity extends GetVinicityActivity{
                     IAirManager.INSTANCE.setCurrentLocation(new LatLng(latitude,longitude));
                     IAirManager.INSTANCE.setCurrentLocationName(response.getJSONArray("results").getJSONObject(0).get("vicinity").toString());
 
-                    //IAirManager.INSTANCE.saveFavoriteLocation(location,locationName);
-                    //favouriteLocationTXT.setText(locationName);
-
                     if (IAirManager.INSTANCE.getFavoriteLocationName()== "null") {
 
                         dialogFavoriteLocation();
                     }
-
-
                     populate();
                 }
 
@@ -338,7 +343,7 @@ public class DashboardActivity extends GetVinicityActivity{
             public void onResult(String response) {
 
             }
-        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyDw9LzBVitGvG3jPApKgFCwvwoFuUpyet8&location="+latLng.latitude+","+latLng.longitude, this);
+        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+ "&sensor=false&type=locality&key=" + GOOGLE_API_KEY + "&location=" +latLng.latitude+","+latLng.longitude, this);
 
     }
 
@@ -450,7 +455,7 @@ public class DashboardActivity extends GetVinicityActivity{
     }
 
 
-    public static void putDataOnDashboard(final Context context) {
+    public static void putDataOnDashboard(Context context) {
         Channel channel = null;
 
         if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
@@ -515,4 +520,31 @@ public class DashboardActivity extends GetVinicityActivity{
     }
 
 
+    @Override
+    public void onLocationChanged(Location location) {
+        if(System.currentTimeMillis()> lastTimestamp +(1000*60*20)) {
+            lastTimestamp = System.currentTimeMillis();
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            IAirManager.INSTANCE.setCurrentLocation(latLng);
+            GPSUtils gpsUtils = new GPSUtils(this);
+            IAirManager.INSTANCE.setCurrentLocationName(gpsUtils.getLocationName(location.getLatitude(), location.getLongitude()));
+            getVicinity(latLng,4000);
+        }
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }

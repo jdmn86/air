@@ -17,7 +17,7 @@
     <string name="No_gps_message">No GPS Available</string>
     <string name="No_data_message">No Data Available</string>
     <string name="txt_view_favorite_location">Favorite Location:</string>
-    <string name="txt_dashboard_data">Data</string>
+    <string name="txt_dashboard_data">Data:</string>
     <string name="txtViewMsgInformative">Informative Message:</string>
     <string name="activity_dashboard_username">Username:</string>
     <string name="set_as_favorite_location">Set As Favorite Location</string>
@@ -33,7 +33,23 @@
     <string name="buttonCancelCreateInformativeMessage">Cancel</string>
     <string name="buttonSaveCreateInformativeMessage">Save</string>
     <string name="buttonSelectDateTimeCreateInformativeMessage">Select Timestamp</string>
+    <string name="buttonSelectDateTimeCreateInformativeMessage">Select Tmestamp</string>
     <string name="set_as_choose_this_location">Set As Location</string>
     <string name="choose_location">Choose Location</string>
+    <string name="list_tab">List</string>
+    <string name="graphical_tab">Graphical</string>
+    <string name="oneDay">Daily</string>
+    <string name="oneWeek">Weekly</string>
+    <string name="oneMonth">Monthly</string>
+    <string name="oneYear">Yearly</string>
+    <string name="textView_notifications">Notifications</string>
+    <string name="textView_time_interval">Time Interval</string>
+    <string name="textView_settings_graphics">Graphics</string>
+    <string name="textView_settings_alarms">Alarms</string>
+    <string name="textView_alarm_radius">Alarm Radius</string>
+    <string name="textView_favourite_location">My Favourite Location</string>
+    <string name="editText_settings_location">Location</string>
+    <string name="editText_settings_map">Map</string>
+
 
 </resources>

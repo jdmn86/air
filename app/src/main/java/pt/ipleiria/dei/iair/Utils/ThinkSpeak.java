@@ -68,8 +68,10 @@ public enum ThinkSpeak {
             Toast.makeText(context, R.string.No_gps_message, Toast.LENGTH_SHORT).show();
             return false;
         }
+        GPSUtils gpsUtils = new GPSUtils(context);
 
-          location = GPSUtils.getLocationDetails(context,latitude, longitude).get(0).getLocality();
+          location = gpsUtils.getLocationName(latitude, longitude);
+        System.out.println(location);
         HttpUtils.Get(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
@@ -134,12 +136,6 @@ public enum ThinkSpeak {
                 i += 1;
             }
 
-            //MQTTHandler mqtt = new MQTTHandler(context, "channels/361937/subscribe/json/" + API_KEY_CREATE_ASSOCIATION, "pl12taes217", "0DT1756US8QLAZUK".toCharArray());
-            //mqtt.connect();
-            //mqtt.addActionListener(new MQTTThinkSpeakHandler() {
-
-            //});
-
             HttpUtils.Post(new HttpCallBack() {
                 @Override
                 public void onResult(JSONObject response) throws JSONException {
@@ -188,7 +184,6 @@ public enum ThinkSpeak {
             @Override
             public void onResult(JSONObject response) throws JSONException {
                 JSONArray feeds = response.getJSONArray("feeds");
-                System.out.println(feeds.length());
                 if (feeds.length() != 0) {
 
                     for (int i = 0; i < feeds.length(); i++) {
@@ -254,10 +249,10 @@ public enum ThinkSpeak {
                 System.out.println(feeds.length());
                 if (feeds.length() != 0) {
 
-                    for (int i = 0; i < feeds.length(); i++) {
-                        JSONObject elem = new JSONObject( feeds.get(i).toString());
-                        if (elem.get("field2").equals(ThinkSpeak.INSTANCE.getLocation())) {
-                            HttpUtils.Get(ThinkSpeak.INSTANCE.getCallback(),"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1"), ThinkSpeak.INSTANCE.getContext());
+                        for (int i = 0; i < feeds.length(); i++) {
+                            JSONObject elem = new JSONObject( feeds.get(i).toString());
+                            if (elem.get("field2").equals(ThinkSpeak.INSTANCE.getLocation())) {
+                                HttpUtils.Get(ThinkSpeak.INSTANCE.getCallback(),"https://api.thingspeak.com/channels/" + elem.get("field3") + "/feeds.json?api_key=" + elem.get("field1"), ThinkSpeak.INSTANCE.getContext());
 
                         }
                     }
@@ -267,8 +262,8 @@ public enum ThinkSpeak {
             @Override
             public void onResult(String response) {
 
-            }
-        }, "https://api.thingspeak.com/channels/"+CHANNEL_ASSOCIATION +"/feeds.json?api_key="+ API_KEY_GET_ASSOCIATION +"", context);
+                }
+            }, "https://api.thingspeak.com/channels/"+CHANNEL_ASSOCIATION +"/feeds.json?api_key="+ API_KEY_GET_ASSOCIATION +"", context);
 
     }
 
@@ -521,43 +516,41 @@ public enum ThinkSpeak {
         }
 
     }
-    public void getThingDataAlerts(final AlertCallBack alertCallback, Context context, CityAssociation city) {
+    public void getThingDataAlerts(final AlertCallback alertCallback, Context context, CityAssociation city) {
 
-        //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
+                    //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
 
-        HttpUtils.Get(new HttpCallBack() {
-            @Override
-            public void onResult(JSONObject response) throws JSONException {
-                JSONArray feeds = response.getJSONArray("feeds");
-                List<Alerts> alerts = new LinkedList();
-                System.out.println(feeds.length());
-                if (feeds.length() != 0) {
+            HttpUtils.Get(new HttpCallBack() {
+                @Override
+                public void onResult(JSONObject response) throws JSONException {
+                    JSONArray feeds = response.getJSONArray("feeds");
+                    List<Alerts> alerts = new LinkedList();
+                    System.out.println(feeds.length());
+                    if (feeds.length() != 0) {
 
-                    for (int i = 0; i < feeds.length(); i++) {
-                        String name=response.getJSONObject("channel").getString("name");
-                        String type=feeds.getJSONObject(i).getString("field1");
-                        String message=feeds.getJSONObject(i).getString("field2");
-                        String timestamp=feeds.getJSONObject(i).getString("field3");
+                        for (int i = 0; i < feeds.length(); i++) {
+                            String name=response.getJSONObject("channel").getString("name");
+                            String type=feeds.getJSONObject(i).getString("field1");
+                            String message=feeds.getJSONObject(i).getString("field2");
+                            String timestamp=feeds.getJSONObject(i).getString("field3");
 
-                        Alerts alert = new Alerts(name,type,message,timestamp);
-                        alerts.add(alert);
+                            Alerts alert = new Alerts(name,type,message,timestamp);
+                            alerts.add(alert);
+                        }
+                        alertCallback.onResult(alerts);
                     }
-                    alertCallback.onResult(alerts);
                 }
-            }
 
-            @Override
-            public void onResult(String response) {
+                @Override
+                public void onResult(String response) {
 
-            }
-        }, "https://api.thingspeak.com/channels/"+city.getALERTS_ID()+"/feeds.json?api_key="+city.getAPI_KEY_ALERTS().toString(), context);
+                }
+            }, "https://api.thingspeak.com/channels/"+city.getALERTS_ID()+"/feeds.json?api_key="+city.getAPI_KEY_ALERTS().toString(), context);
 
     }
 
     public void getThingDataAlerts(LinkedList<CityAssociation> listaCitys, Context context) {
         for (CityAssociation city:listaCitys) {
-
-            //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
 
             HttpUtils.Get(new HttpCallBack() {
                 @Override
@@ -602,7 +595,7 @@ public enum ThinkSpeak {
                     System.out.println(feeds.length());
                     if (feeds.length() != 0) {
 
-                        for (int i =  feeds.length()-1; i >=0; i--) {
+                        for (int i = 0; i < feeds.length(); i++) {
                             //int id=response.getJSONArray("channel").getJSONObject(i).getInt("entry_id");
                             String name=response.getJSONObject("channel").getString("name");
                             String temperature=feeds.getJSONObject(i).getString("field1");
@@ -635,24 +628,17 @@ public enum ThinkSpeak {
             @Override
             public void onResult(JSONObject response) throws JSONException {
                 JSONArray feeds = response.getJSONArray("feeds");
-                //  int id=response.getInt("entry_id");
                 String name=response.getJSONObject("channel").getString("name");
                 String temperature=feeds.getJSONObject(0).getString("field1");
                 String PRESSURE=feeds.getJSONObject(0).getString("field2");
                 String HUMITY=feeds.getJSONObject(0).getString("field3");
                 String latitude=response.getJSONObject("channel").getString("latitude");
                 String longitude=response.getJSONObject("channel").getString("longitude");
-
-                // Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,id,location);
-                //IAirManager.INSTANCE.addChannel(channel);
                 System.out.println("Last channel : "+name + temperature + "etc" );
                 LatLng latLng= new LatLng(Double.parseDouble(latitude),Double.parseDouble(longitude));
-
                 Channel channel = new Channel(temperature,PRESSURE,HUMITY,name,latitude,longitude);
                 IAirManager.INSTANCE.addChannel(channel);
                 IAirManager.INSTANCE.setCityIdLast(IAirManager.INSTANCE.getAllChannels().lastIndexOf(channel));
-
-
             }
 
             @Override
@@ -661,15 +647,15 @@ public enum ThinkSpeak {
             }
         }, "https://api.thingspeak.com/channels/"+city.getCHANNEL_ID()+"/feeds/last.json?api_key="+city.getAPI_KEY_CHANNEL().toString()+"&last", context);
     }
-
-    public void getThingDataAlertsLast(CityAssociation city, Context context) {
+    public void getThingDataAlertsLast( CityAssociation city, Context context)
+    {
         getThingDataAlertsLast(null, city, context);
     }
 
     public List<Alerts> alerts;
     public static void getThingDataAlertsLast(final AlertCallBack callback, CityAssociation city, Context context) {
+    public void getThingDataAlertsLast(final AlertCallback callback, CityAssociation city, Context context) {
 
-        //CityAssociation city = IAirManager.INSTANCE.getCityAssociation(alert.getName());
 
 
         HttpUtils.Get(new HttpCallBack() {
@@ -739,10 +725,8 @@ public enum ThinkSpeak {
     public double getLongitude() {
         return longitude;
     }
-
-
-
 }
+
 
 
 

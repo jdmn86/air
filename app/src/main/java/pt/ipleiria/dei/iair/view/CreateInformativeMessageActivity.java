@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -25,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import pt.ipleiria.dei.iair.model.Alerts;
@@ -44,6 +46,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
     private TextView textViewcharacterCount;
     private Button buttonCancel;
     private ImageView imageGetMyLocation;
+    private Location currentLocation;
     private ArrayAdapter<String> adapter;
     private Spinner spinner;
     private Spinner spinner1;
@@ -93,7 +96,7 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                     textViewDescription.setText("Description: Please insert a description (at least 20 characters)");
                     flag = false;
                 }
-                if (spinnerLocations.getAdapter().getCount() == 0) {
+                if (spinnerLocations.getAdapter().getCount() == 0 || spinnerLocations.getSelectedItem().toString().length()==0){
                     textViewLocation.setTextColor(Color.RED);
                     textViewLocation.setText("Location: Please Insert A Valid Location");
                     flag = false;
@@ -206,6 +209,9 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                 }
             }
         });
+        Intent intent = getIntent();
+        spinnerLocations.setSelection(intent.getIntExtra("listPosition", 0));
+
 
     }
 
@@ -220,9 +226,6 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
                 auxLocation.setLongitude(data.getDoubleExtra("longitude", 0.0));
                 auxLocation.setLocationName(data.getStringExtra("locationName"));
                 String locationName = data.getStringExtra("locationName");
-
-                // System.out.println("location"+location);
-                System.out.println("locationName" + locationName);
 
                 if (IAirManager.INSTANCE.getCityAssociation(locationName) == null) {
 
@@ -278,6 +281,44 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
 
         } else if (id == R.id.menu_gps) {
             enableGPS();
+
+        }else if (id == R.id.menu_send_data) {
+            GPSUtils gpsUtils = new GPSUtils(this);
+            android.location.Location location = gpsUtils.getLocation();
+            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            /*
+
+
+
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+
+            pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temperatureSensorValue.toString(), pressureSensorValue.toString(), humiditySensorValue.toString(), locationName);
+
+            System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+
+            if (city == null) {
+                ThinkSpeak.INSTANCE.createNewChannel(locationName, this);
+                System.out.println("LOCAL :" + locationName);
+
+                city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+                System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+                if (city != null){
+
+                    //ThinkSpeak.insertInChannel(channel,this);
+
+                    //channel=IAirManager.INSTANCE.getChannel(local);
+                    ThinkSpeak.insertInChannel(channel, this);
+                }
+
+            }else{
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.insertInChannel(channel, this);
+            }
+
+            */
         }
 
         if (intent != null) {
@@ -344,7 +385,6 @@ public class CreateInformativeMessageActivity extends GetVinicityActivity {
     public boolean getMyLocation() {
 
         GPSUtils locationTrack = new GPSUtils(getApplicationContext());
-        ;
         if (locationTrack.getLocation() != null) {
             double longitude = locationTrack.getLongitude();
             double latitude = locationTrack.getLatitude();

@@ -41,7 +41,6 @@ public enum IAirManager {
 
     private LatLng favoriteLocationLatLng;
     private String favoriteLocationName;
-
     private String username;
 
     private LinkedList<CityAssociation> listCityAssotiation=new LinkedList<>();
@@ -124,7 +123,6 @@ public enum IAirManager {
         if(mySensorsActivity!=null)
             mySensorsActivity.setTemperatureValue(eventValues[0]);
         temperature = String.valueOf(eventValues[0]);
-        System.out.println("TEmperature:" + String.valueOf(eventValues[0]));
     }
 
     public void changeHumidityValue(float[] eventValues) {
@@ -246,6 +244,11 @@ public enum IAirManager {
         this.cityIdList = cityIdList;
     }
 
+
+    public void CityAssociation(LinkedList<CityAssociation> cityAssociations) {
+        this.listCityAssotiation = cityAssociations;
+    }
+
     public void addToListStrings(String str){
         listaStrings.add(str);
     }
@@ -272,5 +275,19 @@ public enum IAirManager {
 
     public void setCurrentLocationName(String currentLocationName) {
         this.currentLocationName = currentLocationName;
+    }
+
+    public void setCityAssociation(LinkedList<CityAssociation> cityAssociation) {
+        this.listCityAssotiation = cityAssociation;
+    }
+
+    public CityAssociation getCityAssociationsByName(String s) {
+        for (CityAssociation city: listCityAssotiation) {
+            if(s.equals(city.getREGION_NAME()))
+                return city;
+
+
+        }
+        return  null;
     }
 }

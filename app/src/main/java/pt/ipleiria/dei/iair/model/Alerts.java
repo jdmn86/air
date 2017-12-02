@@ -1,5 +1,7 @@
 package pt.ipleiria.dei.iair.model;
 
+import java.util.Date;
+
 /**
  * Created by joaonascimento on 23/11/2017.
  */
@@ -10,12 +12,18 @@ public class Alerts {
     private String type;
     private String message;
     private String timeStamp;
+    private Date date;
 
     public Alerts(String name,String type, String message,String timeStamp) {
         this.name=name;
         this.type = type;
         this.message = message;
         this.timeStamp=timeStamp;
+    }public Alerts(String name,String type, String message,Date timeStamp) {
+        this.name=name;
+        this.type = type;
+        this.message = message;
+        this.date=timeStamp;
     }
 
     public String getType() {
@@ -57,5 +65,9 @@ public class Alerts {
                 "Message Type: " + type + '\n' +
                 "Description: " + message + '\n' +
                 "When: " + timeStamp;
+    }
+
+    public Date getDate() {
+        return date;
     }
 }

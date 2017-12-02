@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
@@ -205,12 +207,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         });
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -237,10 +233,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             finish();
 
         } else if (id == R.id.menu_send_data) {
-            //Location location = GPSUtils.getLocation();
-            //  ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-
             CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName());
 
             String temp = IAirManager.INSTANCE.getTemperature();
@@ -312,8 +304,6 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
                 if (location != IAirManager.INSTANCE.getFavoriteLocationLatLng()) {
 
                     Channel channel = IAirManager.INSTANCE.getAllChannels().get(city.getChannel());
-
-                    System.out.println("CHANNEL" + channel.toString());
 
                     markericon m = new markericon(this, channel.getTemperature().toString(), channel.getPressure().toString(), channel.getHumity().toString());
 
