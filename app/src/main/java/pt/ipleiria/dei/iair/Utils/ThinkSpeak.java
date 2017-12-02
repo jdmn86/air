@@ -437,6 +437,9 @@ public enum ThinkSpeak {
 
         System.out.println("getAPI_KEY "+city.getAPI_KEY_CHANNEL().toString());
 
+
+        city.setCHANNEL_ID(String.valueOf(IAirManager.INSTANCE.getAllChannels().size()-1));
+
         HttpUtils.Post(new HttpCallBack() {
             @Override
             public void onResult(JSONObject response) throws JSONException {
@@ -673,15 +676,15 @@ public enum ThinkSpeak {
             @Override
             public void onResult(JSONObject response) throws JSONException {
                 ThinkSpeak.INSTANCE.alerts = new LinkedList<>();
-                JSONArray feeds = response.getJSONArray("channel");
+                JSONArray feeds = response.getJSONArray("feeds");
                 System.out.println(feeds.length());
                 if (feeds.length() != 0) {
 
                     for (int i = 0; i < feeds.length(); i++) {
                         String name=feeds.getJSONObject(i).getString("name");
-                        String type=feeds.getJSONObject(i).getString("field2");
-                        String message=feeds.getJSONObject(i).getString("field3");
-                        String timestamp=feeds.getJSONObject(i).getString("field4");
+                        String type=feeds.getJSONObject(i).getString("field1");
+                        String message=feeds.getJSONObject(i).getString("field2");
+                        String timestamp=feeds.getJSONObject(i).getString("field3");
 
                         Alerts alert = new Alerts(name,type,message,timestamp);
                         IAirManager.INSTANCE.addAlert(alert);

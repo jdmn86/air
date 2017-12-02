@@ -218,18 +218,23 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
         Intent intent = null;
         if (id == R.id.menu_dashboard) {
             intent = new Intent(this, DashboardActivity.class);
+            finish();
 
         } else if (id == R.id.menu_my_sensors) {
             intent = new Intent(this, MySensorsActivity.class);
+            finish();
 
         } else if (id == R.id.menu_create_message) {
             intent = new Intent(this, CreateInformativeMessageActivity.class);
+            finish();
 
         } else if (id == R.id.menu_locations) {
             intent = new Intent(this, LocationActivity.class);
+            finish();
 
         } else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
+            finish();
 
         } else if (id == R.id.menu_send_data) {
             //Location location = GPSUtils.getLocation();
@@ -298,7 +303,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
 
         }
 
-        if (IAirManager.INSTANCE.getAllCityAssociations().size() != 0) {
+        if (IAirManager.INSTANCE.getAllCityAssociations().size() != 0 && IAirManager.INSTANCE.getAllChannels().size()!=0) {
 
             for (CityAssociation city : IAirManager.INSTANCE.getAllCityAssociations()) {
 
@@ -457,7 +462,7 @@ public class MapActivity extends GPSActivity implements OnMapReadyCallback, Goog
             public void onResult(String response) {
 
             }
-        }, "https://maps.googleapis.com/maps/api/place/search/json?radius=" + String.valueOf(radius) + "&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location=" + latLng.latitude + "," + latLng.longitude, this);
+        }, "https://maps.googleapis.com/maps/api/place/search/json?radius=" + String.valueOf(radius) + "&sensor=false&type=locality&key=AIzaSyBdxSk1cxVRbL5xc_s4pEWZDVbeAMNVzEs&location=" + latLng.latitude + "," + latLng.longitude, this);
 
     }
 }
