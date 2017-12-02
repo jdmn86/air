@@ -595,7 +595,7 @@ public enum ThinkSpeak {
                     System.out.println(feeds.length());
                     if (feeds.length() != 0) {
 
-                        for (int i = 0; i < feeds.length(); i++) {
+                        for (int i = feeds.length()-1; i >=0; i--) {
                             //int id=response.getJSONArray("channel").getJSONObject(i).getInt("entry_id");
                             String name=response.getJSONObject("channel").getString("name");
                             String temperature=feeds.getJSONObject(i).getString("field1");
