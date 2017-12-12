@@ -1,29 +1,36 @@
 package pt.ipleiria.dei.iair.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Location;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.lang.reflect.Array;
+import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
+import pt.ipleiria.dei.iair.Utils.HttpCallBack;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
+import pt.ipleiria.dei.iair.model.CityAssociation;
 
 public class MySensorsActivity extends GPSActivity {
 
     private TextView temperatureSensorValue,humiditySensorValue,pressureSensorValue;
     private SensorManager sensorManager;
+    private String locationName;
+    private LatLng location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,12 +85,6 @@ public class MySensorsActivity extends GPSActivity {
         humiditySensorValue = (TextView) findViewById(R.id.textViewHumiditySensorValue);
     }
 
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -108,10 +109,20 @@ public class MySensorsActivity extends GPSActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         }else if (id == R.id.menu_send_data) {
-            GPSUtils gpsUtils = new GPSUtils(getApplicationContext());
-            Location location = gpsUtils.getLocation();
-            //ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName().toString());
+
+            String temp = IAirManager.INSTANCE.getTemperature();
+            String press = IAirManager.INSTANCE.getPresure();
+            String hum = IAirManager.INSTANCE.getHumity();
+
+            if (city != null) {
+
+                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.INSTANCE.insertInChannel(channel, this);
+                Toast.makeText(MySensorsActivity.this, "The sensors data was send", Toast.LENGTH_LONG).show();
+            }
+
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
@@ -148,4 +159,62 @@ public class MySensorsActivity extends GPSActivity {
     public String getHumidityValue() {
         return humiditySensorValue.getText().toString();
     }
+
+    public void getVicinity(LatLng latLng, int radius){
+
+        HttpUtils.Get(new HttpCallBack() {
+
+            @SuppressLint("ResourceType")
+            @Override
+            public void onResult(JSONObject response) throws JSONException {
+
+                if(response.getJSONArray("results").length()>0){
+
+                    double latitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lat").toString());
+                    double longitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lng").toString());
+
+                     location = new LatLng(latitude, longitude);
+                    locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
+
+                    CityAssociation city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+                    pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(IAirManager.INSTANCE.getTemperature(),
+                            IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity(), locationName,String.valueOf(location.latitude)
+                            ,String.valueOf(location.longitude));
+
+
+                    if (city == null) {
+
+                        ThinkSpeak.INSTANCE.createNewChannel(locationName, String.valueOf(location.latitude),String.valueOf(location.longitude),getApplicationContext());
+                        System.out.println("LOCAL :" + locationName);
+                        city = IAirManager.INSTANCE.getCityAssociation(locationName);
+
+                        System.out.println("tamanho citys:" + IAirManager.INSTANCE.getAllCityAssociations().size());
+                        if (city != null){
+
+                            //ThinkSpeak.insertInChannel(channel,this);
+
+                            //channel=IAirManager.INSTANCE.getChannel(local);
+                            ThinkSpeak.INSTANCE.insertInChannel(channel, getApplicationContext());
+                        }
+
+                    }else{
+                        //channel=IAirManager.INSTANCE.getChannel(local);
+                        ThinkSpeak.INSTANCE.insertInChannel(channel, getApplicationContext());
+                    }
+
+
+
+                }
+
+            }
+
+            @Override
+            public void onResult(String response) {
+
+            }
+        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
+
+    }
+
 }

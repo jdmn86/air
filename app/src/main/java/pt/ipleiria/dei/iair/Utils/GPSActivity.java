@@ -1,15 +1,12 @@
 package pt.ipleiria.dei.iair.Utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.LocationManager;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -34,6 +31,7 @@ public class GPSActivity extends AppCompatActivity {
     protected GoogleApiClient googleApiClient;
     public  Menu menu;
     protected void enableGPS() {
+        System.out.println("no enable");
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(getApplicationContext()) .addApi(LocationServices.API) .build(); googleApiClient.connect();
 

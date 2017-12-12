@@ -16,8 +16,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.widget.Toast;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,7 +34,7 @@ public class GPSUtils extends Service implements LocationListener {
 
     boolean checkNetwork = false;
 
-    private boolean canGetLocation=false;
+    private boolean canGetLocation = false;
 
     Location loc;
     double latitude;
@@ -47,6 +49,7 @@ public class GPSUtils extends Service implements LocationListener {
 
     public GPSUtils(Context context) {
         this.mContext = context;
+
 
     }
 
@@ -196,28 +199,28 @@ public class GPSUtils extends Service implements LocationListener {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            locationManager.removeUpdates(GPSUtils.this);
+            locationManager.removeUpdates(this);
         }
     }
 
 
-
-    public static Address getLocationDetails(Context context, double latitude, double longitude) {
-
+    public List<Address> getLocationDetails(Context context, double latitude, double longitude) {
+        Log.d("APPSENSORS", "LONGITUDE" + longitude);
+        //latitude = 39.753396;
+        //longitude = -8.807000;
         Geocoder geocoder;
-        List<Address> addresses;
+        List<Address> addresses = new LinkedList<>();
         geocoder = new Geocoder(context, Locale.getDefault());
 
         try {
             addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            return addresses.get(0);
+
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
+        return addresses;
 
     }
-
 
 
     @Override
@@ -245,5 +248,21 @@ public class GPSUtils extends Service implements LocationListener {
 
     }
 
+    public String getLocationName(double latitude, double longitude) {
+        List<Address> addresses = getLocationDetails(mContext, latitude, longitude);
+        if (addresses.isEmpty())
+            return "Other";
+        Address address = addresses.get(0);
+        if (address.getLocality() != null)
+            return address.getLocality();
+        else {
 
+            String[] localitionLine = address.getAddressLine(address.getMaxAddressLineIndex()==0 ? 0 : 1).split(" ");
+            if (localitionLine.length == 1)
+                return localitionLine[0];
+            else
+                return localitionLine[1];
+        }
+
+    }
 }

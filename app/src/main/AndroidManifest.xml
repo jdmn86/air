@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pt.ipleiria.dei.iair">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -17,18 +19,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        android:name="android.support.multidex.MultiDexApplication" >
         <activity android:name=".view.DashboardActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
         <service android:name="org.eclipse.paho.android.service.MqttService" />
+
         <activity android:name=".view.SettingsActivity" />
         <activity android:name=".view.CreateInformativeMessageActivity" />
         <activity android:name=".view.LocationActivity" />
-        <activity android:name=".view.MySensorsActivity"/>
+        <activity android:name=".view.MySensorsActivity" />
         <activity android:name=".view.MapActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -43,7 +49,7 @@
             android:value="@string/google_maps_key" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
-    </application>
 
+    </application>
 
 </manifest>

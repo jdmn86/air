@@ -1,157 +1,158 @@
 package pt.ipleiria.dei.iair.view;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.hardware.SensorManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
-import android.content.ServiceConnection;
-import android.location.Location;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import pt.ipleiria.dei.iair.R;
+import pt.ipleiria.dei.iair.Utils.AlertCallback;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import android.widget.EditText;
-
 import com.google.android.gms.maps.model.LatLng;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.nio.channels.Channel;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
-
-import pt.ipleiria.dei.iair.R;
-import pt.ipleiria.dei.iair.controller.IAirManager;
-
-import static android.app.PendingIntent.getActivity;
-
-import pt.ipleiria.dei.iair.Utils.GPSActivity;
 import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
+import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
 import pt.ipleiria.dei.iair.controller.IAirManager;
-import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
+import pt.ipleiria.dei.iair.model.Alerts;
+import pt.ipleiria.dei.iair.model.Channel;
+import pt.ipleiria.dei.iair.model.CityAssociation;
 
-import static junit.framework.Assert.fail;
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class DashboardActivity extends GPSActivity {
+
+public class DashboardActivity extends GetVinicityActivity implements LocationListener{
     public static final String SHARED_PREFERENCES = "Shared";
+    public static final String GOOGLE_API_KEY = "AIzaSyDw9LzBVitGvG3jPApKgFCwvwoFuUpyet8";
     SharedPreferences preferencesRead;
     SharedPreferences.Editor preferencesWrite;
 
-    private String txtUsername = "Username: ";
+
     private TextView favouriteLocationTXT;
-    private TextView temperatureFavLocationValue;
-    private TextView pressureFavLocationValue;
-    private TextView humidityFavLocationValue;
-    private String favLocation;
-    private TextView userNameTXT;
+    private static TextView temperatureFavLocationValue;
+    private static TextView pressureFavLocationValue;
+    private static TextView humidityFavLocationValue;
+    private TextView textViewUserName;
     private TextView txtView;
 
     private ServiceConnection connection;
 
     static final int PICK_LOCATION_REQUEST = 1;  // The request code
-    private LatLng location;
-    private String locationName;
 
+    private static ListView lista;
+    private static ArrayAdapter<String> adapter;
+
+    private ArrayList permissionsToRequest;
+    private ArrayList permissionsRejected = new ArrayList();
+    private ArrayList permissions = new ArrayList();
+
+    private final static int ALL_PERMISSIONS_RESULT = 101;
+    private DashboardActivity context;
+
+    LocationManager mLocationManager;
+    private long lastTimestamp;
+
+
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        preferencesRead =getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
-        preferencesWrite = preferencesRead.edit();
 
         super.onCreate(savedInstanceState);
-        /*try {
-            runUnitTests();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
         setContentView(R.layout.activity_dashboard);
+        setSensorManager();
+        context = this;
 
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         IAirManager.INSTANCE.setSharedPreferences(sharedPref);
-         txtView = this.findViewById(R.id.textViewFavoriteLocation);
-        txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
-        //ThinkSpeak.createNewChannel("Coimbra",40.200939, -8.407976,true,"Temperatura","Pressão","Humidade");
+
         bindTextViews();
 
-        if (IAirManager.INSTANCE.getFavoriteLocationName()== "null") {
-            textDialog();
+        lastTimestamp =  0;
+
+        permissions.add(ACCESS_FINE_LOCATION);
+        permissions.add(ACCESS_COARSE_LOCATION);
+
+        permissionsToRequest = findUnAskedPermissions(permissions);
+        //get the permissions we have asked for before but are not granted..
+        //we will store this in a global list to access later.
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            if (permissionsToRequest.size() > 0) {
+                requestPermissions((String[]) permissionsToRequest.toArray(new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
+            } else {
+                enableGPS();
+                mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
+                Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if(location != null && location.getTime() > Calendar.getInstance().getTimeInMillis() - 2 * 60 * 1000) {
+                    // Do something with the recent location fix
+                    //  if it is less than two minutes old,
+                    //  otherwise wait for the update below
+                }
+
+                setCurrentLocation();
+
+            }
+
+            }
         }
 
+    private void setSensorManager() {
+        try {
+            SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            IAirManager.INSTANCE.setSensorManager(sensorManager);
+        }catch (Exception e){
+            return;
+        }
 
-        favLocation=IAirManager.INSTANCE.getFavoriteLocationName();
-        favouriteLocationTXT.setText(favLocation);
-        userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
-        getDataLocation();
     }
 
-    private void getDataLocation() {
-        ThinkSpeak.getData(new HttpCallBack() {
-            @Override
-            public void onResult(JSONObject response) throws JSONException {
-                temperatureFavLocationValue.setText("N/A");
-                humidityFavLocationValue.setText("N/A");
-                pressureFavLocationValue.setText("N/A");
-                JSONArray feeds = response.getJSONArray("feeds");
-                if(feeds.length() == 0) {
-
-                    Toast.makeText(DashboardActivity.this,"Don't have data in your location",Toast.LENGTH_LONG).show();
-                } else {
-                    //throw Exception;
-                    //temperatureFavLocationValue.setText(String.valueOf(feeds.length()));
-
-                    for (int i = feeds.length()-1; i >= 0; i--) {
-                        JSONObject elem = (JSONObject) feeds.get(i);
-                        if (temperatureFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field1").contains("N/A"))
-                            temperatureFavLocationValue.setText(String.valueOf(elem.getString("field1")));
-                        if (pressureFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field2").contains( "N/A"))
-                            pressureFavLocationValue.setText(String.valueOf(elem.getString("field2")));
-                        if (humidityFavLocationValue.getText().toString().contains("N/A") && !elem.getString("field3").contains( "N/A"))
-                            humidityFavLocationValue.setText(elem.getString("field3"));
-                        //if(!(elem.getString("field1").equals("23") && elem.getString("field2").equals("900") && elem.getString("field3").equals("0"))) {
-                        //fail("not working because" + elem.toString());
-                        //}
-
-                    }
-                }
-            }
-
-            @Override
-            public void onResult(String response) {
-
-            }
-        }, this, favLocation);
-    }
 
     private void bindTextViews() {
         favouriteLocationTXT = findViewById(R.id.textViewFavoriteLocation);
         temperatureFavLocationValue = findViewById(R.id.textViewValueTemperature);
         pressureFavLocationValue =  findViewById(R.id.textViewValuePressure);
         humidityFavLocationValue = findViewById(R.id.textViewValueHumidity);
-        userNameTXT = findViewById(R.id.textViewUserName);
-        //listViewInformativeMessage = findViewById(R.id.listViewInformativeMessage);
-    }
+        textViewUserName = findViewById(R.id.textViewUsernamedescription);
+        txtView = this.findViewById(R.id.textViewFavoriteLocation);
+        lista= this.findViewById(R.id.listViewInformativeMessage);
 
+        temperatureFavLocationValue.setText("N/A");
+        humidityFavLocationValue.setText("N/A");
+        pressureFavLocationValue.setText("N/A");
+    }
 
 
     @Override
@@ -160,18 +161,14 @@ public class DashboardActivity extends GPSActivity {
         if (requestCode == PICK_LOCATION_REQUEST) {
             if (resultCode == RESULT_OK) { // Activity.RESULT_OK
 
-                String location = data.getStringExtra("location");
+                double latitude = data.getDoubleExtra("latitude",0.0);
+                double longitude = data.getDoubleExtra("longitude", 0.0);
                 String locationName = data.getStringExtra("locationName");
-
-                System.out.println("location" + location);
-                System.out.println("locationName" + locationName);
-
                 LatLng latLng;
-                if (location.isEmpty()) {
+                if (latitude==0.0||longitude==0.0||locationName.isEmpty()) {
                     return;
                 } else {
-                    String[] strs = location.split(";");
-                    latLng = new LatLng(Double.parseDouble(strs[0]), Double.parseDouble(strs[1]));
+                    latLng = new LatLng(latitude, longitude);
                 }
 
                 IAirManager.INSTANCE.saveFavoriteLocation(latLng, locationName);
@@ -184,17 +181,18 @@ public class DashboardActivity extends GPSActivity {
     }//onActivityResult
 
 
-    public void textDialog(){
+
+    public void dialogFavoriteLocation(){
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Alert");
         alertDialogBuilder.setMessage("Your current favorite location isn't set, please choose one option.");
 
-        alertDialogBuilder.setPositiveButton("Go To Map", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("Map", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                Intent intent = null;
+                Intent intent;
                 intent = new Intent(getApplicationContext(), MapActivity.class);
                 if (intent != null) {
                     Intent pickLocation = new Intent( getApplicationContext() , MapActivity.class );
@@ -202,39 +200,36 @@ public class DashboardActivity extends GPSActivity {
                     pickLocation.putExtra("SEND_LOCATION_REQUEST", 2);
                     startActivityForResult(pickLocation, PICK_LOCATION_REQUEST);
                 }
-                if (IAirManager.INSTANCE.getUsername() == null) {
-                    openDialogName();
-                }
-                favouriteLocationTXT.setText(getLocationFavourite());
-                Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + getActualLocation(),Toast.LENGTH_LONG).show();
+
+                favouriteLocationTXT.setText(IAirManager.INSTANCE.getFavoriteLocationName());
+                Toast.makeText(DashboardActivity.this,"Location Favourite Updated to: " + IAirManager.INSTANCE.getFavoriteLocationName(),Toast.LENGTH_LONG).show();
             }
         });
 
         alertDialogBuilder.setNegativeButton("My Current Location",new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                enableGPS();
+/*                enableGPS();
                 GPSUtils locationTrack = new GPSUtils(getApplicationContext());;
                 if (locationTrack.getLocation()!= null) {
                     double longitude = locationTrack.getLongitude();
                     double latitude = locationTrack.getLatitude();
-                    LatLng latLng=new LatLng(latitude,longitude);
+                    LatLng latLng=new LatLng(latitude,longitude);*/
 
-                    getVicinity(latLng,4000);
+                    IAirManager.INSTANCE.saveFavoriteLocation(IAirManager.INSTANCE.getCurrentLocation(),IAirManager.INSTANCE.getCurrentLocationName().toString());
+                    favouriteLocationTXT.setText(IAirManager.INSTANCE.getCurrentLocationName().toString());
 
-                    //  Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
+
+                  //  Toast.makeText(getApplicationContext(), "Longitude:" + Double.toString(longitude) + "\nLatitude:" + Double.toString(latitude), Toast.LENGTH_SHORT).show();
                 }
-                if (IAirManager.INSTANCE.getUsername() == "null") {
-                    openDialogName();
-                }
-                //Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
-            }
+               // Toast.makeText(DashboardActivity.this,"Your favourite location isn't choose",Toast.LENGTH_LONG).show();
+            //}
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
-    public void openDialogName(){
+    public void dialogUsername(){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setTitle("Insert Name");
@@ -247,66 +242,21 @@ public class DashboardActivity extends GPSActivity {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
                 IAirManager.INSTANCE.saveUsername(input.getText().toString());
-                userNameTXT.setText(txtUsername + IAirManager.INSTANCE.getUsername());
-                Toast.makeText(DashboardActivity.this, "Save your Username", Toast.LENGTH_LONG).show();
+                textViewUserName.setText(IAirManager.INSTANCE.getUsername());
+
+                Toast.makeText(DashboardActivity.this, "Username Saved", Toast.LENGTH_LONG).show();
             }
         });
         alertDialogBuilder.setNegativeButton("CANCEL",new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(DashboardActivity.this,"Your username isn't choose",Toast.LENGTH_LONG).show();
+                dialogUsername();
+                Toast.makeText(DashboardActivity.this,"Your username isn't choosen",Toast.LENGTH_LONG).show();
             }
         });
 
-
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
-    }
-
-
-
-
-
-    private String getActualLocation() {
-        GPSUtils gpsUtils = new GPSUtils(getApplicationContext());
-        Location currentLocation = gpsUtils.getLocation();
-        String actualLocation = "null";
-        try {
-            actualLocation = preferencesRead.getString("locationText", GPSUtils.getLocationDetails(this, currentLocation.getLatitude(), currentLocation.getLongitude()).getLocality());
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        return actualLocation;
-    }
-
-
-    public void saveFavouriteLocation() {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("locationFavourite", getActualLocation());
-        editor.apply();
-    }
-
-    private void saveUsername(String username) {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("userName", username);
-        editor.apply();
-    }
-
-    public String getLocationFavourite () {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-        String favLocation = sharedPreferences.getString("locationFavourite", "");
-        return  favLocation;
-    }
-
-    public String getUsername() {
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", Context.MODE_PRIVATE);
-        String username = sharedPreferences.getString("userName", "");
-        return  username;
-
     }
 
 
@@ -331,14 +281,24 @@ public class DashboardActivity extends GPSActivity {
             intent = new Intent(this, SettingsActivity.class);
 
         } else if (id == R.id.menu_send_data) {
+            CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getCurrentLocationName().toString());
 
-            //Location location = GPSUtils.getLocation();
-            ThinkSpeak.sendData(this, 39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            //ThinkSpeak.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
+            String temp = IAirManager.INSTANCE.getTemperature();
+            String press = IAirManager.INSTANCE.getPresure();
+            String hum = IAirManager.INSTANCE.getHumity();
+
+            if (city != null) {
+
+                pt.ipleiria.dei.iair.model.Channel channel = new pt.ipleiria.dei.iair.model.Channel(temp, press, hum, city.getREGION_NAME(),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().latitude),String.valueOf(IAirManager.INSTANCE.getCurrentLocation().longitude));
+                //channel=IAirManager.INSTANCE.getChannel(local);
+                ThinkSpeak.INSTANCE.insertInChannel(channel, this);
+                Toast.makeText(this, "The sensors data was send", Toast.LENGTH_LONG).show();
+                putDataOnDashboard(this);
+            }
+
+
         } else if (id == R.id.menu_gps) {
             enableGPS();
-
-
         }
         if(intent != null) {
             startActivity(intent);
@@ -347,13 +307,6 @@ public class DashboardActivity extends GPSActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
-        userNameTXT.setText(txtUsername + getUsername());
     }
 
 
@@ -370,10 +323,14 @@ public class DashboardActivity extends GPSActivity {
                     double latitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lat").toString());
                     double longitude=Double.parseDouble(response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location").get("lng").toString());
 
-                    location = new LatLng(latitude,longitude);
-                    locationName = response.getJSONArray("results").getJSONObject(0).get("vicinity").toString();
-                    IAirManager.INSTANCE.saveFavoriteLocation(location,locationName);
-                    favouriteLocationTXT.setText(locationName);
+                    IAirManager.INSTANCE.setCurrentLocation(new LatLng(latitude,longitude));
+                    IAirManager.INSTANCE.setCurrentLocationName(response.getJSONArray("results").getJSONObject(0).get("vicinity").toString());
+
+                    if (IAirManager.INSTANCE.getFavoriteLocationName()== "null") {
+
+                        dialogFavoriteLocation();
+                    }
+                    populate();
                 }
 
             }
@@ -382,10 +339,214 @@ public class DashboardActivity extends GPSActivity {
             public void onResult(String response) {
 
             }
-        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+"&sensor=false&type=locality&key=AIzaSyCel8hjaRHf6-DK0fe3KmIsXp1MMP-RYQk&location="+latLng.latitude+","+latLng.longitude, this);
+        }, "https://maps.googleapis.com/maps/api/place/search/json?radius="+String.valueOf(radius)+ "&sensor=false&type=locality&key=" + GOOGLE_API_KEY + "&location=" +latLng.latitude+","+latLng.longitude, this);
+
+    }
+
+    public void setCurrentLocation(){
+
+        GPSUtils locationTrack = new GPSUtils(this);
+
+      //  if (
+            Location loc =locationTrack.getLocation();
+            if(loc!=null){
+                double longitude = loc.getLongitude();
+                double latitude = loc.getLatitude();
+                LatLng latLng = new LatLng(latitude, longitude);
+                getVicinity(latLng,4000);
+            }
 
     }
 
 
+    private ArrayList findUnAskedPermissions(ArrayList wanted) {
+        ArrayList result = new ArrayList();
 
+        for (Object perm : wanted) {
+            if (!hasPermission((String) perm)) {
+                result.add(perm);
+            }
+        }
+        return result;
+    }
+
+    private boolean hasPermission(String permission) {
+        if (canMakeSmores()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                return (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
+            }
+        }
+        return true;
+    }
+
+    private boolean canMakeSmores() {
+        return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        switch (requestCode) {
+
+            case ALL_PERMISSIONS_RESULT:
+                for (Object perms : permissionsToRequest) {
+                    if (!hasPermission((String) perms)) {
+                        permissionsRejected.add(perms);
+                    }
+                }
+
+                if (permissionsRejected.size() > 0) {
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (shouldShowRequestPermissionRationale((String) permissionsRejected.get(0))) {
+                            showMessageOKCancel("These permissions are mandatory for the application. Please allow access.",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                requestPermissions((String[]) permissionsRejected.toArray(new String[permissionsRejected.size()]), ALL_PERMISSIONS_RESULT);
+                                            }
+                                        }
+                                    });
+                            return;
+                        }
+                    }
+
+                }
+
+                break;
+        }
+
+        enableGPS();
+
+        setCurrentLocation();
+
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new android.app.AlertDialog.Builder(this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+    public void populate(){
+
+
+        if (IAirManager.INSTANCE.getUsername()==null || IAirManager.INSTANCE.getUsername()=="null") {
+
+            dialogUsername();
+        }
+
+        textViewUserName.setText(IAirManager.INSTANCE.getUsername());
+
+        pt.ipleiria.dei.iair.model.Channel channel=null;
+
+        //carrega dados
+        ThinkSpeak.INSTANCE.getThingDataAssociations(this);
+
+    }
+
+
+    public static void putDataOnDashboard(final Context context) {
+        Channel channel = null;
+
+        if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
+
+            channel = IAirManager.INSTANCE.getChannel(IAirManager.INSTANCE.getFavoriteLocationName());
+        }
+
+        if (channel != null) {
+            if (channel.getTemperature()!=null&&!channel.getTemperature().contains("N/A"))
+                temperatureFavLocationValue.setText(channel.getTemperature());
+            if (channel.getPressure()!=null&&!channel.getPressure().contains("N/A"))
+                pressureFavLocationValue.setText(channel.getPressure());
+            if (channel.getHumity()!=null&&!channel.getHumity().contains("N/A"))
+                humidityFavLocationValue.setText(channel.getHumity());
+        }
+
+        CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
+
+        if(city!=null){
+
+            ThinkSpeak.INSTANCE.getThingDataAlertsLast(new AlertCallback() {
+
+                @Override
+                public void onResult(List<Alerts> response) {
+
+                    ArrayList<String> strings = new ArrayList<>();
+
+                    adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, strings);
+
+                    if(IAirManager.INSTANCE.getAllAlerts().size()!=0){
+                        // Convert ArrayList to array
+
+                        for (Alerts alert :response) {
+                            adapter.clear();
+                            adapter.add(alert.toString());
+                        }
+
+
+
+                        lista.setAdapter(adapter);
+                        // adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item
+
+                    }
+                    else{
+                        adapter.clear();
+                        adapter.add("No alerts available!");
+                        lista.setAdapter(adapter);
+                    }
+                }
+
+                @Override
+                public void onResult(LinkedList<CityAssociation> cityAssociations) {
+
+                }
+            }, city,context);
+
+
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        txtView.setText(IAirManager.INSTANCE.getFavoriteLocationName());
+        textViewUserName.setText(IAirManager.INSTANCE.getUsername());
+
+        putDataOnDashboard(this);
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if(System.currentTimeMillis()> lastTimestamp +(1000*60*20)) {
+            lastTimestamp = System.currentTimeMillis();
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            IAirManager.INSTANCE.setCurrentLocation(latLng);
+            GPSUtils gpsUtils = new GPSUtils(this);
+            IAirManager.INSTANCE.setCurrentLocationName(gpsUtils.getLocationName(location.getLatitude(), location.getLongitude()));
+            getVicinity(latLng,4000);
+        }
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }

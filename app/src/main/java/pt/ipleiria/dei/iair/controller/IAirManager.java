@@ -9,9 +9,12 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.LinkedList;
 
+import pt.ipleiria.dei.iair.model.Alerts;
+import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
 import pt.ipleiria.dei.iair.model.IAirSensorListener;
-import pt.ipleiria.dei.iair.view.MapActivity;
+import pt.ipleiria.dei.iair.model.Location;
+import pt.ipleiria.dei.iair.view.CreateInformativeMessageActivity;
 import pt.ipleiria.dei.iair.view.MySensorsActivity;
 
 /**
@@ -25,31 +28,69 @@ public enum IAirManager {
 
     MySensorsActivity mySensorsActivity;
 
+    CreateInformativeMessageActivity createInformativeMessageActivity;
+
     private String humity;
     private String presure;
     private String temperature;
 
-    Place favoriteLocation;
-    Place selectedPlace;
     SharedPreferences sharedPreferences;
-    LatLng favoriteLocationLatLng;
+
+    private LatLng currentLocation;
+    private String currentLocationName;
+
+    private LatLng favoriteLocationLatLng;
     private String favoriteLocationName;
     private String username;
 
     private LinkedList<CityAssociation> listCityAssotiation=new LinkedList<>();
 
+    private LinkedList<Alerts> listAlerts=new LinkedList<>();
+    private LinkedList<Channel> listChannel=new LinkedList<>();
+    private LinkedList<String> listaStrings;
+    private int cityIdList;
+
     public CityAssociation getCityAssociation(String LocationName){
 
         for (CityAssociation city:listCityAssotiation) {
-           // if(city.getName().equals(LocationName)){
-              //  return city;
-            //}
+            if(city.getREGION_NAME().equalsIgnoreCase(LocationName)){
+                return city;
+            }
         }
         return null;
     }
 
     public void addCityAssociation(CityAssociation city){
         listCityAssotiation.add(city);
+        System.out.println("City:" + city.getChannel());
+    }
+
+    public Alerts getAlerts(String alertName){
+
+        for (Alerts alert:listAlerts) {
+            if(alert.getName().equals(alertName)){
+                return alert;
+            }
+        }
+        return null;
+    }
+
+    public void addAlert(Alerts alert){
+        listAlerts.add(alert);
+    }
+
+    public Channel getChannel(String channelname){
+
+        for (Channel channel:listChannel) {
+            if(channel.getName().equals(channelname)){
+                return channel;
+            }
+        }
+        return null;
+    }
+
+    public void addChannel(Channel channel){
+        listChannel.add(channel);
     }
 
     public String getHumity() {
@@ -66,20 +107,26 @@ public enum IAirManager {
 
     public void setSensorManager(SensorManager sensorManager) {
         this.sensorManager = sensorManager;
+        setSensor(sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE));
+        setSensor(sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE));
+        setSensor(sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY));
     }
 
     public void changeTemperatureValue(float[] eventValues) {
-        mySensorsActivity.setTemperatureValue(eventValues[0]);
+        if(mySensorsActivity!=null)
+            mySensorsActivity.setTemperatureValue(eventValues[0]);
         temperature = String.valueOf(eventValues[0]);
     }
 
     public void changeHumidityValue(float[] eventValues) {
-        mySensorsActivity.setHumidityValue(eventValues[0]);
+        if(mySensorsActivity!=null)
+            mySensorsActivity.setHumidityValue(eventValues[0]);
         humity = String.valueOf(eventValues[0]);
     }
 
     public void changePressureValue(float[] eventValues) {
-        mySensorsActivity.setPressureValue(eventValues[0]);
+        if(mySensorsActivity!=null)
+            mySensorsActivity.setPressureValue(eventValues[0]);
         presure = String.valueOf(eventValues[0]);
 
     }
@@ -87,27 +134,17 @@ public enum IAirManager {
     public void setMySensorsActivity(MySensorsActivity mySensorsActivity) {
         this.mySensorsActivity = mySensorsActivity;
     }
+    public void setCreateInformativeMessageActivity(CreateInformativeMessageActivity createInformativeMessageActivity) {
+        this.createInformativeMessageActivity = createInformativeMessageActivity;
+    }
 
     public void setSensor(Sensor sensor) {
-
         sensorManager.registerListener(new IAirSensorListener(),sensor,SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    public SensorManager getSensorManager() {
-        return sensorManager;
-    }
-
-    public void setSelectedPlace(Place place) {
-        this.selectedPlace = place;
-    }
-
-    public Place getFavoriteLocation() {
-        return favoriteLocation;
-    }
 
     public void saveFavoriteLocation(LatLng latLng, String name) {
         IAirManager.INSTANCE.setFavoriteLocationName(name);
-        System.out.println("lat "+latLng.latitude+" long"+latLng.longitude);
         IAirManager.INSTANCE.setFavoriteLocation(latLng.latitude +";"+latLng.longitude);
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -120,7 +157,8 @@ public enum IAirManager {
 
 
     public void saveFavoriteLocation(Place favoriteLocation) {
-        this.favoriteLocation = favoriteLocation;
+
+        favoriteLocationName= favoriteLocation.getName().toString();
         this.favoriteLocationLatLng=favoriteLocation.getLatLng();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("favoriteLocation",favoriteLocation.getLatLng().latitude + ";" + favoriteLocation.getLatLng().longitude);
@@ -133,6 +171,7 @@ public enum IAirManager {
         this.sharedPreferences = sharedPreferences;
         setFavoriteLocation(sharedPreferences.getString("favoriteLocation","null"));
         setFavoriteLocationName(sharedPreferences.getString("favoriteLocationName","null"));
+        setUsername(sharedPreferences.getString("username","null"));
     }
 
     public LatLng getFavoriteLocationLatLng() {
@@ -166,5 +205,82 @@ public enum IAirManager {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public LinkedList<CityAssociation> getAllCityAssociations() {
+        return listCityAssotiation;
+    }
+
+    public LinkedList<Alerts> getAllAlerts() {
+        return listAlerts;
+    }
+
+    public LinkedList<Channel> getAllChannels() {
+        return listChannel;
+    }
+
+    public int getCityIdFavoriteLocation(){
+        if(listCityAssotiation.size()!=0) {
+            for (int i = 0; i < listCityAssotiation.size(); i++) {
+                if (listCityAssotiation.get(i).getREGION_NAME() == currentLocationName)
+                    return i;
+            }
+        }
+        return -1;
+    }
+
+    public int getCityIdLast() {
+        return cityIdList;
+    }
+
+    public void setCityIdLast(int cityIdList) {
+        this.cityIdList = cityIdList;
+    }
+
+
+    public void CityAssociation(LinkedList<CityAssociation> cityAssociations) {
+        this.listCityAssotiation = cityAssociations;
+    }
+
+    public void addToListStrings(String str){
+        listaStrings.add(str);
+    }
+
+    public LinkedList<String> getListaStrings() {
+        return listaStrings;
+    }
+
+    public void setListaStrings(LinkedList<String> listaStrings) {
+        this.listaStrings = listaStrings;
+    }
+
+    public LatLng getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public  void setCurrentLocation(LatLng latLng) {
+         this.currentLocation= latLng;
+    }
+
+    public String getCurrentLocationName() {
+        return currentLocationName;
+    }
+
+    public void setCurrentLocationName(String currentLocationName) {
+        this.currentLocationName = currentLocationName;
+    }
+
+    public void setCityAssociation(LinkedList<CityAssociation> cityAssociation) {
+        this.listCityAssotiation = cityAssociation;
+    }
+
+    public CityAssociation getCityAssociationsByName(String s) {
+        for (CityAssociation city: listCityAssotiation) {
+            if(s.equals(city.getREGION_NAME()))
+                return city;
+
+
+        }
+        return  null;
     }
 }
