@@ -664,7 +664,7 @@ public enum ThinkSpeak {
                 if (feeds.length() != 0) {
 
                     for (int i = 0; i < feeds.length(); i++) {
-                        String name=feeds.getJSONObject(i).getString("name");
+                        String name=response.getJSONObject("channel").getString("name");
                         String type=feeds.getJSONObject(i).getString("field1");
                         String message=feeds.getJSONObject(i).getString("field2");
                         String timestamp=feeds.getJSONObject(i).getString("field3");
