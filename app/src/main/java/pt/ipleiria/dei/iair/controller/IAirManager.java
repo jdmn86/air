@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.LinkedList;
 
+import pt.ipleiria.dei.iair.Utils.ChannelCallBack;
 import pt.ipleiria.dei.iair.model.Alerts;
 import pt.ipleiria.dei.iair.model.Channel;
 import pt.ipleiria.dei.iair.model.CityAssociation;
@@ -40,7 +41,7 @@ public enum IAirManager {
     private String currentLocationName;
 
     private LatLng favoriteLocationLatLng;
-    private String favoriteLocationName;
+    private String favoriteLocationName = "";
     private String username;
 
     private LinkedList<CityAssociation> listCityAssotiation=new LinkedList<>();
@@ -49,6 +50,9 @@ public enum IAirManager {
     private LinkedList<Channel> listChannel=new LinkedList<>();
     private LinkedList<String> listaStrings;
     private int cityIdList;
+    private ChannelCallBack channelCallBack;
+    private String channelNameWaitting;
+    
 
     public CityAssociation getCityAssociation(String LocationName){
 
@@ -91,6 +95,11 @@ public enum IAirManager {
 
     public void addChannel(Channel channel){
         listChannel.add(channel);
+        if(channelCallBack !=null && channelNameWaitting.equals(channel.getName())) {
+            channelCallBack.onResult(channel);
+            channelCallBack = null;
+            channelNameWaitting = "";
+        }
     }
 
     public String getHumity() {
@@ -282,5 +291,14 @@ public enum IAirManager {
 
         }
         return  null;
+    }
+
+    public void getChannel(String favoriteLocationName, ChannelCallBack channelCallBack) {
+        Channel channel = getChannel(favoriteLocationName);
+        if (channel != null)
+            channelCallBack.onResult(channel);
+        else
+            this.channelCallBack = channelCallBack;
+            this.channelNameWaitting = favoriteLocationName;
     }
 }
