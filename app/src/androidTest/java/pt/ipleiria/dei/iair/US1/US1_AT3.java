@@ -5,6 +5,7 @@ import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -24,6 +25,8 @@ import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -40,79 +43,112 @@ public class US1_AT3 {
 
     @Test
     public void uS1_AT3() {
+        try {
+        ViewInteraction editText = onView(
+                allOf(childAtPosition(
+                        allOf(withId(R.id.custom),
+                                childAtPosition(
+                                        withId(R.id.customPanel),
+                                        0)),
+                        0),
+                        isDisplayed()));
+        editText.perform(click());
+
+        ViewInteraction editText2 = onView(
+                allOf(childAtPosition(
+                        allOf(withId(R.id.custom),
+                                childAtPosition(
+                                        withId(R.id.customPanel),
+                                        0)),
+                        0),
+                        isDisplayed()));
+        editText2.perform(replaceText("k"), closeSoftKeyboard());
+
         ViewInteraction appCompatButton = onView(
-                allOf(withId(android.R.id.button3), withText("OK"),
+                allOf(withId(android.R.id.button1), withText("OK"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.buttonPanel),
                                         0),
-                                0)));
+                                3)));
         appCompatButton.perform(scrollTo(), click());
 
         ViewInteraction appCompatButton2 = onView(
-                allOf(withId(android.R.id.button2), withText("CANCEL"),
+                allOf(withId(android.R.id.button2), withText("My Current Location"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.buttonPanel),
                                         0),
                                 2)));
         appCompatButton2.perform(scrollTo(), click());
+    } catch(Exception e)
+
+    {
+        Log.d("cathed", "no error just routine");
+    }
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
-        ViewInteraction linearLayout = onView(
-                allOf(childAtPosition(
+        ViewInteraction textView = onView(
+                allOf(withId(R.id.title), withText("Dashboard"),
                         childAtPosition(
-                                IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                        0),
                                 0),
-                        5),
                         isDisplayed()));
-        linearLayout.check(matches(isDisplayed()));
+        textView.check(matches(withText("Dashboard")));
 
-        ViewInteraction linearLayout2 = onView(
-                allOf(childAtPosition(
+        ViewInteraction textView2 = onView(
+                allOf(withId(R.id.title), withText("Create Inf. Message"),
                         childAtPosition(
-                                IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                        0),
                                 0),
-                        4),
                         isDisplayed()));
-        linearLayout2.check(matches(isDisplayed()));
+        textView2.check(matches(withText("Create Inf. Message")));
 
-        ViewInteraction linearLayout3 = onView(
-                allOf(childAtPosition(
+        ViewInteraction textView3 = onView(
+                allOf(withId(R.id.title), withText("Location list"),
                         childAtPosition(
-                                IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                        0),
                                 0),
-                        2),
                         isDisplayed()));
-        linearLayout3.check(matches(isDisplayed()));
+        textView3.check(matches(withText("Location list")));
 
-        ViewInteraction linearLayout4 = onView(
-                allOf(childAtPosition(
+        ViewInteraction textView4 = onView(
+                allOf(withId(R.id.title), withText("Map"),
                         childAtPosition(
-                                IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                        0),
                                 0),
-                        3),
                         isDisplayed()));
-        linearLayout4.check(matches(isDisplayed()));
+        textView4.check(matches(withText("Map")));
 
-        ViewInteraction linearLayout5 = onView(
-                allOf(childAtPosition(
+        ViewInteraction textView5 = onView(
+                allOf(withId(R.id.title), withText("My Hardware"),
                         childAtPosition(
-                                IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                        0),
                                 0),
-                        1),
                         isDisplayed()));
-        linearLayout5.check(matches(isDisplayed()));
+        textView5.check(matches(withText("My Hardware")));
 
-        ViewInteraction linearLayout6 = onView(
-                allOf(childAtPosition(
+        ViewInteraction textView6 = onView(
+                allOf(withId(R.id.title), withText("Settings"),
                         childAtPosition(
-                                IsInstanceOf.<View>instanceOf(android.widget.FrameLayout.class),
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                        0),
                                 0),
-                        0),
                         isDisplayed()));
-        linearLayout6.check(matches(isDisplayed()));
+        textView6.check(matches(withText("Settings")));
+
 
     }
 
