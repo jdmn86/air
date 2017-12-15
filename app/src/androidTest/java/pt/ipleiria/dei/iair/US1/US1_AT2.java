@@ -40,28 +40,17 @@ public class US1_AT2 {
 
     @Test
     public void uS1_AT2() {
+        //must run after US1_AT6 so the username and favorite location are set!!!
 
         ViewInteraction textView = onView(
-                allOf(withId(R.id.textViewUserName), withText("Username: teste"),
-                        childAtPosition(
-                                allOf(withId(R.id.linearLayout1),
-                                        childAtPosition(
-                                                IsInstanceOf.<View>instanceOf(android.widget.ScrollView.class),
-                                                0)),
-                                0),
+                allOf(withId(R.id.textViewUsernamedescription),
                         isDisplayed()));
-        textView.check(matches(withText("Username: teste")));
+        textView.check(matches(withText("teste")));
 
         ViewInteraction textView2 = onView(
-                allOf(withId(R.id.textViewFavoriteLocation), withText("Leiria"),
-                        childAtPosition(
-                                allOf(withId(R.id.layouy2),
-                                        childAtPosition(
-                                                withId(R.id.linearLayout1),
-                                                1)),
-                                1),
+                allOf(withId(R.id.textViewFavoriteLocation),
                         isDisplayed()));
-        textView2.check(matches(withText("Leiria")));
+        textView2.check(matches(withText("Lisbon")));
 
     }
 
