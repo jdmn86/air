@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.util.Log;
@@ -41,7 +40,6 @@ import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.AlarmsDataAdapter;
 import pt.ipleiria.dei.iair.Utils.AlertCallback;
 import pt.ipleiria.dei.iair.Utils.GPSActivity;
-import pt.ipleiria.dei.iair.Utils.GPSUtils;
 import pt.ipleiria.dei.iair.Utils.HttpCallBack;
 import pt.ipleiria.dei.iair.Utils.SensorDataAdapter;
 import pt.ipleiria.dei.iair.Utils.ThinkSpeak;
@@ -324,11 +322,6 @@ public class LocationActivity extends GPSActivity {
         }  else if (id == R.id.menu_settings) {
             intent = new Intent(this, SettingsActivity.class);
 
-        } else if (id == R.id.menu_send_data) {
-            GPSUtils gpsUtils = new GPSUtils(getApplicationContext());
-            Location location = gpsUtils.getLocation();
-            //ThinkSpeak.sendData(this,39.749495, -8.807290, IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
-            ThinkSpeak.INSTANCE.sendData(this,location.getLatitude(), location.getLongitude(), IAirManager.INSTANCE.getTemperature(), IAirManager.INSTANCE.getPresure(), IAirManager.INSTANCE.getHumity());
         } else if (id == R.id.menu_gps) {
             enableGPS();
 
