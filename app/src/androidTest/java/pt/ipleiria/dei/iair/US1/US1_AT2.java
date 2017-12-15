@@ -52,6 +52,7 @@ public class US1_AT2 {
                         isDisplayed()));
         textView2.check(matches(withText("Lisbon")));
 
+
     }
 
     private static Matcher<View> childAtPosition(
