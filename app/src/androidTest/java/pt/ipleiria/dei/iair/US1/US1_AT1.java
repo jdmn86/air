@@ -13,11 +13,11 @@ import android.view.ViewParent;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import pt.ipleiria.dei.iair.MasterTest;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.view.DashboardActivity;
 
@@ -28,21 +28,23 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static junit.framework.Assert.fail;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US1_AT3 {
+public class US1_AT1 extends MasterTest{
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
 
     @Test
-    public void uS1_AT3() {
+    public void uS1_AT1() {
         try {
         ViewInteraction editText = onView(
                 allOf(childAtPosition(
@@ -62,7 +64,7 @@ public class US1_AT3 {
                                         0)),
                         0),
                         isDisplayed()));
-        editText2.perform(replaceText("k"), closeSoftKeyboard());
+        editText2.perform(replaceText("ke"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(android.R.id.button1), withText("OK"),
@@ -89,66 +91,31 @@ public class US1_AT3 {
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
-        ViewInteraction textView = onView(
-                allOf(withId(R.id.title), withText("Dashboard"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textView.check(matches(withText("Dashboard")));
-
-        ViewInteraction textView2 = onView(
-                allOf(withId(R.id.title), withText("Create Inf. Message"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textView2.check(matches(withText("Create Inf. Message")));
-
-        ViewInteraction textView3 = onView(
+        ViewInteraction appCompatTextView = onView(
                 allOf(withId(R.id.title), withText("Location list"),
                         childAtPosition(
                                 childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                        withClassName(is("android.support.v7.view.menu.ListMenuItemView")),
                                         0),
                                 0),
                         isDisplayed()));
-        textView3.check(matches(withText("Location list")));
+        appCompatTextView.perform(click());
 
-        ViewInteraction textView4 = onView(
-                allOf(withId(R.id.title), withText("Map"),
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+
+        ViewInteraction appCompatTextView2 = onView(
+                allOf(withId(R.id.title), withText("Dashboard"),
                         childAtPosition(
                                 childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+                                        withClassName(is("android.support.v7.view.menu.ListMenuItemView")),
                                         0),
                                 0),
                         isDisplayed()));
-        textView4.check(matches(withText("Map")));
+        appCompatTextView2.perform(click());
 
-        ViewInteraction textView5 = onView(
-                allOf(withId(R.id.title), withText("My Hardware"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textView5.check(matches(withText("My Hardware")));
-
-        ViewInteraction textView6 = onView(
-                allOf(withId(R.id.title), withText("Settings"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textView6.check(matches(withText("Settings")));
-
+        if(getCurrentActivity().getClass().getName() != DashboardActivity.class.getName()) {
+            fail("Activity not Opened");
+        }
 
     }
 

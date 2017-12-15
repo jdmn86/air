@@ -1,11 +1,15 @@
 package pt.ipleiria.dei.iair.US1;
 
 
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObjectNotFoundException;
+import android.support.test.uiautomator.UiSelector;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -13,7 +17,7 @@ import android.view.ViewParent;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.core.IsInstanceOf;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,9 +25,7 @@ import org.junit.runner.RunWith;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.view.DashboardActivity;
 
-import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.replaceText;
@@ -32,18 +34,41 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static junit.framework.Assert.fail;
 import static org.hamcrest.Matchers.allOf;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class US1_AT3 {
+public class US1_AT6 {
 
     @Rule
     public ActivityTestRule<DashboardActivity> mActivityTestRule = new ActivityTestRule<>(DashboardActivity.class);
 
+    private UiDevice mDevice;
+
+    @Before
+    public void setUp() {
+        mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+    }
+
     @Test
-    public void uS1_AT3() {
+    public void uS1_AT6() {
+
+        //gps coordinates must be set to lisbon!!!
+
+        UiObject button = mDevice.findObject(new UiSelector().text("ALLOW"));
+
         try {
+            button.click();
+        } catch (UiObjectNotFoundException e) {
+            fail("Button allow not found!");
+        }
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         ViewInteraction editText = onView(
                 allOf(childAtPosition(
                         allOf(withId(R.id.custom),
@@ -62,7 +87,7 @@ public class US1_AT3 {
                                         0)),
                         0),
                         isDisplayed()));
-        editText2.perform(replaceText("k"), closeSoftKeyboard());
+        editText2.perform(replaceText("teste"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(android.R.id.button1), withText("OK"),
@@ -81,74 +106,16 @@ public class US1_AT3 {
                                         0),
                                 2)));
         appCompatButton2.perform(scrollTo(), click());
-    } catch(Exception e)
-
-    {
-        Log.d("cathed", "no error just routine");
-    }
-
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction textView = onView(
-                allOf(withId(R.id.title), withText("Dashboard"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                0),
+                allOf(withId(R.id.textViewUsernamedescription),
                         isDisplayed()));
-        textView.check(matches(withText("Dashboard")));
+        textView.check(matches(withText("teste")));
 
         ViewInteraction textView2 = onView(
-                allOf(withId(R.id.title), withText("Create Inf. Message"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                0),
+                allOf(withId(R.id.textViewFavoriteLocation),
                         isDisplayed()));
-        textView2.check(matches(withText("Create Inf. Message")));
-
-        ViewInteraction textView3 = onView(
-                allOf(withId(R.id.title), withText("Location list"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textView3.check(matches(withText("Location list")));
-
-        ViewInteraction textView4 = onView(
-                allOf(withId(R.id.title), withText("Map"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textView4.check(matches(withText("Map")));
-
-        ViewInteraction textView5 = onView(
-                allOf(withId(R.id.title), withText("My Hardware"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textView5.check(matches(withText("My Hardware")));
-
-        ViewInteraction textView6 = onView(
-                allOf(withId(R.id.title), withText("Settings"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textView6.check(matches(withText("Settings")));
-
+        textView2.check(matches(withText("Lisbon")));
 
     }
 

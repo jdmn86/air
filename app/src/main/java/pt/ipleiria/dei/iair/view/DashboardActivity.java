@@ -26,6 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import pt.ipleiria.dei.iair.R;
 import pt.ipleiria.dei.iair.Utils.AlertCallback;
+import pt.ipleiria.dei.iair.Utils.CallBack;
+import pt.ipleiria.dei.iair.Utils.ChannelCallBack;
 import pt.ipleiria.dei.iair.Utils.HttpUtils;
 import pt.ipleiria.dei.iair.controller.IAirManager;
 import android.widget.EditText;
@@ -456,17 +458,23 @@ public class DashboardActivity extends GetVinicityActivity implements LocationLi
 
         if (IAirManager.INSTANCE.getAllChannels().size() != 0) {
 
-            channel = IAirManager.INSTANCE.getChannel(IAirManager.INSTANCE.getFavoriteLocationName());
+            IAirManager.INSTANCE.getChannel(IAirManager.INSTANCE.getFavoriteLocationName(), new ChannelCallBack() {
+
+                @Override
+                public void onResult(Channel channel) {
+                    if (channel != null) {
+                        if (channel.getTemperature()!=null&&!channel.getTemperature().contains("N/A"))
+                            temperatureFavLocationValue.setText(channel.getTemperature());
+                        if (channel.getPressure()!=null&&!channel.getPressure().contains("N/A"))
+                            pressureFavLocationValue.setText(channel.getPressure());
+                        if (channel.getHumity()!=null&&!channel.getHumity().contains("N/A"))
+                            humidityFavLocationValue.setText(channel.getHumity());
+                    }
+                }
+            });
         }
 
-        if (channel != null) {
-            if (channel.getTemperature()!=null&&!channel.getTemperature().contains("N/A"))
-                temperatureFavLocationValue.setText(channel.getTemperature());
-            if (channel.getPressure()!=null&&!channel.getPressure().contains("N/A"))
-                pressureFavLocationValue.setText(channel.getPressure());
-            if (channel.getHumity()!=null&&!channel.getHumity().contains("N/A"))
-                humidityFavLocationValue.setText(channel.getHumity());
-        }
+
 
         CityAssociation city = IAirManager.INSTANCE.getCityAssociation(IAirManager.INSTANCE.getFavoriteLocationName());
 
